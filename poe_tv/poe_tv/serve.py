@@ -9,9 +9,9 @@ Bản sửa CouchSubs gửi khung hình Remote Play tới  POST /frame  khoảng
 CouchSubs chỉ chuyển nguyên các ô này sang app TV (SubtitleServer.SendRegion). Mọi quyết định
 (khi nào tra, đặt ô ở đâu, viết gì) nằm ở đây, để sửa mà không phải build lại CouchSubs.
 
-Cách tra: khi màn hình đứng yên khoảng STABLE_S giây (mở tooltip thì game dừng) và khác chỗ đã
-tra lần trước → tìm tooltip → đọc món → tra giá realm Sony → hiện ô giá cạnh tooltip.
-Màn hình đổi (đóng tooltip, chuyển món) → xóa ô.
+Cách tra: chưa có ô giá thì cứ khoảng DETECT_GAP giây tìm tooltip một lần trên khung mới nhất (game vẫn chuyển
+động sau bảng đồ nên không chờ cả màn hình đứng yên) → đọc món → tra giá realm Sony → hiện ô giá cạnh tooltip.
+Sau đó chỉ theo dõi riêng vùng tooltip: vùng đó đổi (đóng tooltip, chuyển món) thì xóa ô và tìm lại.
 """
 from __future__ import annotations
 
@@ -33,9 +33,12 @@ from . import data, parse, query, tooltip
 REGION_ID = "poe-price"
 SIG_W, SIG_H = 96, 54     # ảnh thu nhỏ để so khung hình
 PIX_DIFF = 20             # một điểm ảnh đổi hơn mức này (0–255) coi là "đổi"
-MOVE = 0.01               # tỉ lệ điểm đổi giữa 2 khung liên tiếp: trên mức này = màn hình đang động
-CHANGED = 0.02            # so với khung đã tra: trên mức này = đã sang màn hình khác
-STABLE_S = 0.6            # đứng yên bao lâu thì tra
+DETECT_GAP = 0.7          # chưa có ô giá: nghỉ bấy nhiêu giây giữa 2 lần tìm tooltip
+TT_CHANGED = 0.5          # bản đồ chữ vùng tooltip khác quá tỉ lệ này = tooltip đã đóng hoặc sang món khác
+TT_SIG = (96, 96)         # số ô của bản đồ chữ vùng tooltip
+TEXT_LEVEL = 110          # điểm ảnh sáng hơn mức này (0–255) coi là chữ
+MISS_SAVE_GAP = 30        # không thấy tooltip: cứ bấy nhiêu giây lưu lại 1 ảnh để xem
+RECENT_S = 600            # mở lại đúng món đã tra trong bấy nhiêu giây thì hiện giá cũ ngay, không tra lại
 NEXT_MS = 300             # CouchSubs gửi khung kế tiếp sau bấy nhiêu ms
 LINE = 0.026              # chiều cao một dòng chữ trên TV (tỉ lệ chiều cao màn hình)
 MAX_SAVED = 30            # số ảnh tra gần nhất giữ lại trong thư mục logs
@@ -53,6 +56,36 @@ def signature(img: np.ndarray) -> np.ndarray:
 
 def frac(a: np.ndarray, b: np.ndarray) -> float:
     return float(np.count_nonzero(np.abs(a - b) > PIX_DIFF)) / a.size
+
+
+def crop_sig(img: np.ndarray, box) -> np.ndarray:
+    """Bản đồ chữ của vùng tooltip: ô nào có chữ sáng. Nền tooltip trong suốt một phần nên game động phía sau vẫn
+    lộ ra, nhưng chỉ lờ mờ (tối), không vượt ngưỡng chữ sáng → so bản đồ chữ không bị quái/pet cử động làm nhiễu."""
+    x0, y0, x1, y1 = box
+    crop = img[y0:y1, x0:x1]
+    if crop.size == 0:
+        return np.zeros(TT_SIG[::-1], bool)
+    text = (cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY) > TEXT_LEVEL).astype(np.uint8) * 255
+    density = cv2.resize(text, TT_SIG, interpolation=cv2.INTER_AREA)
+    return density > 25
+
+
+def sig_change(a: np.ndarray, b: np.ndarray) -> float:
+    """Tỉ lệ ô chữ khác nhau giữa 2 bản đồ chữ (0 = y hệt)."""
+    return np.count_nonzero(a ^ b) / max(int(np.count_nonzero(a)), int(np.count_nonzero(b)), 50)
+
+
+def inner_box(box, W, H):
+    """Bỏ phần lề tooltip.find thêm vào (0,02 rộng, 0,01 cao): chỉ so phần chữ, nền game quanh tooltip có động cũng không sao."""
+    x0, y0, x1, y1 = box
+    mx, my = int(0.02 * W), int(0.01 * H)
+    if x1 - x0 > 3 * mx and y1 - y0 > 3 * my:
+        return (x0 + mx, y0 + my, x1 - mx, y1 - my)
+    return box
+
+
+def letters_key(text: str) -> str:
+    return "".join(ch for ch in text.lower() if ch.isalnum())
 
 
 def short_price(amount, currency) -> str:
@@ -123,23 +156,32 @@ def region(text: str, box=None) -> dict:
 
 
 class Watcher:
-    """Nhận khung hình, quyết định khi nào tra và gửi lại ô nào."""
+    """Nhận khung hình, quyết định khi nào tìm tooltip, khi nào tra giá và gửi lại ô nào.
+
+    Game vẫn chuyển động phía sau bảng đồ (21/11: màn hình động 4–15% khi đang mở tooltip), nên không chờ cả màn hình
+    đứng yên. Thay vào đó: chưa có ô giá thì cứ cách DETECT_GAP giây tìm tooltip một lần trên khung mới nhất; thấy
+    tooltip thì hiện ô và chỉ theo dõi riêng vùng tooltip đó. Vùng đó đổi (đóng tooltip, chuyển món) thì xóa ô và tìm lại.
+    """
 
     def __init__(self, D, trade=None, status="securable", log_dir=None, threaded=True, clock=time.monotonic):
         self.D, self.trade, self.status = D, trade, status
         self.log_dir, self.threaded, self.clock = log_dir, threaded, clock
         self.lock = threading.Lock()
-        self.prev = None          # khung trước
-        self.stable_since = 0.0
-        self.checked = None       # khung đã tra gần nhất
-        self.shown = None         # khung ứng với ô đang hiện trên TV
-        self.job = None           # {"sig":…, "stale": bool}
+        self.prev = None          # ảnh thu nhỏ của khung trước (chỉ để báo mức động)
+        self.latest = None        # khung mới nhất
+        self.job = None           # lần tìm/tra đang chạy: {"stale": bool}
+        self.last_done = -1e9     # lúc lần tìm gần nhất xong
+        self.shown = None         # ô đang hiện: {"box": vùng tooltip, "sig": ảnh vùng đó, "key": nội dung}
         self.pending = []         # ô chờ gửi
         self.history = deque(maxlen=20)
-        self.frames = 0           # số khung hình đã nhận (để biết CouchSubs có đang gửi không)
-        self.latest = None        # khung mới nhất (để chụp lại bằng /snap)
-        self.motion = deque(maxlen=200)   # mức động của các khung gần đây
-        self.window_frames = 0    # số khung trong chu kỳ báo trạng thái hiện tại
+        self.frames = 0
+        self.motion = deque(maxlen=200)
+        self.window_frames = 0
+        self.window_detects = 0   # số lần tìm tooltip trong chu kỳ báo trạng thái
+        self.window_found = 0
+        self.last_miss_saved = -1e9
+        self.changed_frames = 0   # số khung liên tiếp vùng tooltip khác đi (cần 2 khung mới xóa, đỡ nháy)
+        self.recent = {}          # nội dung tooltip → (lúc tra, các dòng ô giá): mở lại món vừa xem thì hiện ngay
 
     # ---- gọi từ máy chủ HTTP ----
     def on_frame(self, img: np.ndarray) -> list[dict]:
@@ -152,20 +194,21 @@ class Watcher:
         with self.lock:
             self.latest = img
             self.window_frames += 1
-            moving = 1.0 if self.prev is None else frac(sig, self.prev)
-            self.motion.append(moving)
-            if moving > MOVE:
-                self.stable_since = now
+            self.motion.append(1.0 if self.prev is None else frac(sig, self.prev))
             self.prev = sig
-            if self.shown is not None and frac(sig, self.shown) > CHANGED:
-                self.pending.append(region(""))
-                self.shown = None
-            if self.job is not None:
-                if frac(sig, self.job["sig"]) > CHANGED:
-                    self.job["stale"] = True
-            elif now - self.stable_since >= STABLE_S and (self.checked is None or frac(sig, self.checked) > CHANGED):
-                self.checked = sig
-                self.job = start = {"sig": sig, "stale": False}
+            if self.shown is not None:
+                if sig_change(crop_sig(img, self.shown["box"]), self.shown["sig"]) > TT_CHANGED:
+                    self.changed_frames += 1
+                else:
+                    self.changed_frames = 0
+                if self.changed_frames >= 2:
+                    self.pending.append(region(""))
+                    self.shown = None
+                    self.changed_frames = 0
+                    if self.job is not None:
+                        self.job["stale"] = True
+            if self.job is None and self.shown is None and now - self.last_done >= DETECT_GAP:
+                self.job = start = {"stale": False}
         if start is not None:
             if self.threaded:
                 threading.Thread(target=self._run, args=(img.copy(), start), daemon=True).start()
@@ -175,16 +218,7 @@ class Watcher:
             out, self.pending = self.pending, []
         return out
 
-    # ---- tra một món (chạy nền) ----
-    def _emit(self, job, r, shown=True):
-        with self.lock:
-            if job["stale"]:
-                return False
-            self.pending.append(r)
-            if shown:
-                self.shown = job["sig"]
-            return True
-
+    # ---- tìm tooltip và tra giá (chạy nền) ----
     def _run(self, img, job):
         t0 = time.time()
         rec = {"at": time.strftime("%H:%M:%S"), "found": False}
@@ -195,12 +229,27 @@ class Watcher:
                 return
             rec["found"] = True
             H, W = img.shape[:2]
+            inner = inner_box(tt.box, W, H)
             it = parse.parse(tt.header, tt.lines, self.D)
             q, notes = query.build(it, status=self.status)
+            key = "|".join(letters_key(x) for x in tt.header + [l.text for l in tt.lines[:6]])
             rec.update(name=it.name, base=it.base, rarity=it.rarity, notes=notes)
             title = it.name if it.rarity == "Unique" and it.name else (it.base or it.name or "?")
             wait = [title[:MAX_CHARS], "Đang tra giá…"]
-            self._emit(job, region("\n".join(wait), place(tt.box, W, H, wait)))
+            sig = crop_sig(img, inner)
+            with self.lock:
+                # OCR mất 1–2 giây: tooltip đã đóng hoặc đổi trong lúc đó thì thôi
+                if job["stale"] or self.latest is None or sig_change(crop_sig(self.latest, inner), sig) > TT_CHANGED:
+                    rec["shown"] = False
+                    return
+                self.shown = {"box": inner, "sig": sig, "key": key}
+                self.changed_frames = 0
+                cached = self.recent.get(key)
+                if cached and time.time() - cached[0] < RECENT_S:
+                    self.pending.append(region("\n".join(cached[1]), place(tt.box, W, H, cached[1])))
+                    rec.update(text=cached[1], shown=True, cached=True)
+                    return
+                self.pending.append(region("\n".join(wait), place(tt.box, W, H, wait)))
             if self.trade is None:
                 lines = [title[:MAX_CHARS], "(chưa bật tra giá)"] + note_lines(notes)[:1]
             else:
@@ -208,14 +257,19 @@ class Watcher:
                 try:
                     res = self.trade.search(q)
                     lines = price_lines(it, res, notes)
+                    with self.lock:
+                        self.recent[key] = (time.time(), lines)
                     rec["summary"] = {"total": res["total"], "url": res["url"], "cached": res.get("cached")}
                 except RateLimited as e:
                     lines = [title[:MAX_CHARS], f"Trade API bận, chờ {int(getattr(e, 'wait', 0)) + 1} giây"]
                 except Exception as e:  # mạng, 403…
                     lines = [title[:MAX_CHARS], "Lỗi tra giá", str(e)[:MAX_CHARS]]
                     rec["error"] = str(e)
-            ok = self._emit(job, region("\n".join(lines), place(tt.box, W, H, lines)))
             rec["text"] = lines
+            with self.lock:
+                ok = not job["stale"] and self.shown is not None and self.shown["key"] == key
+                if ok:
+                    self.pending.append(region("\n".join(lines), place(tt.box, W, H, lines)))
             rec["shown"] = ok
         except Exception as e:
             rec["error"] = f"{type(e).__name__}: {e}"
@@ -224,28 +278,34 @@ class Watcher:
             rec["seconds"] = round(time.time() - t0, 2)
             with self.lock:
                 self.job = None
+                self.last_done = self.clock()
                 self.history.appendleft(rec)
-            if not rec.get("found") and not rec.get("error"):
-                print(f"[{rec['at']}] màn hình đứng yên, không thấy tooltip ({rec['seconds']}s)", flush=True)
-                self._save(img, rec)
+                self.window_detects += 1
+                self.window_found += 1 if rec.get("found") else 0
             if rec.get("found") or rec.get("error"):
+                shown = "" if rec.get("shown") else "  [không hiện: tooltip đã đổi]"
                 print(f"[{rec['at']}] {rec.get('base') or ''} {rec.get('name') or ''} → "
-                      f"{' | '.join(rec.get('text', [])) or rec.get('error', '')} ({rec['seconds']}s)", flush=True)
+                      f"{' | '.join(rec.get('text', [])) or rec.get('error', '')} ({rec['seconds']}s){shown}", flush=True)
+                self._save(img, rec)
+            elif time.time() - self.last_miss_saved >= MISS_SAVE_GAP:
+                self.last_miss_saved = time.time()      # thỉnh thoảng lưu 1 ảnh không thấy tooltip để xem lại
                 self._save(img, rec)
 
     def status_line(self):
-        """Một dòng tóm tắt 10 giây vừa qua: số khung, kích thước, màn hình động bao nhiêu."""
+        """Một dòng tóm tắt 10 giây vừa qua."""
         with self.lock:
             n, self.window_frames = self.window_frames, 0
+            d, self.window_detects = self.window_detects, 0
+            f, self.window_found = self.window_found, 0
             motion = sorted(self.motion)
             self.motion.clear()
             img = self.latest
+            showing = self.shown is not None
         if not n or img is None:
             return None
         med = motion[len(motion) // 2] * 100 if motion else 0
-        low = motion[0] * 100 if motion else 0
-        return (f"[{time.strftime('%H:%M:%S')}] nhận {n} khung/10 giây, {img.shape[1]}x{img.shape[0]}, "
-                f"màn hình động: thường {med:.1f}%, ít nhất {low:.1f}% (dưới {MOVE * 100:g}% mới coi là đứng yên)")
+        return (f"[{time.strftime('%H:%M:%S')}] {n} khung/10 giây ({img.shape[1]}x{img.shape[0]}, động {med:.0f}%), "
+                f"tìm tooltip {d} lần, thấy {f}" + (" · đang hiện ô giá" if showing else ""))
 
     def snap(self):
         with self.lock:
