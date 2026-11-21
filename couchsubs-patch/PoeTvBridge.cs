@@ -3,8 +3,9 @@
 // Khung hình Remote Play được gửi tới máy chủ tra giá chạy trên cùng máy (python -m poe_tv.serve, mặc định
 // http://127.0.0.1:8788/frame). Máy chủ trả về các ô chữ (id, text, box, line); ô nào cũng chuyển nguyên sang app TV
 // bằng SubtitleServer.SendRegion. Mọi quyết định (khi nào tra, viết gì, đặt ở đâu) nằm ở máy chủ Python.
-// Bật mặc định. Máy chủ trả thêm cờ "translate" (bật/tắt dịch phụ đề tiếng Việt) và "screen" (dịch cả màn hình
-// một lần), người dùng bấm trên trang điện thoại của máy chủ. Dịch tắt thì phần đọc phụ đề không chạy (đỡ tốn máy).
+// Bật mặc định. Máy chủ giữ trạng thái bật/tắt: "price" (tra giá), "translate" (dịch phụ đề tiếng Việt), "screen"
+// (dịch cả màn hình một lần). Người dùng bấm 3 nút trong cửa sổ CouchSubs (MainView.PoeTv.cs → SetAsync). Dịch tắt
+// thì phần đọc phụ đề không chạy (đỡ tốn máy).
 // Đặt biến môi trường POE_TV=0 để chạy như CouchSubs gốc.
 
 using System.Globalization;
@@ -30,7 +31,15 @@ public sealed class PoeTvBridge : IDisposable
     private int announced;
     private volatile bool connected;
     private volatile bool translate;
+    private volatile bool price = true;
     private int screenRequests;
+    private SubtitleServer? lastServer;
+
+    /// <summary>Đã nối được máy chủ tra giá (cửa sổ PoE TV) chưa.</summary>
+    public bool Connected => connected;
+
+    /// <summary>Tra giá có đang bật không (theo máy chủ).</summary>
+    public bool PriceOn => price;
 
     /// <summary>Dịch phụ đề có đang bật không (theo cờ "translate" của máy chủ).</summary>
     public bool TranslateOn => translate;
@@ -65,8 +74,45 @@ public sealed class PoeTvBridge : IDisposable
         return !translate;
     }
 
+    /// <summary>Nút trong cửa sổ CouchSubs: đổi trạng thái trên máy chủ rồi nhận lại trạng thái mới. Không bao giờ ném lỗi.</summary>
+    public async Task SetAsync(bool? price = null, bool? translate = null, bool screen = false)
+    {
+        var query = new List<string> { "json=1" };
+        if (price is { } p) query.Add("price=" + (p ? "1" : "0"));
+        if (translate is { } t) query.Add("translate=" + (t ? "1" : "0"));
+        if (screen) query.Add("screen=1");
+        try
+        {
+            using var response = await http.GetAsync(new Uri(Endpoint, "/set?" + string.Join("&", query))).ConfigureAwait(false);
+            var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            using var document = JsonDocument.Parse(json);
+            ApplyFlags(document.RootElement);
+            connected = true;
+        }
+        catch (Exception error)
+        {
+            SubtitleLog.Write($"poe-tv: không đổi được trạng thái ({error.GetType().Name}: {error.Message})");
+        }
+    }
+
+    private void ApplyFlags(JsonElement root)
+    {
+        if (root.TryGetProperty("price", out var pr) && pr.ValueKind is JsonValueKind.True or JsonValueKind.False)
+            price = pr.ValueKind == JsonValueKind.True;
+        if (root.TryGetProperty("translate", out var tr) && tr.ValueKind is JsonValueKind.True or JsonValueKind.False)
+        {
+            var on = tr.ValueKind == JsonValueKind.True;
+            if (translate && !on) lastServer?.Clear();          // tắt dịch: xóa phụ đề đang hiện trên TV
+            if (translate != on) SubtitleLog.Write($"poe-tv: dịch phụ đề {(on ? "bật" : "tắt")}");
+            translate = on;
+        }
+        if (root.TryGetProperty("screen", out var sc) && sc.ValueKind == JsonValueKind.True)
+            Interlocked.Increment(ref screenRequests);
+    }
+
     private async Task SendAsync(Frame frame, SubtitleServer server)
     {
+        lastServer = server;
         var wait = DefaultIntervalMs;
         try
         {
@@ -86,15 +132,7 @@ public sealed class PoeTvBridge : IDisposable
             if (root.TryGetProperty("regions", out var regions) && regions.ValueKind == JsonValueKind.Array)
                 foreach (var region in regions.EnumerateArray())
                     Apply(region, server);
-            if (root.TryGetProperty("translate", out var tr) && tr.ValueKind is JsonValueKind.True or JsonValueKind.False)
-            {
-                var on = tr.ValueKind == JsonValueKind.True;
-                if (translate && !on) server.Clear();          // tắt dịch: xóa phụ đề đang hiện trên TV
-                if (translate != on) SubtitleLog.Write($"poe-tv: dịch phụ đề {(on ? "bật" : "tắt")}");
-                translate = on;
-            }
-            if (root.TryGetProperty("screen", out var sc) && sc.ValueKind == JsonValueKind.True)
-                Interlocked.Increment(ref screenRequests);
+            ApplyFlags(root);
             if (!connected)
             {
                 connected = true;

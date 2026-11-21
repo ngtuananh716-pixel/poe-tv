@@ -2,7 +2,8 @@
 # Chỉ build lại 2 DLL từ mã gốc v0.1.0-beta.70 cộng bản vá trong couchsubs-patch/:
 #   CouchSubs.Shell.dll       – móc tra giá, bật/tắt dịch, giữ tiếng Anh khi thiếu khóa AI
 #   CouchSubs.Translation.dll – lời nhắc AI dịch sang tiếng Việt
-# Hai DLL thay vào một BẢN SAO của CouchSubs beta.70 đã cài trên laptop; bản cài chính thức giữ nguyên.
+#   CouchSubs.dll             – cửa sổ chính có 3 nút: Tra giá, Dịch, Dịch cả màn hình
+# Ba DLL thay vào một BẢN SAO của CouchSubs beta.70 đã cài trên laptop; bản cài chính thức giữ nguyên.
 name: build
 
 on:
@@ -40,8 +41,10 @@ jobs:
       - name: Áp bản vá poe-tv
         run: |
           cp couchsubs-patch/PoeTvBridge.cs upstream/windows/src/CouchSubs.Shell/
+          cp couchsubs-patch/MainView.PoeTv.cs upstream/windows/src/CouchSubs.App/Views/
           git -C upstream apply --verbose ../couchsubs-patch/appcontroller.patch
           git -C upstream apply --verbose ../couchsubs-patch/aitranslator.patch
+          git -C upstream apply --verbose ../couchsubs-patch/mainview.patch
 
       - name: Build CouchSubs.Shell và CouchSubs.Translation
         run: |
@@ -51,12 +54,26 @@ jobs:
           cp out_tr/CouchSubs.Translation.dll out/
           ls -la out/CouchSubs.Shell.dll out/CouchSubs.Translation.dll
 
+      # Cửa sổ chính (WPF) build được trên Linux nhờ EnableWindowsTargeting (Directory.Build.props của CouchSubs).
+      # Các file Xbox bridge chỉ có khi build đủ bộ; tạo file rỗng để bước chép nội dung không báo thiếu.
+      - name: Build CouchSubs.App
+        run: |
+          VERSION="${UPSTREAM_TAG#v}"
+          mkdir -p upstream/windows/xbox-bridge/dist
+          touch upstream/windows/xbox-bridge/dist/bridge.cjs upstream/windows/xbox-bridge/dist/player.html upstream/windows/xbox-bridge/dist/player.js
+          dotnet build upstream/windows/src/CouchSubs.App -c Release -p:Version="$VERSION" \
+            -p:CouchSubsPacksUrl=https://couchsubs-packs.enmera.workers.dev \
+            -p:CouchSubsPacksFallbackUrl=https://couchsubs-packs.enmeraapps.com -o out_app
+          cp out_app/CouchSubs.dll out/
+          ls -la out/
+
       - uses: actions/upload-artifact@v4
         with:
           name: poe-tv-shell
           path: |
             out/CouchSubs.Shell.dll
             out/CouchSubs.Translation.dll
+            out/CouchSubs.dll
           if-no-files-found: error
           retention-days: 30
 
@@ -65,10 +82,10 @@ jobs:
         env:
           TOKEN: ${{ github.token }}
         run: |
-          mkdir dist && cp out/CouchSubs.Shell.dll out/CouchSubs.Translation.dll dist/
+          mkdir dist && cp out/CouchSubs.Shell.dll out/CouchSubs.Translation.dll out/CouchSubs.dll dist/
           cd dist
           echo "Build từ commit ${GITHUB_SHA} trên mã gốc ${UPSTREAM_TAG}" > BUILD.txt
-          sha256sum CouchSubs.Shell.dll CouchSubs.Translation.dll >> BUILD.txt
+          sha256sum CouchSubs.Shell.dll CouchSubs.Translation.dll CouchSubs.dll >> BUILD.txt
           git init -q -b dist
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

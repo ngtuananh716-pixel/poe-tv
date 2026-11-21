@@ -384,7 +384,7 @@ class Watcher:
         """Cờ gửi kèm mỗi phản hồi cho CouchSubs: dịch bật/tắt, yêu cầu dịch cả màn hình (một lần)."""
         with self.lock:
             screen, self.screen_pending = self.screen_pending, False
-            return {"translate": self.translate_on, "screen": screen}
+            return {"price": self.price_on, "translate": self.translate_on, "screen": screen}
 
     def set(self, price=None, translate=None, screen=False):
         with self.lock:
@@ -516,6 +516,8 @@ def make_handler(watcher: Watcher):
                     q = {k: v[-1] for k, v in parse_qs(qs).items()}
                     onoff = lambda k: None if k not in q else q[k] == "1"
                     watcher.set(price=onoff("price"), translate=onoff("translate"), screen=q.get("screen") == "1")
+                    if q.get("json") == "1":          # nút trong cửa sổ CouchSubs bản sửa
+                        return self._json(200, watcher.flags())
                     self.send_response(303)
                     self.send_header("Location", "/")
                     self.send_header("Content-Length", "0")
@@ -547,7 +549,8 @@ def make_handler(watcher: Watcher):
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="poe_tv.serve", description="Máy chủ tra giá cho bản sửa CouchSubs")
     ap.add_argument("--port", type=int, default=8788)
-    ap.add_argument("--host", default="0.0.0.0", help="0.0.0.0 = mở được trang bật/tắt trên điện thoại; 127.0.0.1 = chỉ máy này")
+    ap.add_argument("--host", default="127.0.0.1",
+                    help="127.0.0.1 = chỉ máy này (mặc định; bật/tắt bằng nút trong CouchSubs); 0.0.0.0 = mở thêm trang bật/tắt trên điện thoại")
     ap.add_argument("--no-trade", action="store_true", help="chỉ đọc món, không tra giá")
     ap.add_argument("--status", default="securable", help="securable = mua ngay (mặc định) | available | online | any")
     ap.add_argument("--league", default=None)

@@ -1,17 +1,19 @@
 diff --git a/windows/src/CouchSubs.Shell/AppController.cs b/windows/src/CouchSubs.Shell/AppController.cs
-index 1892b97..918f1e3 100644
+index 1892b97..529f6b7 100644
 --- a/windows/src/CouchSubs.Shell/AppController.cs
 +++ b/windows/src/CouchSubs.Shell/AppController.cs
-@@ -74,6 +74,8 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
+@@ -74,6 +74,10 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
      private IStreamSession? session;
      private IKeeper? keeper;
      private SubtitlePipeline? pipeline;
 +    /// <summary>poe-tv: tra giá món đồ PoE thay cho đọc phụ đề (PoeTvBridge.cs).</summary>
 +    private readonly PoeTvBridge poeTv = new();
++    /// <summary>poe-tv: cho 3 nút bật/tắt trong cửa sổ chính (MainView.PoeTv.cs).</summary>
++    public PoeTvBridge PoeTv => poeTv;
      /// <summary>Hattın yazı okuyucusu; ek bölgelerin tek seferlik okuması da bunu kullanır.</summary>
      private ITextReader? activeReader;
      private int extraBusy;
-@@ -2694,7 +2696,10 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
+@@ -2694,7 +2698,10 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
      {
          var local = MakeLocalTranslator();
          // Açılamayan ücretsiz motor yedek olamaz; çevrimiçi motor çeviremeyince satır yeniden denenir.
@@ -23,7 +25,7 @@ index 1892b97..918f1e3 100644
          var engine = settings.OnlineEngine;
          if (!OnlineTranslationActive || engine.StoreKey() is not { } storeKey) return local;
          // Oynanan oyunun adı modele bağlam olarak gider, önbellek de oyuna göre ayrılır. Ad kararlı oyundur (GameSense:
-@@ -2713,6 +2718,7 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
+@@ -2713,6 +2720,7 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
              online = engine.Provider() is { } provider
                  ? services.MakeAiTranslator(provider, key, provider.Model(settings.ModelFor(provider)).Id, fallback, game, settings.AiInstruction,
                      settings.GeminiPaidTier && provider == AiProvider.Gemini)
@@ -31,7 +33,7 @@ index 1892b97..918f1e3 100644
                  : services.MakeOnlineTranslator(key, fallback);
          }
          if (online is null) return local;
-@@ -2915,6 +2921,9 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
+@@ -2915,6 +2923,9 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
                  LastFrame = frame;
                  UpdateSubtitleOffTip(frameArrived: true);
              });
