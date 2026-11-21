@@ -34,6 +34,10 @@ CÀI (1 lần; cập nhật cũng làm y hệt với gói mới)
    e. Gõ 6 ký tự Passphrase hiện ở góc trái dưới TV vào app, bấm Install on the TV.
 7. Muốn dịch: trong app vào Settings > Translation, chọn Gemini, dán khóa Gemini của bạn.
 
+CÀI / CẬP NHẬT BẰNG MỘT DÒNG LỆNH (tải bản mới nhất, dùng được cả khi app đổi)
+- Mở Terminal, dán dòng dưới rồi nhấn Enter (tải khoảng 80 MB):
+  curl -fsSL https://raw.githubusercontent.com/ngtuananh716-pixel/poe-tv/main/chia-se-mac/cai-moi.sh | bash
+
 CẬP NHẬT NHANH (khi chỉ có bản sửa lõi tra giá, không cần tải lại app)
 - Mở Terminal, dán dòng dưới rồi nhấn Enter (khoảng 10-30 giây):
   curl -fsSL https://raw.githubusercontent.com/ngtuananh716-pixel/poe-tv/main/chia-se-mac/cap-nhat.sh | bash
