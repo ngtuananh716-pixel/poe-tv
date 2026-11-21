@@ -50,7 +50,7 @@ jobs:
 
       - name: Nhớ đệm thư viện Remote Play (chiaki)
         id: chiaki
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: upstream/third-party/build/CChiaki.xcframework
           key: chiaki-mac-${{ env.UPSTREAM_TAG }}-${{ hashFiles('upstream/scripts/build-chiaki-macos.sh', 'upstream/scripts/make-cchiaki-xcframework.sh') }}
@@ -60,10 +60,19 @@ jobs:
         working-directory: upstream
         run: ./scripts/build-chiaki-macos.sh
 
+      # lưu ngay (không đợi cả job thành công) để lần build sau khỏi build lại chiaki
+      - name: Lưu nhớ đệm chiaki
+        if: steps.chiaki.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: upstream/third-party/build/CChiaki.xcframework
+          key: ${{ steps.chiaki.outputs.cache-primary-key }}
+
       - name: Build app
         working-directory: upstream
         run: |
           (cd mac && xcodegen generate --quiet)
+          mkdir -p build
           set -o pipefail
           xcodebuild -project mac/CouchSubs.xcodeproj -scheme CouchSubs -configuration Release \
             -derivedDataPath build/mac CODE_SIGN_IDENTITY=- \
