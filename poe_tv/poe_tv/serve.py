@@ -137,6 +137,9 @@ class Watcher:
         self.pending = []         # ô chờ gửi
         self.history = deque(maxlen=20)
         self.frames = 0           # số khung hình đã nhận (để biết CouchSubs có đang gửi không)
+        self.latest = None        # khung mới nhất (để chụp lại bằng /snap)
+        self.motion = deque(maxlen=200)   # mức động của các khung gần đây
+        self.window_frames = 0    # số khung trong chu kỳ báo trạng thái hiện tại
 
     # ---- gọi từ máy chủ HTTP ----
     def on_frame(self, img: np.ndarray) -> list[dict]:
@@ -147,7 +150,11 @@ class Watcher:
         sig = signature(img)
         start = None
         with self.lock:
-            if self.prev is None or frac(sig, self.prev) > MOVE:
+            self.latest = img
+            self.window_frames += 1
+            moving = 1.0 if self.prev is None else frac(sig, self.prev)
+            self.motion.append(moving)
+            if moving > MOVE:
                 self.stable_since = now
             self.prev = sig
             if self.shown is not None and frac(sig, self.shown) > CHANGED:
@@ -220,10 +227,38 @@ class Watcher:
                 self.history.appendleft(rec)
             if not rec.get("found") and not rec.get("error"):
                 print(f"[{rec['at']}] màn hình đứng yên, không thấy tooltip ({rec['seconds']}s)", flush=True)
+                self._save(img, rec)
             if rec.get("found") or rec.get("error"):
                 print(f"[{rec['at']}] {rec.get('base') or ''} {rec.get('name') or ''} → "
                       f"{' | '.join(rec.get('text', [])) or rec.get('error', '')} ({rec['seconds']}s)", flush=True)
                 self._save(img, rec)
+
+    def status_line(self):
+        """Một dòng tóm tắt 10 giây vừa qua: số khung, kích thước, màn hình động bao nhiêu."""
+        with self.lock:
+            n, self.window_frames = self.window_frames, 0
+            motion = sorted(self.motion)
+            self.motion.clear()
+            img = self.latest
+        if not n or img is None:
+            return None
+        med = motion[len(motion) // 2] * 100 if motion else 0
+        low = motion[0] * 100 if motion else 0
+        return (f"[{time.strftime('%H:%M:%S')}] nhận {n} khung/10 giây, {img.shape[1]}x{img.shape[0]}, "
+                f"màn hình động: thường {med:.1f}%, ít nhất {low:.1f}% (dưới {MOVE * 100:g}% mới coi là đứng yên)")
+
+    def snap(self):
+        with self.lock:
+            img = self.latest
+        if img is None or not self.log_dir:
+            return None
+        os.makedirs(self.log_dir, exist_ok=True)
+        path = os.path.join(self.log_dir, f"snap-{time.strftime('%Y%m%d-%H%M%S')}.png")
+        ok, buf = cv2.imencode(".png", img)
+        if ok:
+            buf.tofile(path)
+            return path
+        return None
 
     def _save(self, img, rec):
         if not self.log_dir:
@@ -281,6 +316,9 @@ def make_handler(watcher: Watcher):
         def do_GET(self):
             if self.path == "/health":
                 return self._json(200, {"ok": True, "frames": watcher.frames})
+            if self.path == "/snap":
+                path = watcher.snap()
+                return self._json(200 if path else 404, {"saved": path} if path else {"error": "chưa có khung hình nào"})
             if self.path == "/last":
                 with watcher.lock:
                     return self._json(200, list(watcher.history))
@@ -318,6 +356,21 @@ def main(argv=None):
         except Exception as e:
             print(f"Chưa lấy được league ({e}); sẽ thử lại khi tra", flush=True)
     w = Watcher(D, tr, status=a.status, log_dir=a.logs or None)
+
+    def report():
+        waited = 0
+        while True:
+            time.sleep(10)
+            line = w.status_line()
+            if line:
+                print(line, flush=True)
+                waited = 0
+            else:
+                waited += 10
+                if waited in (30, 120) or (waited and waited % 600 == 0):
+                    print(f"[{time.strftime('%H:%M:%S')}] chưa nhận khung hình nào từ CouchSubs "
+                          f"(đã bấm Start translating chưa?)", flush=True)
+    threading.Thread(target=report, daemon=True).start()
     srv = ThreadingHTTPServer(("127.0.0.1", a.port), make_handler(w))
     print(f"Sẵn sàng: http://127.0.0.1:{a.port}  (Ctrl+C để dừng). Mở CouchSubs bản poe-tv rồi bấm bắt đầu.",
           flush=True)
