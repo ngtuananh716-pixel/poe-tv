@@ -59,6 +59,11 @@ def build(it: Item, status: str = "securable"):
 
     if it.rarity == "Unique":
         qq["name"], qq["type"] = it.name, it.base
+        # đồ Foulborn và đồ thường cùng tên giá khác hẳn nhau: lọc đúng loại (như Awakened PoE Trade)
+        mf = flt.setdefault("misc_filters", {"filters": {}})["filters"]
+        mf["foulborn_item"] = {"option": "true" if it.foulborn else "false"}
+        if it.foulborn:
+            notes.append("Foulborn: chưa lọc theo dòng mod đột biến, giá là món Foulborn rẻ nhất cùng tên")
         return q, notes
     if it.rarity == "Gem":
         qq["type"] = it.name

@@ -94,8 +94,7 @@ def short_price(amount, currency) -> str:
 
 def price_lines(it, result, notes) -> list[str]:
     """Nội dung ô giá: tên món, giá rẻ nhất, giá phổ biến + số món, 1 lưu ý quan trọng nhất."""
-    title = it.name if it.rarity == "Unique" and it.name else (it.base or it.name or "?")
-    lines = [title[:MAX_CHARS]]
+    lines = [it.title[:MAX_CHARS]]
     ls = [l for l in result["listings"] if l.get("amount") is not None]
     if not ls:
         lines.append("Không có món nào đang bán")
@@ -120,6 +119,8 @@ def note_lines(notes) -> list[str]:
             continue
         elif n.startswith("Không có chỉ số đáng lọc"):
             out.append("! Chỉ tra theo loại món")
+        elif n.startswith("Foulborn"):
+            out.append("! Chưa lọc dòng đột biến")
         else:
             out.append("! " + n[:MAX_CHARS - 2])
     unsure = sum(1 for n in notes if n.startswith("Dòng đọc chưa chắc"))
@@ -234,7 +235,7 @@ class Watcher:
             q, notes = query.build(it, status=self.status)
             key = "|".join(letters_key(x) for x in tt.header + [l.text for l in tt.lines[:6]])
             rec.update(name=it.name, base=it.base, rarity=it.rarity, notes=notes)
-            title = it.name if it.rarity == "Unique" and it.name else (it.base or it.name or "?")
+            title = it.title
             wait = [title[:MAX_CHARS], "Đang tra giá…"]
             sig = crop_sig(img, inner)
             with self.lock:
@@ -255,8 +256,20 @@ class Watcher:
             else:
                 from .trade import RateLimited
                 try:
-                    res = self.trade.search(q)
+                    try:
+                        res = self.trade.search(q)
+                    except RateLimited:
+                        raise
+                    except Exception:
+                        # phòng khi trade realm Sony không nhận bộ lọc foulborn_item: bỏ bộ lọc đó, tra lại 1 lần
+                        mf = q["query"].get("filters", {}).get("misc_filters", {}).get("filters", {})
+                        if mf.pop("foulborn_item", None) is None:
+                            raise
+                        rec["foulborn_filter_failed"] = True
+                        res = self.trade.search(q)
                     lines = price_lines(it, res, notes)
+                    if rec.get("foulborn_filter_failed"):
+                        lines.append("! Trade không lọc được Foulborn")
                     with self.lock:
                         self.recent[key] = (time.time(), lines)
                     rec["summary"] = {"total": res["total"], "url": res["url"], "cached": res.get("cached")}

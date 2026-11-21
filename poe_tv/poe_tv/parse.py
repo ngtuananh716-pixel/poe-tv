@@ -74,6 +74,14 @@ class Item:
     mods: list = field(default_factory=list)
     unmatched: list = field(default_factory=list)
     corrupted: bool = False
+    foulborn: bool = False      # unique "Foulborn …": có một dòng mod đột biến (từ 3.26)
+
+    @property
+    def title(self):
+        """Tên ngắn để hiện: unique thì tên riêng, đồ khác thì loại đồ."""
+        if self.rarity == "Unique" and self.name:
+            return ("Foulborn " if self.foulborn else "") + self.name
+        return self.base or self.name or "?"
 
     # ----- chỉ số tính sẵn cho vũ khí -----
     def _avg(self, key):
@@ -142,7 +150,12 @@ def parse(header: list[str], lines: list[ocr.Line], data: Data) -> Item:
         b = data.find_base(base_txt)
         it.base = b["name"] if b else base_txt.title()
         it.category = b["category"] if b else None
-        u = data.find_unique(header[0])
+        uname = header[0]
+        m = re.match(r"^\s*foulborn\s+(.+)$", uname, re.I)       # giống FOULBORN_NAME của Awakened PoE Trade
+        if m:
+            uname = m.group(1)
+        u = data.find_unique(uname)
+        it.foulborn = bool(m and u)
         it.rarity = "Unique" if u and letters(u["base"]) == letters(it.base) else "Rare"
         if it.rarity == "Unique":
             it.name = u["name"]
