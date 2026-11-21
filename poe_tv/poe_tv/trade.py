@@ -116,6 +116,38 @@ class Trade:
         return out
 
 
+    def exchange(self, tag, status="online"):
+        """Tra giá đồ bán theo lô (currency, fragment, offering, scarab…) trên sàn trao đổi: 1 lần gọi là có giá,
+        không cần bước fetch. Trả giá mỗi món tính bằng chaos và bằng divine (ai bán rẻ nhất)."""
+        league = self.pick_league()
+        have = ["divine"] if tag == "chaos" else ["chaos", "divine"]
+        body = {"engine": "new", "query": {"status": {"option": status}, "have": have, "want": [tag]},
+                "sort": {"have": "asc"}}
+        key = json.dumps(body, sort_keys=True)
+        hit = self.cache.get(key)
+        if hit and time.time() - hit[0] < CACHE_TTL:
+            return {**hit[1], "cached": True}
+        res = self._call("exchange", "POST", f"{BASE}/api/trade/exchange/{self.realm}/{league}", json=body)
+        offers = []
+        for r in (res.get("result") or {}).values():
+            lst = (r or {}).get("listing") or {}
+            if len(lst.get("offers") or []) != 1:
+                continue
+            o = lst["offers"][0]
+            if not o["item"].get("amount"):
+                continue
+            offers.append({"each": o["exchange"]["amount"] / o["item"]["amount"], "currency": o["exchange"]["currency"],
+                           "stock": o["item"].get("stock")})
+        best = {}
+        for o in offers:
+            if o["currency"] not in best or o["each"] < best[o["currency"]]["each"]:
+                best[o["currency"]] = o
+        out = {"total": res.get("total", 0), "league": league, "best": best, "sellers": len(offers),
+               "url": f"{BASE}/trade/exchange/{self.realm}/{league}/{res.get('id')}", "cached": False}
+        self.cache[key] = (time.time(), out)
+        return out
+
+
 DEFAULT_LEAGUE = "Covens"   # league 3.30; đổi khi sang league mới nếu không tự lấy được
 
 

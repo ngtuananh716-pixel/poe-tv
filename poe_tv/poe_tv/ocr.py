@@ -50,3 +50,27 @@ def read(img: np.ndarray, scale: float = 1.0) -> list[Line]:
         out.append(Line(text.strip(), min(xs), min(ys), max(xs), max(ys), float(conf)))
     out.sort(key=lambda l: (l.y0, l.x0))
     return out
+
+
+def read_fast(img: np.ndarray, det_max: int = 1280) -> list[Line]:
+    """Tìm vị trí chữ trên ảnh thu nhỏ (cạnh dài ≤ det_max, nhanh hơn), rồi đọc chữ trên các ô cắt từ ảnh GỐC
+    (không mất nét như đọc trên ảnh thu nhỏ). Bỏ bước xoay chữ vì chữ trong game luôn nằm ngang."""
+    e = engine()
+    H, W = img.shape[:2]
+    s = min(1.0, det_max / max(H, W))
+    small = img if s == 1.0 else cv2.resize(img, None, fx=s, fy=s, interpolation=cv2.INTER_AREA)
+    boxes, _ = e.text_detector(small)
+    if boxes is None or len(boxes) == 0:
+        return []
+    boxes = e.sorted_boxes(boxes)
+    full = [np.array(b, dtype=np.float32) / s for b in boxes]
+    crops = e.get_crop_img_list(img, full)
+    rec, _ = e.text_recognizer(crops)
+    out = []
+    for b, (text, conf) in zip(full, rec):
+        if float(conf) < e.text_score or not text.strip():
+            continue
+        xs, ys = b[:, 0], b[:, 1]
+        out.append(Line(text.strip(), float(xs.min()), float(ys.min()), float(xs.max()), float(ys.max()), float(conf)))
+    out.sort(key=lambda l: (l.y0, l.x0))
+    return out

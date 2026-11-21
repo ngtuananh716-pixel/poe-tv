@@ -30,15 +30,28 @@ PROP_PATTERNS = {
 }
 
 
+# Chế độ "Advanced Descriptions" (bấm R3 trong game): có thêm dòng mô tả mod và khoảng giá trị "7(6-9)"
+META_LINE = re.compile(r"^\W*(PREFIX|SUFFIX|IMPLICIT|UNIQUE|MASTER\s*CRAFTED|CRAFTED|MONSTER|ENCHANT\w*|FRACTURED|"
+                       r"CORRUPTED|FOULBORN|EATER|SEARING|SYNTHESI[SZ]ED|VEILED)\b.*\bMODIFIER\b")
+RANGE = re.compile(r"\s*\(\s*[+-]?\d+(?:\.\d+)?\s*[-–~]\s*[+-]?\d+(?:\.\d+)?\s*\)")
+
+
+def is_meta(s: str) -> bool:
+    return bool(META_LINE.match(s.upper()))
+
+
 def clean_numbers(s: str) -> str:
-    """Sửa lỗi OCR hay gặp: chữ O/I lẫn vào con số, số 1/0 lẫn vào chữ."""
+    """Sửa lỗi OCR hay gặp: chữ O/I lẫn vào con số, số 1/0 lẫn vào chữ. Bỏ khoảng giá trị "(6-9)" và đuôi
+    "— Unscalable Value" của chế độ Advanced Descriptions."""
     s = s.upper()
+    s = re.sub(r"\s*[—–-]+\s*UNSCALABLE\s*VALUE", "", s)
     s = re.sub(r"(?<=[\d.])O", "0", s)
     s = re.sub(r"(?<![A-Z])O(?=\d)", "0", s)
     s = re.sub(r"(?<![A-Z])[IL|](?=\d)", "1", s)
     s = re.sub(r"(?<=\d)[IL|](?=[\d%])", "1", s)
     s = re.sub(r"(?<=[A-Z])1(?=[A-Z])", "I", s)
     s = re.sub(r"(?<=[A-Z])0(?=[A-Z])", "O", s)
+    s = RANGE.sub("", s)
     return s
 
 
@@ -204,6 +217,8 @@ def parse(header: list[str], lines: list[ocr.Line], data: Data) -> Item:
         for r in sec:
             # mỗi hàng có thể gồm nhiều ô; thử cả hàng trước, rồi từng ô
             cands = [" ".join(l.text for l in sorted(r, key=lambda l: l.x0))] + ([l.text for l in r] if len(r) > 1 else [])
+            if is_meta(cands[0]):
+                continue            # dòng mô tả mod của chế độ Advanced Descriptions, không phải mod
             best = None
             for c in cands:
                 c = clean_numbers(c)

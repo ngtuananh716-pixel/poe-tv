@@ -33,7 +33,7 @@ from . import data, parse, query, tooltip
 REGION_ID = "poe-price"
 SIG_W, SIG_H = 96, 54     # ảnh thu nhỏ để so khung hình
 PIX_DIFF = 20             # một điểm ảnh đổi hơn mức này (0–255) coi là "đổi"
-DETECT_GAP = 0.7          # chưa có ô giá: nghỉ bấy nhiêu giây giữa 2 lần tìm tooltip
+DETECT_GAP = 0.25         # chưa có ô giá: nghỉ bấy nhiêu giây giữa 2 lần tìm tooltip
 TT_CHANGED = 0.5          # bản đồ chữ vùng tooltip khác quá tỉ lệ này = tooltip đã đóng hoặc sang món khác
 TT_SIG = (96, 96)         # số ô của bản đồ chữ vùng tooltip
 TEXT_LEVEL = 110          # điểm ảnh sáng hơn mức này (0–255) coi là chữ
@@ -107,6 +107,28 @@ def price_lines(it, result, notes) -> list[str]:
         common = max(counts.items(), key=lambda kv: kv[1])[0]
         lines.append(f"Phổ biến: {common} · {result['total']} món")
     lines.extend(note_lines(notes)[:1])
+    return lines
+
+
+def fmt_each(v: float) -> str:
+    if v >= 10:
+        return f"{v:.0f}"
+    if v >= 1:
+        return f"{v:.1f}".rstrip("0").rstrip(".")
+    return f"{v:.2f}".rstrip("0").rstrip(".")
+
+
+def bulk_lines(title, res) -> list[str]:
+    """Ô giá cho đồ bán theo lô: giá mỗi món rẻ nhất tính bằng chaos và divine, số người bán đang online."""
+    lines = [title[:MAX_CHARS]]
+    best = res.get("best") or {}
+    if not best:
+        return lines + ["Sàn trao đổi: không ai bán", "(chỉ tính người đang online)"]
+    if "chaos" in best:
+        lines.append(f"Rẻ nhất: {fmt_each(best['chaos']['each'])} c/món")
+    if "divine" in best:
+        lines.append(f"Hoặc {fmt_each(best['divine']['each'])} div/món")
+    lines.append(f"{res.get('sellers', 0)} người bán online")
     return lines
 
 
@@ -251,8 +273,23 @@ class Watcher:
                     rec.update(text=cached[1], shown=True, cached=True)
                     return
                 self.pending.append(region("\n".join(wait), place(tt.box, W, H, wait)))
+            tag = self.D.trade_tags.get(letters_key(it.name)) if it.rarity == "Other" else None
             if self.trade is None:
                 lines = [title[:MAX_CHARS], "(chưa bật tra giá)"] + note_lines(notes)[:1]
+            elif tag:
+                # đồ bán theo lô (currency, fragment, offering, scarab…): tra trên sàn trao đổi
+                from .trade import RateLimited
+                try:
+                    res = self.trade.exchange(tag)
+                    lines = bulk_lines(title, res)
+                    rec["summary"] = {"exchange": tag, "url": res["url"], "cached": res.get("cached")}
+                    with self.lock:
+                        self.recent[key] = (time.time(), lines)
+                except RateLimited as e:
+                    lines = [title[:MAX_CHARS], f"Trade API bận, chờ {int(getattr(e, 'wait', 0)) + 1} giây"]
+                except Exception as e:
+                    lines = [title[:MAX_CHARS], "Lỗi tra giá", str(e)[:MAX_CHARS]]
+                    rec["error"] = str(e)
             else:
                 from .trade import RateLimited
                 try:

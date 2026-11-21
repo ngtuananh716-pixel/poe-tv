@@ -1,6 +1,7 @@
 """Tìm vùng tooltip món đồ trong một khung hình và đọc lại cho chính xác."""
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from statistics import median
 
@@ -25,11 +26,21 @@ def _is_item_line(text: str, data: Data) -> bool:
                 or data.find_other(text))
 
 
-def find(img: np.ndarray, data: Data, detect_scale: float | None = None) -> Tooltip | None:
+def needs_fine(header: list[str], data: Data) -> bool:
+    """Có cần đọc lại kỹ (phóng to 2 lần) không. Unique, ngọc, currency chỉ cần tên và vài thuộc tính → bỏ qua,
+    nhanh hơn 1–2 giây. Rare/magic cần đọc đúng từng dòng mod → đọc kỹ."""
+    if len(header) == 2:
+        name = re.sub(r"^\s*foulborn\s+", "", header[0], flags=re.I)
+        u, b = data.find_unique(name), data.find_base(header[1])
+        return not (u and b and letters(u["base"]) == letters(b["name"]))
+    return not (data.find_gem(header[0]) or data.find_other(header[0]))
+
+
+def find(img: np.ndarray, data: Data, fine: bool | None = False, fast: bool = True) -> Tooltip | None:
+    """fine: True = luôn đọc kỹ, False = không, None = tự quyết theo loại món (needs_fine).
+    fast: tìm chữ trên ảnh thu nhỏ rồi đọc trên ảnh gốc (ocr.read_fast)."""
     H, W = img.shape[:2]
-    if detect_scale is None:
-        detect_scale = min(1.0, 1600 / W)
-    lines = ocr.read(img, scale=detect_scale)
+    lines = ocr.read_fast(img) if fast else ocr.read(img, scale=min(1.0, 1600 / W))
     if not lines:
         return None
 
@@ -38,7 +49,9 @@ def find(img: np.ndarray, data: Data, detect_scale: float | None = None) -> Tool
     for i, l in enumerate(lines):
         if not data.find_base(l.text) and not data.find_gem(l.text) and not data.find_other(l.text):
             continue
-        above = [p for p in lines[:i] if 0 < l.y0 - p.y1 < 2.0 * l.h and abs(p.cx - l.cx) < 0.04 * W]
+        # khung chữ 2 dòng tên/loại có thể chạm nhau (khoảng cách 0) khi tìm chữ trên ảnh thu nhỏ
+        above = [p for p in lines[:i] if p is not l and -0.5 * l.h < l.y0 - p.y1 < 2.0 * l.h
+                 and p.y0 < l.y0 and abs(p.cx - l.cx) < 0.04 * W]
         if above:
             header = [above[-1], l]
         else:
@@ -74,9 +87,18 @@ def find(img: np.ndarray, data: Data, detect_scale: float | None = None) -> Tool
     mx, my = 0.02 * W, 0.01 * H
     box = (max(0, int(x0 - mx)), max(0, int(y0 - my)), min(W, int(x1 + mx)), min(H, int(y1 + my)))
 
-    # 3) Đọc lại vùng đã cắt, phóng to 2 lần
-    crop = img[box[1]:box[3], box[0]:box[2]]
-    fine = ocr.read(crop, scale=2.0)
-    for l in fine:
-        l.x0 += box[0]; l.x1 += box[0]; l.y0 += box[1]; l.y1 += box[1]
-    return Tooltip(box=box, header=[h.text for h in header], lines=fine)
+    names = [h.text for h in header]
+    if fine is None:
+        fine = needs_fine(names, data)
+    if not fine:
+        return Tooltip(box=box, header=names, lines=allb)
+
+    # 3) Đọc lại vùng đã cắt, phóng to 2 lần. Cắt rộng thêm 2 bên: lượt đầu có thể sót dòng dài nhất nên khung hẹp,
+    #    cắt sát thì mất chữ cuối dòng ("RATING" thành "RATINC" → không khớp mod).
+    ex = int(0.03 * W)
+    cx0, cx1 = max(0, box[0] - ex), min(W, box[2] + ex)
+    crop = img[box[1]:box[3], cx0:cx1]
+    got = ocr.read(crop, scale=2.0)
+    for l in got:
+        l.x0 += cx0; l.x1 += cx0; l.y0 += box[1]; l.y1 += box[1]
+    return Tooltip(box=box, header=names, lines=got)

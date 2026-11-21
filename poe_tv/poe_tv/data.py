@@ -62,6 +62,7 @@ class Data:
     uniques: dict = field(default_factory=dict)     # letters(name) -> {"name", "base"}
     gems: dict = field(default_factory=dict)        # letters(name) -> name
     others: dict = field(default_factory=dict)      # tiền tệ, thẻ bài... letters(name) -> (name, namespace)
+    trade_tags: dict = field(default_factory=dict)  # letters(name) -> mã trên sàn trao đổi theo lô (vd "offer", "chaos")
     matchers: dict = field(default_factory=dict)    # template_key -> list[(entry, matcher)]
     _matcher_keys: list = field(default_factory=list)
 
@@ -170,6 +171,8 @@ def load() -> Data:
     for line in open(DATA_DIR / "items.ndjson", encoding="utf-8"):
         o = json.loads(line)
         ns, name = o.get("namespace"), o.get("name")
+        if o.get("tradeTag") and name:
+            d.trade_tags[letters(name)] = o["tradeTag"]
         if ns == "ITEM" and o.get("craftable"):
             d.bases[letters(name)] = {"name": name, "category": o["craftable"]["category"]}
         elif ns == "UNIQUE" and o.get("unique"):
