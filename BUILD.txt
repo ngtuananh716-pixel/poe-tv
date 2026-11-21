@@ -1,0 +1,4 @@
+Build từ commit 22d99496683899fc0c01d9a960d57ce749c83298 trên mã gốc v0.1.0-beta.70
+1f28ffcc0c003d09de5905b16f5fd24faf88778d7fc315f96c917c8afccb56e7  CouchSubs.Shell.dll
+64084e4b97a8e11669ba24d15e95ee9b5e03c24e79cd69f95c8e0410934195e2  CouchSubs.Translation.dll
+b2b7c773c94fbb1a69a427111561abe4372278cb72ce0ce661ef3d2c5f9e93d4  CouchSubs.dll
