@@ -136,10 +136,14 @@ class Watcher:
         self.job = None           # {"sig":…, "stale": bool}
         self.pending = []         # ô chờ gửi
         self.history = deque(maxlen=20)
+        self.frames = 0           # số khung hình đã nhận (để biết CouchSubs có đang gửi không)
 
     # ---- gọi từ máy chủ HTTP ----
     def on_frame(self, img: np.ndarray) -> list[dict]:
         now = self.clock()
+        self.frames += 1
+        if self.frames == 1:
+            print(f"Đã nhận khung hình đầu tiên từ CouchSubs: {img.shape[1]}x{img.shape[0]}", flush=True)
         sig = signature(img)
         start = None
         with self.lock:
@@ -214,6 +218,8 @@ class Watcher:
             with self.lock:
                 self.job = None
                 self.history.appendleft(rec)
+            if not rec.get("found") and not rec.get("error"):
+                print(f"[{rec['at']}] màn hình đứng yên, không thấy tooltip ({rec['seconds']}s)", flush=True)
             if rec.get("found") or rec.get("error"):
                 print(f"[{rec['at']}] {rec.get('base') or ''} {rec.get('name') or ''} → "
                       f"{' | '.join(rec.get('text', [])) or rec.get('error', '')} ({rec['seconds']}s)", flush=True)
@@ -274,7 +280,7 @@ def make_handler(watcher: Watcher):
 
         def do_GET(self):
             if self.path == "/health":
-                return self._json(200, {"ok": True})
+                return self._json(200, {"ok": True, "frames": watcher.frames})
             if self.path == "/last":
                 with watcher.lock:
                     return self._json(200, list(watcher.history))
