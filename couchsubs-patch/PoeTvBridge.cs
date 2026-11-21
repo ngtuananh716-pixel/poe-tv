@@ -3,7 +3,9 @@
 // Khung hình Remote Play được gửi tới máy chủ tra giá chạy trên cùng máy (python -m poe_tv.serve, mặc định
 // http://127.0.0.1:8788/frame). Máy chủ trả về các ô chữ (id, text, box, line); ô nào cũng chuyển nguyên sang app TV
 // bằng SubtitleServer.SendRegion. Mọi quyết định (khi nào tra, viết gì, đặt ở đâu) nằm ở máy chủ Python.
-// Bật mặc định và thay cho phần đọc phụ đề; đặt biến môi trường POE_TV=0 để chạy như CouchSubs gốc.
+// Bật mặc định. Máy chủ trả thêm cờ "translate" (bật/tắt dịch phụ đề tiếng Việt) và "screen" (dịch cả màn hình
+// một lần), người dùng bấm trên trang điện thoại của máy chủ. Dịch tắt thì phần đọc phụ đề không chạy (đỡ tốn máy).
+// Đặt biến môi trường POE_TV=0 để chạy như CouchSubs gốc.
 
 using System.Globalization;
 using System.Net.Http.Headers;
@@ -27,9 +29,28 @@ public sealed class PoeTvBridge : IDisposable
     private long nextAt;
     private int announced;
     private volatile bool connected;
+    private volatile bool translate;
+    private int screenRequests;
+
+    /// <summary>Dịch phụ đề có đang bật không (theo cờ "translate" của máy chủ).</summary>
+    public bool TranslateOn => translate;
+
+    /// <summary>Máy chủ vừa yêu cầu "dịch cả màn hình" chưa (mỗi yêu cầu chỉ trả true một lần).</summary>
+    public bool TakeScreenRequest() => Interlocked.Exchange(ref screenRequests, 0) > 0;
+
+    /// <summary>Bản poe-tv dịch sang tiếng Việt bằng AI; không dùng bộ dịch Anh→Thổ trên máy làm dự phòng.</summary>
+    public static bool Vietnamese => true;
+
+    /// <summary>Chưa có khóa AI (hoặc bộ dịch không đổi được sang tiếng Việt): giữ nguyên tiếng Anh.</summary>
+    public static ITextTranslator KeepEnglish { get; } = new KeepEnglishTranslator();
+
+    private sealed class KeepEnglishTranslator : ITextTranslator
+    {
+        public Task<string> TranslateAsync(string text, CancellationToken cancellationToken = default) => Task.FromResult(text);
+    }
 
     /// <summary>
-    /// Gọi với mỗi khung hình. Trả true khi chế độ tra giá đang bật (CouchSubs bỏ qua phần đọc phụ đề).
+    /// Gọi với mỗi khung hình. Trả true khi CouchSubs nên bỏ qua phần đọc phụ đề (bản poe-tv đang chạy và dịch đang tắt).
     /// Không chặn luồng khung hình: mỗi lúc chỉ có một yêu cầu, khung đến khi đang bận thì bỏ qua.
     /// </summary>
     public bool Offer(Frame frame, SubtitleServer server)
@@ -37,11 +58,11 @@ public sealed class PoeTvBridge : IDisposable
         if (!Enabled) return false;
         if (Interlocked.Exchange(ref announced, 1) == 0)
             SubtitleLog.Write($"poe-tv: chế độ tra giá PoE bật, gửi khung hình tới {Endpoint}");
-        if (!frame.IsConsistent || frame.Width == 0 || frame.Height == 0) return true;
-        if (Environment.TickCount64 < Interlocked.Read(ref nextAt)) return true;
-        if (Interlocked.Exchange(ref busy, 1) == 1) return true;
-        _ = SendAsync(frame, server);
-        return true;
+        if (frame.IsConsistent && frame.Width > 0 && frame.Height > 0
+            && Environment.TickCount64 >= Interlocked.Read(ref nextAt)
+            && Interlocked.Exchange(ref busy, 1) == 0)
+            _ = SendAsync(frame, server);
+        return !translate;
     }
 
     private async Task SendAsync(Frame frame, SubtitleServer server)
@@ -65,6 +86,15 @@ public sealed class PoeTvBridge : IDisposable
             if (root.TryGetProperty("regions", out var regions) && regions.ValueKind == JsonValueKind.Array)
                 foreach (var region in regions.EnumerateArray())
                     Apply(region, server);
+            if (root.TryGetProperty("translate", out var tr) && tr.ValueKind is JsonValueKind.True or JsonValueKind.False)
+            {
+                var on = tr.ValueKind == JsonValueKind.True;
+                if (translate && !on) server.Clear();          // tắt dịch: xóa phụ đề đang hiện trên TV
+                if (translate != on) SubtitleLog.Write($"poe-tv: dịch phụ đề {(on ? "bật" : "tắt")}");
+                translate = on;
+            }
+            if (root.TryGetProperty("screen", out var sc) && sc.ValueKind == JsonValueKind.True)
+                Interlocked.Increment(ref screenRequests);
             if (!connected)
             {
                 connected = true;

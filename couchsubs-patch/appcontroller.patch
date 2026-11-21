@@ -1,5 +1,5 @@
 diff --git a/windows/src/CouchSubs.Shell/AppController.cs b/windows/src/CouchSubs.Shell/AppController.cs
-index 1892b97..5a107a7 100644
+index 1892b97..918f1e3 100644
 --- a/windows/src/CouchSubs.Shell/AppController.cs
 +++ b/windows/src/CouchSubs.Shell/AppController.cs
 @@ -74,6 +74,8 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
@@ -11,11 +11,32 @@ index 1892b97..5a107a7 100644
      /// <summary>Hattın yazı okuyucusu; ek bölgelerin tek seferlik okuması da bunu kullanır.</summary>
      private ITextReader? activeReader;
      private int extraBusy;
-@@ -2915,6 +2917,8 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
+@@ -2694,7 +2696,10 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
+     {
+         var local = MakeLocalTranslator();
+         // Açılamayan ücretsiz motor yedek olamaz; çevrimiçi motor çeviremeyince satır yeniden denenir.
+-        var fallback = local is UnavailableTranslator || services.Translation.EngineFailed ? null : local;
++        // poe-tv: dịch sang tiếng Việt bằng AI; bộ dịch trên máy chỉ có Anh→Thổ nên không dùng làm dự phòng, thiếu khóa
++        // thì giữ nguyên tiếng Anh.
++        var fallback = PoeTvBridge.Vietnamese || local is UnavailableTranslator || services.Translation.EngineFailed ? null : local;
++        if (PoeTvBridge.Vietnamese) local = PoeTvBridge.KeepEnglish;
+         var engine = settings.OnlineEngine;
+         if (!OnlineTranslationActive || engine.StoreKey() is not { } storeKey) return local;
+         // Oynanan oyunun adı modele bağlam olarak gider, önbellek de oyuna göre ayrılır. Ad kararlı oyundur (GameSense:
+@@ -2713,6 +2718,7 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
+             online = engine.Provider() is { } provider
+                 ? services.MakeAiTranslator(provider, key, provider.Model(settings.ModelFor(provider)).Id, fallback, game, settings.AiInstruction,
+                     settings.GeminiPaidTier && provider == AiProvider.Gemini)
++                : PoeTvBridge.Vietnamese ? null    // poe-tv: DeepL đang ghi cứng tiếng Thổ → giữ tiếng Anh
+                 : services.MakeOnlineTranslator(key, fallback);
+         }
+         if (online is null) return local;
+@@ -2915,6 +2921,9 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
                  LastFrame = frame;
                  UpdateSubtitleOffTip(frameArrived: true);
              });
-+            // poe-tv: khung hình đi sang máy chủ tra giá; phần đọc phụ đề không chạy.
++            // poe-tv: khung hình đi sang máy chủ tra giá; dịch đang tắt thì phần đọc phụ đề không chạy.
++            if (poeTv.TakeScreenRequest()) post(() => _ = TranslateScreenAsync());
 +            if (poeTv.Offer(frame, server)) return;
              // Duraklatıldıysa kare yalnız ek bölgeler ve serbest alan için saklanır; altyazı okunmaz.
              if (subtitlesPaused) return;

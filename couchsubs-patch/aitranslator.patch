@@ -1,0 +1,46 @@
+diff --git a/windows/src/CouchSubs.Translation/AiTranslator.cs b/windows/src/CouchSubs.Translation/AiTranslator.cs
+index 39b1dcd..12cab94 100644
+--- a/windows/src/CouchSubs.Translation/AiTranslator.cs
++++ b/windows/src/CouchSubs.Translation/AiTranslator.cs
+@@ -32,9 +32,13 @@ public static class AiRequest
+     public const int ScreenOutputTokens = 8192;
+ 
+     public const string SystemPrompt =
+-        "You translate English video game subtitles into natural, spoken Turkish, the way people really talk. " +
+-        "Characters address each other informally (use \"sen\", not \"siz\") unless the line is clearly formal. " +
++        // poe-tv: bản sửa dịch sang tiếng Việt (bản gốc ghi cứng tiếng Thổ).
++        "You translate English video game subtitles and on-screen text into natural, spoken Vietnamese, the way " +
++        "Vietnamese people really talk. Choose pronouns (tôi, ta, anh, em, cậu, ngươi, ông, bà…) that fit who is " +
++        "speaking to whom; keep a natural, casual tone unless the line is clearly formal. " +
+         "Keep character names, place names and speaker labels such as \"ATREUS:\" exactly as they are. " +
++        "Keep game terms that players use in English exactly as written: item names, base types, skill and gem names, " +
++        "currency names (Chaos Orb, Divine Orb…), stat names such as Energy Shield, and all numbers. " +
+         "Keep line breaks. Keep the meaning and tone; do not add or leave out anything. " +
+         // #296: OCR kaçan/yanlış harfler ve önceki altyazının devamı olan satırlar.
+         "The text is read from the screen by OCR and may have misread or missing letters (\"Y u ave to ask?\", " +
+@@ -88,13 +92,13 @@ public static class AiRequest
+             foreach (var line in context)
+             {
+                 lines.Add($"English: {line.Source}");
+-                if (line.Translation is { } translation) lines.Add($"Turkish: {translation}");
++                if (line.Translation is { } translation) lines.Add($"Vietnamese: {translation}");
+             }
+             parts.Add(string.Join("\n", lines));
+         }
+         var list = new JsonArray([.. sentences.Select(s => (JsonNode?)JsonValue.Create(s))]).ToJsonString(Compact);
+-        parts.Add($"Translate each string in this JSON array into Turkish. Reply with only a JSON array of {sentences.Count} " +
+-                  $"Turkish strings in the same order.\n{list}");
++        parts.Add($"Translate each string in this JSON array into Vietnamese. Reply with only a JSON array of {sentences.Count} " +
++                  $"Vietnamese strings in the same order.\n{list}");
+         return string.Join("\n\n", parts);
+     }
+ 
+@@ -535,6 +539,8 @@ public sealed class AiTranslator : ITextTranslator, IOnlineTranslator
+     private string CacheKey(string text, string? game)
+     {
+         var key = string.IsNullOrEmpty(game) ? text : game + "\u001f" + text;
++        // poe-tv: bản dịch tiếng Việt để riêng, không lấy lại bản tiếng Thổ cũ trong bộ nhớ đệm dùng chung.
++        key = "vi\u001f" + key;
+         return _instructionTag is null ? key : "i:" + _instructionTag + "\u001f" + key;
+     }
+ 

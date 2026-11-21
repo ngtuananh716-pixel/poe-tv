@@ -222,6 +222,9 @@ class Watcher:
         self.window_found = 0
         self.last_miss_saved = -1e9
         self.changed_frames = 0   # số khung liên tiếp vùng tooltip khác đi (cần 2 khung mới xóa, đỡ nháy)
+        self.price_on = True      # bật/tắt trên trang điện thoại
+        self.translate_on = False # dịch phụ đề tiếng Việt (CouchSubs bản sửa đọc cờ này)
+        self.screen_pending = False
         self.recent = {}          # nội dung tooltip → (lúc tra, các dòng ô giá): mở lại món vừa xem thì hiện ngay
 
     # ---- gọi từ máy chủ HTTP ----
@@ -237,7 +240,13 @@ class Watcher:
             self.window_frames += 1
             self.motion.append(1.0 if self.prev is None else frac(sig, self.prev))
             self.prev = sig
-            if self.shown is not None:
+            if not self.price_on:
+                if self.shown is not None:
+                    self.pending.append(region(""))
+                    self.shown = None
+                if self.job is not None:
+                    self.job["stale"] = True
+            elif self.shown is not None:
                 if sig_change(crop_sig(img, self.shown["box"]), self.shown["sig"]) > TT_CHANGED:
                     self.changed_frames += 1
                 else:
@@ -248,7 +257,7 @@ class Watcher:
                     self.changed_frames = 0
                     if self.job is not None:
                         self.job["stale"] = True
-            if self.job is None and self.shown is None and now - self.last_done >= DETECT_GAP:
+            if self.price_on and self.job is None and self.shown is None and now - self.last_done >= DETECT_GAP:
                 self.job = start = {"stale": False}
         if start is not None:
             if self.threaded:
@@ -371,6 +380,23 @@ class Watcher:
                 self.last_miss_saved = time.time()      # thỉnh thoảng lưu 1 ảnh không thấy tooltip để xem lại
                 self._save(img, rec)
 
+    def flags(self) -> dict:
+        """Cờ gửi kèm mỗi phản hồi cho CouchSubs: dịch bật/tắt, yêu cầu dịch cả màn hình (một lần)."""
+        with self.lock:
+            screen, self.screen_pending = self.screen_pending, False
+            return {"translate": self.translate_on, "screen": screen}
+
+    def set(self, price=None, translate=None, screen=False):
+        with self.lock:
+            if price is not None:
+                self.price_on = price
+            if translate is not None:
+                self.translate_on = translate
+            if screen:
+                self.screen_pending = True
+        print(f"[{time.strftime('%H:%M:%S')}] tra giá {'BẬT' if self.price_on else 'TẮT'} · dịch {'BẬT' if self.translate_on else 'TẮT'}"
+              + (" · dịch cả màn hình" if screen else ""), flush=True)
+
     def status_line(self):
         """Một dòng tóm tắt 10 giây vừa qua."""
         with self.lock:
@@ -428,6 +454,35 @@ def decode(body: bytes, w: int, h: int, stride: int) -> np.ndarray:
     return np.ascontiguousarray(rows[:, :, :3])     # BGRA → BGR
 
 
+def control_page(w: Watcher) -> str:
+    """Trang bật/tắt mở trên điện thoại (cùng mạng nhà)."""
+    def btn(name, on, label):
+        state, color, nxt = ("ĐANG BẬT", "#2e7d32", "0") if on else ("ĐANG TẮT", "#555", "1")
+        return (f'<a class="b" style="background:{color}" href="/set?{name}={nxt}">{label}<br><small>{state} · bấm để '
+                f'{"tắt" if on else "bật"}</small></a>')
+    return f"""<!doctype html><html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>PoE TV</title>
+<style>body{{font-family:system-ui,sans-serif;background:#111;color:#eee;margin:0;padding:16px}}
+h1{{font-size:20px}} .b{{display:block;color:#fff;text-decoration:none;text-align:center;font-size:22px;
+padding:22px 10px;margin:12px 0;border-radius:14px}} small{{font-size:14px;opacity:.85}} p{{color:#aaa;font-size:14px}}</style>
+</head><body><h1>PoE TV</h1>
+{btn("price", w.price_on, "Tra giá")}
+{btn("translate", w.translate_on, "Dịch phụ đề tiếng Việt")}
+<a class="b" style="background:#1565c0" href="/set?screen=1">Dịch cả màn hình<br><small>bấm lần nữa để tắt</small></a>
+<p>Dịch cần khóa AI (Gemini miễn phí hoặc Claude) nhập trong CouchSubs › Settings › Translation. Chưa có khóa thì phụ đề giữ tiếng Anh.</p>
+</body></html>"""
+
+
+def lan_ip() -> str | None:
+    import socket
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("192.168.1.1", 9))      # không gửi gì, chỉ để biết địa chỉ trong mạng nhà
+            return s.getsockname()[0]
+    except OSError:
+        return None
+
+
 def make_handler(watcher: Watcher):
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
@@ -449,11 +504,30 @@ def make_handler(watcher: Watcher):
                 w, h = int(self.headers.get("X-Width", "0")), int(self.headers.get("X-Height", "0"))
                 stride = int(self.headers.get("X-Stride", str(w * 4)))
                 regions = watcher.on_frame(decode(body, w, h, stride))
-                self._json(200, {"regions": regions, "next_ms": NEXT_MS})
+                self._json(200, {"regions": regions, "next_ms": NEXT_MS, **watcher.flags()})
             except Exception as e:
                 self._json(400, {"error": str(e), "next_ms": 2000})
 
         def do_GET(self):
+            path, _, qs = self.path.partition("?")
+            if path in ("/", "/set"):
+                if path == "/set":
+                    from urllib.parse import parse_qs
+                    q = {k: v[-1] for k, v in parse_qs(qs).items()}
+                    onoff = lambda k: None if k not in q else q[k] == "1"
+                    watcher.set(price=onoff("price"), translate=onoff("translate"), screen=q.get("screen") == "1")
+                    self.send_response(303)
+                    self.send_header("Location", "/")
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+                    return
+                body = control_page(watcher).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+                return
             if self.path == "/health":
                 return self._json(200, {"ok": True, "frames": watcher.frames})
             if self.path == "/snap":
@@ -473,6 +547,7 @@ def make_handler(watcher: Watcher):
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="poe_tv.serve", description="Máy chủ tra giá cho bản sửa CouchSubs")
     ap.add_argument("--port", type=int, default=8788)
+    ap.add_argument("--host", default="0.0.0.0", help="0.0.0.0 = mở được trang bật/tắt trên điện thoại; 127.0.0.1 = chỉ máy này")
     ap.add_argument("--no-trade", action="store_true", help="chỉ đọc món, không tra giá")
     ap.add_argument("--status", default="securable", help="securable = mua ngay (mặc định) | available | online | any")
     ap.add_argument("--league", default=None)
@@ -511,9 +586,12 @@ def main(argv=None):
                     print(f"[{time.strftime('%H:%M:%S')}] chưa nhận khung hình nào từ CouchSubs "
                           f"(đã bấm Start translating chưa?)", flush=True)
     threading.Thread(target=report, daemon=True).start()
-    srv = ThreadingHTTPServer(("127.0.0.1", a.port), make_handler(w))
+    srv = ThreadingHTTPServer((a.host, a.port), make_handler(w))
     print(f"Sẵn sàng: http://127.0.0.1:{a.port}  (Ctrl+C để dừng). Mở CouchSubs bản poe-tv rồi bấm bắt đầu.",
           flush=True)
+    ip = lan_ip() if a.host == "0.0.0.0" else None
+    if ip:
+        print(f"Bật/tắt tra giá và dịch trên điện thoại (cùng Wi-Fi): http://{ip}:{a.port}", flush=True)
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

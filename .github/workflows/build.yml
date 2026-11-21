@@ -1,6 +1,8 @@
 # Build bản sửa poe-tv của CouchSubs.
-# Chỉ build lại CouchSubs.Shell.dll (nơi có chỗ móc tra giá) từ mã gốc v0.1.0-beta.70 cộng bản vá trong couchsubs-patch/.
-# DLL này thay vào một BẢN SAO của CouchSubs beta.70 đã cài trên laptop; bản cài chính thức giữ nguyên.
+# Chỉ build lại 2 DLL từ mã gốc v0.1.0-beta.70 cộng bản vá trong couchsubs-patch/:
+#   CouchSubs.Shell.dll       – móc tra giá, bật/tắt dịch, giữ tiếng Anh khi thiếu khóa AI
+#   CouchSubs.Translation.dll – lời nhắc AI dịch sang tiếng Việt
+# Hai DLL thay vào một BẢN SAO của CouchSubs beta.70 đã cài trên laptop; bản cài chính thức giữ nguyên.
 name: build
 
 on:
@@ -39,17 +41,22 @@ jobs:
         run: |
           cp couchsubs-patch/PoeTvBridge.cs upstream/windows/src/CouchSubs.Shell/
           git -C upstream apply --verbose ../couchsubs-patch/appcontroller.patch
+          git -C upstream apply --verbose ../couchsubs-patch/aitranslator.patch
 
-      - name: Build CouchSubs.Shell
+      - name: Build CouchSubs.Shell và CouchSubs.Translation
         run: |
           VERSION="${UPSTREAM_TAG#v}"
           dotnet build upstream/windows/src/CouchSubs.Shell -c Release -p:Version="$VERSION" -o out
-          ls -la out/CouchSubs.Shell.dll
+          dotnet build upstream/windows/src/CouchSubs.Translation -c Release -p:Version="$VERSION" -o out_tr
+          cp out_tr/CouchSubs.Translation.dll out/
+          ls -la out/CouchSubs.Shell.dll out/CouchSubs.Translation.dll
 
       - uses: actions/upload-artifact@v4
         with:
           name: poe-tv-shell
-          path: out/CouchSubs.Shell.dll
+          path: |
+            out/CouchSubs.Shell.dll
+            out/CouchSubs.Translation.dll
           if-no-files-found: error
           retention-days: 30
 
@@ -58,12 +65,12 @@ jobs:
         env:
           TOKEN: ${{ github.token }}
         run: |
-          mkdir dist && cp out/CouchSubs.Shell.dll dist/
+          mkdir dist && cp out/CouchSubs.Shell.dll out/CouchSubs.Translation.dll dist/
           cd dist
-          echo "CouchSubs.Shell.dll build từ commit ${GITHUB_SHA} trên mã gốc ${UPSTREAM_TAG}" > BUILD.txt
-          sha256sum CouchSubs.Shell.dll >> BUILD.txt
+          echo "Build từ commit ${GITHUB_SHA} trên mã gốc ${UPSTREAM_TAG}" > BUILD.txt
+          sha256sum CouchSubs.Shell.dll CouchSubs.Translation.dll >> BUILD.txt
           git init -q -b dist
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add . && git commit -q -m "CouchSubs.Shell.dll từ ${GITHUB_SHA::7}"
+          git add . && git commit -q -m "DLL từ ${GITHUB_SHA::7}"
           git push -f -q "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" dist
