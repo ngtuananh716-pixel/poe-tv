@@ -34,6 +34,12 @@ CÀI (1 lần; cập nhật cũng làm y hệt với gói mới)
    e. Gõ 6 ký tự Passphrase hiện ở góc trái dưới TV vào app, bấm Install on the TV.
 7. Muốn dịch: trong app vào Settings > Translation, chọn Gemini, dán khóa Gemini của bạn.
 
+CẬP NHẬT NHANH (khi chỉ có bản sửa lõi tra giá, không cần tải lại app)
+- Mở Terminal, dán dòng dưới rồi nhấn Enter (khoảng 10-30 giây):
+  curl -fsSL https://raw.githubusercontent.com/ngtuananh716-pixel/poe-tv/main/chia-se-mac/cap-nhat.sh | bash
+- Khi app có bản mới (Claude sẽ báo), cài lại bằng gói poe-tv-mac.zip mới như bước CÀI; lần sau nhanh hơn lần đầu
+  vì Python và thư viện đã có sẵn.
+
 CHƠI
 - Mỗi lần chơi: bật PS5, mở app CouchSubs trên TV, bấm đúp "PoE TV" trên Mac, bấm Start translating.
 - Dưới nút Start có 4 nút: "Tra giá: BẬT/TẮT", "Dịch: BẬT/TẮT", "Dịch cả màn hình", "Game: PoE1/PoE2".
