@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write   # đẩy DLL đã build vào nhánh dist
 
 env:
   UPSTREAM_TAG: v0.1.0-beta.70
@@ -52,3 +52,18 @@ jobs:
           path: out/CouchSubs.Shell.dll
           if-no-files-found: error
           retention-days: 30
+
+      # Nhánh dist chỉ giữ bản build mới nhất (1 commit, ghi đè mỗi lần): tải DLL qua git, không qua kho artifact.
+      - name: Đẩy DLL vào nhánh dist
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          mkdir dist && cp out/CouchSubs.Shell.dll dist/
+          cd dist
+          echo "CouchSubs.Shell.dll build từ commit ${GITHUB_SHA} trên mã gốc ${UPSTREAM_TAG}" > BUILD.txt
+          sha256sum CouchSubs.Shell.dll >> BUILD.txt
+          git init -q -b dist
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add . && git commit -q -m "CouchSubs.Shell.dll từ ${GITHUB_SHA::7}"
+          git push -f -q "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" dist
