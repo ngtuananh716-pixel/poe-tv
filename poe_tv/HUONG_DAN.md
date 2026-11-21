@@ -7,7 +7,7 @@ Bước 1 của công cụ tra giá trên TV. Hiện tại công cụ nhận **�
 3. Nhận diện món đồ: loại (unique/rare/gem…), base, thuộc tính, mod implicit/explicit.
 4. Dựng bộ lọc và tra trên trade **realm Sony**, league hiện tại, mặc định chỉ tính hàng **mua ngay**.
 
-Bước 2 (lấy hình tự động qua Remote Play) và bước 3 (hiện giá trên TV LG) sẽ làm sau.
+Từ 21/11/2026 có thêm chế độ **hiện giá thẳng trên TV LG** qua bản sửa CouchSubs, xem mục cuối.
 
 ## Cài đặt trên laptop (Windows 11, làm 1 lần)
 
@@ -60,3 +60,21 @@ Trang trade có lớp chống bot (Cloudflare). Công cụ gọi API với tên 
 ## Ghi công
 
 Dữ liệu mod/món đồ (`data/stats.ndjson`, `data/items.ndjson`) và cách chọn mod local/global, chỉ số tổng, dải ±10% lấy từ **Awakened PoE Trade** của SnosMe, giấy phép MIT (`data/LICENSE-awakened-poe-trade.txt`). Khi sang league mới, cập nhật 2 file này từ bản APT mới nhất.
+
+## Chạy trên TV (bản sửa CouchSubs, từ 21/11/2026)
+
+Thư mục trên laptop: `C:\Users\Public\poe_tv` gồm `poe_tv\` (lõi tra giá), `venv\` (Python), `couchsubs\` (bản sao
+CouchSubs beta.70 đã thay `CouchSubs.Shell.dll`) và `Chay PoE TV.cmd`.
+
+1. Bật PS5, bật app CouchSubs trên TV LG.
+2. Trên laptop bấm đúp **PoE TV** ngoài màn hình nền. Nó đóng CouchSubs bản thường nếu đang mở, mở cửa sổ máy chủ tra giá
+   (để nguyên, đừng tắt), rồi mở CouchSubs bản sửa. Trong CouchSubs bấm bắt đầu như mọi khi.
+3. Trong game, mở tooltip món đồ và đứng yên khoảng 1 giây: cạnh tooltip hiện ô "Đang tra giá…", vài giây sau ra giá.
+   Đóng tooltip hoặc chuyển món thì ô tự tắt.
+
+- Cửa sổ máy chủ in từng lần tra. Ảnh và kết quả 30 lần tra gần nhất lưu ở `poe_tv\logs\` để Claude xem khi tra sai.
+- Lần đầu chạy bản sửa, Windows/CouchSubs có thể hỏi quyền mở tường lửa cho mạng riêng (Private): bấm cho phép,
+  không thì TV không nhận được chữ.
+- Bản sửa **không tự cập nhật** và không đụng tới CouchSubs bản thường. Muốn dùng CouchSubs dịch phụ đề như cũ thì
+  mở bản thường. Không mở cả hai cùng lúc.
+- Bản sao chỉ chạy đúng với CouchSubs **beta.70**. Khi cài lại từ bản mới hơn, báo Claude build lại DLL cho khớp.
