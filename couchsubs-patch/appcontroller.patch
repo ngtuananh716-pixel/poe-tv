@@ -1,0 +1,22 @@
+diff --git a/windows/src/CouchSubs.Shell/AppController.cs b/windows/src/CouchSubs.Shell/AppController.cs
+index 1892b97..5a107a7 100644
+--- a/windows/src/CouchSubs.Shell/AppController.cs
++++ b/windows/src/CouchSubs.Shell/AppController.cs
+@@ -74,6 +74,8 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
+     private IStreamSession? session;
+     private IKeeper? keeper;
+     private SubtitlePipeline? pipeline;
++    /// <summary>poe-tv: tra giá món đồ PoE thay cho đọc phụ đề (PoeTvBridge.cs).</summary>
++    private readonly PoeTvBridge poeTv = new();
+     /// <summary>Hattın yazı okuyucusu; ek bölgelerin tek seferlik okuması da bunu kullanır.</summary>
+     private ITextReader? activeReader;
+     private int extraBusy;
+@@ -2915,6 +2917,8 @@ public sealed class AppController : INotifyPropertyChanged, IDisposable
+                 LastFrame = frame;
+                 UpdateSubtitleOffTip(frameArrived: true);
+             });
++            // poe-tv: khung hình đi sang máy chủ tra giá; phần đọc phụ đề không chạy.
++            if (poeTv.Offer(frame, server)) return;
+             // Duraklatıldıysa kare yalnız ek bölgeler ve serbest alan için saklanır; altyazı okunmaz.
+             if (subtitlesPaused) return;
+             // Önceki kare hâlâ işleniyorsa bu kare atlanır; okuma kareleri biriktirmez.
