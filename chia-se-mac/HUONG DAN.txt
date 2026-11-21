@@ -37,7 +37,9 @@ CÀI (1 lần; cập nhật cũng làm y hệt với gói mới)
 CHƠI
 - Mỗi lần chơi: bật PS5, mở app CouchSubs trên TV, bấm đúp "PoE TV" trên Mac, bấm Start translating.
 - Dưới nút Start có 4 nút: "Tra giá: BẬT/TẮT", "Dịch: BẬT/TẮT", "Dịch cả màn hình", "Game: PoE1/PoE2".
-- Mở tooltip món đồ trong PoE, chờ một chút: cạnh tooltip hiện "Đang tra giá..." rồi ra giá.
+- Mở túi đồ / stash / cửa sổ mua bán, đưa con trỏ vào món, chờ một chút: cạnh tooltip hiện "Đang tra giá..." rồi
+  ra giá. Chỉ tra khi đáy màn hình có dòng gợi ý nút (Navigate, Compare / More Actions); đang đánh quái thì đồ dưới đất
+  không hiện ô giá. Không tra đồ chưa giám định và đồ bán theo lô (currency, fragment, offering, scarab, essence, thẻ bài).
   PoE1 tra realm Sony; PoE2 đang thử nghiệm (ô giá ghi "PoE2 ·" ở đầu).
 - Ảnh và kết quả 30 lần tra gần nhất ở ~/poe_tv/poe_tv/logs (gửi kèm khi báo tra sai).
 

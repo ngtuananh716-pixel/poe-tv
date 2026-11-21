@@ -36,6 +36,26 @@ def needs_fine(header: list[str], data: Data) -> bool:
     return not (data.find_gem(header[0]) or data.find_other(header[0]))
 
 
+# Dòng gợi ý nút ở đáy màn hình chỉ có khi mở túi đồ / stash / cửa sổ bán đồ (bản console): "Navigate",
+# "Compare / More Actions", "Reorder Tabs". Lúc đang đánh quái không có, nên đồ dưới đất không bị tra giá.
+UI_MARKERS = re.compile(r"NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS")
+UI_STRIP = 0.70        # chỉ đọc phần màn hình từ 70% chiều cao trở xuống (dòng gợi ý nằm ở đáy)
+
+
+def inventory_open(img: np.ndarray) -> tuple[bool, list[str]]:
+    """Màn hình đang mở túi đồ/stash/cửa sổ mua bán chưa: đọc riêng dải đáy (nhẹ hơn đọc cả màn hình) và tìm chữ
+    của dòng gợi ý nút. Trả (có/không, các chữ khớp)."""
+    H = img.shape[0]
+    strip = img[int(H * UI_STRIP):, :]
+    marks = [l.text for l in ocr.read_fast(strip) if UI_MARKERS.search(re.sub(r"[^A-Z]", "", l.text.upper()))]
+    return bool(marks), marks
+
+
+def unidentified(tt: "Tooltip") -> bool:
+    """Món chưa giám định: tooltip có dòng "Unidentified"."""
+    return any("UNIDENTIFIED" in re.sub(r"[^A-Z]", "", l.text.upper()) for l in tt.lines)
+
+
 def find(img: np.ndarray, data: Data, fine: bool | None = False, fast: bool = True) -> Tooltip | None:
     """fine: True = luôn đọc kỹ, False = không, None = tự quyết theo loại món (needs_fine).
     fast: tìm chữ trên ảnh thu nhỏ rồi đọc trên ảnh gốc (ocr.read_fast)."""

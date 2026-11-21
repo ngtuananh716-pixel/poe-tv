@@ -35,6 +35,7 @@ GAME_NAME = {"poe1": "PoE1", "poe2": "PoE2"}
 SIG_W, SIG_H = 96, 54     # ảnh thu nhỏ để so khung hình
 PIX_DIFF = 20             # một điểm ảnh đổi hơn mức này (0–255) coi là "đổi"
 DETECT_GAP = 0.25         # chưa có ô giá: nghỉ bấy nhiêu giây giữa 2 lần tìm tooltip
+UI_IDLE_GAP = 0.6         # không mở túi đồ (đang chơi): nghỉ lâu hơn giữa 2 lần xem, đỡ tốn CPU
 TT_CHANGED = 0.5          # bản đồ chữ vùng tooltip khác quá tỉ lệ này = tooltip đã đóng hoặc sang món khác
 TT_SIG = (96, 96)         # số ô của bản đồ chữ vùng tooltip
 TEXT_LEVEL = 110          # điểm ảnh sáng hơn mức này (0–255) coi là chữ
@@ -212,18 +213,20 @@ class Watcher:
     """
 
     def __init__(self, D, trade=None, status="securable", log_dir=None, threaded=True, clock=time.monotonic,
-                 game="poe1", loader=None, state_path=None):
+                 game="poe1", loader=None, state_path=None, inventory_only=True):
         self.D, self.trade, self.status = D, trade, status
         self.game = game                                 # "poe1" / "poe2": bấm nút Game trong cửa sổ CouchSubs để đổi
         self.loader = loader                             # game -> (dữ liệu, Trade); nạp khi chuyển sang game chưa nạp
         self.games = {game: (D, trade)}
         self.state_path = state_path
+        self.inventory_only = inventory_only           # chỉ tra khi đang mở túi đồ/stash/cửa sổ mua bán
         self.log_dir, self.threaded, self.clock = log_dir, threaded, clock
         self.lock = threading.Lock()
         self.prev = None          # ảnh thu nhỏ của khung trước (chỉ để báo mức động)
         self.latest = None        # khung mới nhất
         self.job = None           # lần tìm/tra đang chạy: {"stale": bool}
         self.last_done = -1e9     # lúc lần tìm gần nhất xong
+        self.gap = DETECT_GAP     # nghỉ trước lần tìm kế tiếp (dài hơn khi không mở túi đồ)
         self.shown = None         # ô đang hiện: {"box": vùng tooltip, "sig": ảnh vùng đó, "key": nội dung}
         self.pending = []         # ô chờ gửi
         self.history = deque(maxlen=20)
@@ -254,7 +257,8 @@ class Watcher:
             self.prev = sig
             if not self.price_on:
                 if self.shown is not None:
-                    self.pending.append(region(""))
+                    if not self.shown.get("silent"):
+                        self.pending.append(region(""))
                     self.shown = None
                 if self.job is not None:
                     self.job["stale"] = True
@@ -264,12 +268,13 @@ class Watcher:
                 else:
                     self.changed_frames = 0
                 if self.changed_frames >= 2:
-                    self.pending.append(region(""))
+                    if not self.shown.get("silent"):
+                        self.pending.append(region(""))
                     self.shown = None
                     self.changed_frames = 0
                     if self.job is not None:
                         self.job["stale"] = True
-            if self.price_on and self.job is None and self.shown is None and now - self.last_done >= DETECT_GAP:
+            if self.price_on and self.job is None and self.shown is None and now - self.last_done >= self.gap:
                 self.job = start = {"stale": False}
         if start is not None:
             if self.threaded:
@@ -288,6 +293,12 @@ class Watcher:
             with self.lock:
                 D, trade, game = self.D, self.trade, self.game
             job["game"] = game
+            if self.inventory_only:
+                is_open, marks = tooltip.inventory_open(img)
+                rec["ui"] = marks
+                if not is_open:
+                    rec["ui_closed"] = True
+                    return          # đang chơi, không mở túi đồ: không tra (đồ dưới đất, chat…)
             tt = tooltip.find(img, D)
             rec["ocr_s"] = round(time.time() - t0, 2)
             if not tt:
@@ -295,7 +306,19 @@ class Watcher:
             rec["found"] = True
             H, W = img.shape[:2]
             inner = inner_box(tt.box, W, H)
-            it = parse.parse(tt.header, tt.lines, D)
+            skip = "chưa giám định" if tooltip.unidentified(tt) else None
+            it = None if skip else parse.parse(tt.header, tt.lines, D)
+            if it is not None and it.rarity == "Other":
+                skip = "đồ bán theo lô"       # currency, fragment, offering, scarab, essence, thẻ bài…: người dùng bỏ
+            if skip:
+                rec.update(skip=skip, name=it.name if it else " ".join(tt.header))
+                # theo dõi im lặng vùng tooltip này (không hiện ô): khỏi đọc lại mỗi 0,25 giây khi món vẫn đang mở
+                sig = crop_sig(img, inner)
+                with self.lock:
+                    if not job["stale"] and self.latest is not None and sig_change(crop_sig(self.latest, inner), sig) <= TT_CHANGED:
+                        self.shown = {"box": inner, "sig": sig, "key": "", "silent": True}
+                        self.changed_frames = 0
+                return
             if it.foulborn:
                 parse.add_mutated(it, tooltip.pink_rows(img, tt), D)
             q, notes = query.build(it, status=self.status, game=game)
@@ -385,10 +408,13 @@ class Watcher:
             with self.lock:
                 self.job = None
                 self.last_done = self.clock()
+                self.gap = UI_IDLE_GAP if rec.get("ui_closed") else DETECT_GAP
                 self.history.appendleft(rec)
                 self.window_detects += 1
                 self.window_found += 1 if rec.get("found") else 0
-            if rec.get("found") or rec.get("error"):
+            if rec.get("skip"):
+                print(f"[{rec['at']}] {rec.get('name') or ''} → bỏ qua ({rec['skip']})", flush=True)
+            elif rec.get("found") or rec.get("error"):
                 shown = "" if rec.get("shown") else "  [không hiện: tooltip đã đổi]"
                 print(f"[{rec['at']}] {rec.get('base') or ''} {rec.get('name') or ''} → "
                       f"{' | '.join(rec.get('text', [])) or rec.get('error', '')} ({rec['seconds']}s){shown}", flush=True)
@@ -614,6 +640,8 @@ def main(argv=None):
     ap.add_argument("--host", default="127.0.0.1",
                     help="127.0.0.1 = chỉ máy này (mặc định; bật/tắt bằng nút trong CouchSubs); 0.0.0.0 = mở thêm trang bật/tắt trên điện thoại")
     ap.add_argument("--no-trade", action="store_true", help="chỉ đọc món, không tra giá")
+    ap.add_argument("--everywhere", action="store_true",
+                    help="tra cả khi không mở túi đồ (mặc định chỉ tra khi màn hình có dòng gợi ý Navigate/Compare ở đáy)")
     ap.add_argument("--status", default="securable", help="securable = mua ngay (mặc định) | available | online | any")
     ap.add_argument("--league", default=None, help="league PoE1 (mặc định tự lấy league mới nhất của realm)")
     ap.add_argument("--league2", default=None, help="league PoE2 (mặc định tự lấy league trade2 mới nhất)")
@@ -657,7 +685,8 @@ def main(argv=None):
                   flush=True)
         except Exception as e:
             print(f"Chưa lấy được league ({e}); sẽ thử lại khi tra", flush=True)
-    w = Watcher(D, tr, status=a.status, log_dir=a.logs or None, game=game, loader=loader, state_path=state_path)
+    w = Watcher(D, tr, status=a.status, log_dir=a.logs or None, game=game, loader=loader, state_path=state_path,
+                inventory_only=not a.everywhere)
 
     def report():
         waited = 0
