@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-// poe-tv: 3 nút dưới nút "Start translating": Tra giá bật/tắt, Dịch tiếng Việt bật/tắt, Dịch cả màn hình (một lần).
+// poe-tv: 4 nút dưới nút "Start translating": Tra giá bật/tắt, Dịch tiếng Việt bật/tắt, Dịch cả màn hình (một lần),
+// Game PoE1/PoE2 (tra giá theo game nào).
 // Trạng thái nằm ở máy chủ poe_tv (cửa sổ PoE TV); nút chỉ gửi lệnh rồi hiện trạng thái máy chủ trả về.
 
 using System.Windows;
@@ -11,6 +12,14 @@ namespace CouchSubs.App.Views;
 public partial class MainView
 {
     private DispatcherTimer? poeTimer;
+    private bool poePolling;
+
+    private async Task PollPoeAsync()
+    {
+        poePolling = true;
+        try { await controller.PoeTv.SetAsync(); }
+        finally { poePolling = false; }
+    }
 
     private void OnPoeLoaded(object sender, RoutedEventArgs e)
     {
@@ -31,6 +40,9 @@ public partial class MainView
     private void RefreshPoe()
     {
         var bridge = controller.PoeTv;
+        // Chưa bấm bắt đầu thì không có khung hình nào mang trạng thái về: hỏi máy chủ (không đổi gì) mỗi ~3 giây.
+        if (bridge.SinceUpdateMs > 3000 && !poePolling) _ = PollPoeAsync();
+        PoeGameButton.Content = bridge.Game == "poe2" ? "Game: PoE2" : "Game: PoE1";
         PoePriceButton.Content = bridge.PriceOn ? "Tra giá: BẬT" : "Tra giá: TẮT";
         PoeTranslateButton.Content = bridge.TranslateOn ? "Dịch: BẬT" : "Dịch: TẮT";
         PoeButtons.ToolTip = bridge.Connected ? null : "Chưa nối được máy chủ tra giá: mở PoE TV (cửa sổ đen) trước.";
@@ -49,4 +61,10 @@ public partial class MainView
     }
 
     private async void OnPoeScreen(object sender, RoutedEventArgs e) => await controller.PoeTv.SetAsync(screen: true);
+
+    private async void OnPoeGame(object sender, RoutedEventArgs e)
+    {
+        await controller.PoeTv.SetAsync(game: controller.PoeTv.Game == "poe2" ? "poe1" : "poe2");
+        RefreshPoe();
+    }
 }

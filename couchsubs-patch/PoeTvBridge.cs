@@ -32,6 +32,8 @@ public sealed class PoeTvBridge : IDisposable
     private volatile bool connected;
     private volatile bool translate;
     private volatile bool price = true;
+    private volatile string game = "poe1";
+    private long updatedAt;
     private int screenRequests;
     private SubtitleServer? lastServer;
 
@@ -43,6 +45,12 @@ public sealed class PoeTvBridge : IDisposable
 
     /// <summary>Dịch phụ đề có đang bật không (theo cờ "translate" của máy chủ).</summary>
     public bool TranslateOn => translate;
+
+    /// <summary>Game đang tra giá: "poe1" hoặc "poe2" (theo máy chủ; nút Game trong cửa sổ CouchSubs để đổi).</summary>
+    public string Game => game;
+
+    /// <summary>Bao lâu (ms) chưa nhận trạng thái từ máy chủ; nút trong cửa sổ hỏi lại khi lâu không có khung hình.</summary>
+    public long SinceUpdateMs => Environment.TickCount64 - Interlocked.Read(ref updatedAt);
 
     /// <summary>Máy chủ vừa yêu cầu "dịch cả màn hình" chưa (mỗi yêu cầu chỉ trả true một lần).</summary>
     public bool TakeScreenRequest() => Interlocked.Exchange(ref screenRequests, 0) > 0;
@@ -75,12 +83,13 @@ public sealed class PoeTvBridge : IDisposable
     }
 
     /// <summary>Nút trong cửa sổ CouchSubs: đổi trạng thái trên máy chủ rồi nhận lại trạng thái mới. Không bao giờ ném lỗi.</summary>
-    public async Task SetAsync(bool? price = null, bool? translate = null, bool screen = false)
+    public async Task SetAsync(bool? price = null, bool? translate = null, bool screen = false, string? game = null)
     {
         var query = new List<string> { "json=1" };
         if (price is { } p) query.Add("price=" + (p ? "1" : "0"));
         if (translate is { } t) query.Add("translate=" + (t ? "1" : "0"));
         if (screen) query.Add("screen=1");
+        if (game is "poe1" or "poe2") query.Add("game=" + game);
         try
         {
             using var response = await http.GetAsync(new Uri(Endpoint, "/set?" + string.Join("&", query))).ConfigureAwait(false);
@@ -91,7 +100,9 @@ public sealed class PoeTvBridge : IDisposable
         }
         catch (Exception error)
         {
-            SubtitleLog.Write($"poe-tv: không đổi được trạng thái ({error.GetType().Name}: {error.Message})");
+            connected = false;
+            if (price is not null || translate is not null || screen || game is not null)
+                SubtitleLog.Write($"poe-tv: không đổi được trạng thái ({error.GetType().Name}: {error.Message})");
         }
     }
 
@@ -108,6 +119,9 @@ public sealed class PoeTvBridge : IDisposable
         }
         if (root.TryGetProperty("screen", out var sc) && sc.ValueKind == JsonValueKind.True)
             Interlocked.Increment(ref screenRequests);
+        if (root.TryGetProperty("game", out var gm) && gm.ValueKind == JsonValueKind.String && gm.GetString() is "poe1" or "poe2")
+            game = gm.GetString()!;
+        Interlocked.Exchange(ref updatedAt, Environment.TickCount64);
     }
 
     private async Task SendAsync(Frame frame, SubtitleServer server)

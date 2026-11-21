@@ -1,16 +1,17 @@
 diff --git a/windows/src/CouchSubs.App/Views/MainView.xaml b/windows/src/CouchSubs.App/Views/MainView.xaml
-index fe8e888..84c9bc0 100644
+index fe8e888..90fc06e 100644
 --- a/windows/src/CouchSubs.App/Views/MainView.xaml
 +++ b/windows/src/CouchSubs.App/Views/MainView.xaml
-@@ -81,6 +81,13 @@
+@@ -81,6 +81,14 @@
                          </StackPanel>
                      </Button>
  
-+                    <!-- poe-tv: bật/tắt tra giá, dịch tiếng Việt; dịch cả màn hình một lần (MainView.PoeTv.cs) -->
-+                    <UniformGrid x:Name="PoeButtons" Columns="3" Margin="0,8,0,0" Loaded="OnPoeLoaded">
-+                        <Button x:Name="PoePriceButton" Style="{StaticResource SecondaryButton}" Margin="0,0,4,0" Click="OnPoePrice" />
-+                        <Button x:Name="PoeTranslateButton" Style="{StaticResource SecondaryButton}" Margin="4,0,4,0" Click="OnPoeTranslate" />
-+                        <Button x:Name="PoeScreenButton" Style="{StaticResource SecondaryButton}" Margin="4,0,0,0" Click="OnPoeScreen" />
++                    <!-- poe-tv: bật/tắt tra giá, dịch tiếng Việt; dịch cả màn hình một lần; chọn PoE1/PoE2 (MainView.PoeTv.cs) -->
++                    <UniformGrid x:Name="PoeButtons" Columns="2" Margin="0,8,0,0" Loaded="OnPoeLoaded">
++                        <Button x:Name="PoePriceButton" Style="{StaticResource SecondaryButton}" Margin="0,0,4,4" Click="OnPoePrice" />
++                        <Button x:Name="PoeTranslateButton" Style="{StaticResource SecondaryButton}" Margin="4,0,0,4" Click="OnPoeTranslate" />
++                        <Button x:Name="PoeScreenButton" Style="{StaticResource SecondaryButton}" Margin="0,4,4,0" Click="OnPoeScreen" />
++                        <Button x:Name="PoeGameButton" Style="{StaticResource SecondaryButton}" Margin="4,4,0,0" Click="OnPoeGame" />
 +                    </UniformGrid>
 +
                      <!-- Deneme altyazısı: altyazı TV'ye gidiyorsa "TV'de dene", yalnız bilgisayardaysa "Ekranda dene" -->

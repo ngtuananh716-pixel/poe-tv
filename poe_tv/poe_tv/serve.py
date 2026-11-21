@@ -404,15 +404,20 @@ class Watcher:
             return {"price": self.price_on, "translate": self.translate_on, "screen": screen, "game": self.game}
 
     def set(self, price=None, translate=None, screen=False, game=None):
+        """Nút trong CouchSubs gọi /set; không kèm thay đổi nào thì chỉ là hỏi trạng thái (mỗi vài giây), không in gì."""
         if game is not None and game != self.game:
             self.switch_game(game)
         with self.lock:
+            before = (self.price_on, self.translate_on)
             if price is not None:
                 self.price_on = price
             if translate is not None:
                 self.translate_on = translate
             if screen:
                 self.screen_pending = True
+            changed = before != (self.price_on, self.translate_on)
+        if not (changed or screen):
+            return
         print(f"[{time.strftime('%H:%M:%S')}] {GAME_NAME[self.game]} · tra giá {'BẬT' if self.price_on else 'TẮT'}"
               f" · dịch {'BẬT' if self.translate_on else 'TẮT'}" + (" · dịch cả màn hình" if screen else ""), flush=True)
 
