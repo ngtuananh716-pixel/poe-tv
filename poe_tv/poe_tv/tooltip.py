@@ -44,41 +44,49 @@ def find(img: np.ndarray, data: Data, fine: bool | None = False, fast: bool = Tr
     if not lines:
         return None
 
-    # 1) Tìm dòng tiêu đề: dòng là base/unique/gem/vật phẩm, ưu tiên cặp (tên, base) xếp chồng
-    header = None
+    # 1) Mọi dòng có thể là tiêu đề: base/unique/gem/vật phẩm (ghép với dòng tên ngay phía trên nếu có),
+    #    hoặc đồ magic có tên chứa base. Khung chat, bảng đồ… cũng có tên món (link đồ trong chat) nên không lấy dòng
+    #    đầu tiên tìm thấy, mà chấm điểm từng ứng viên theo cột chữ căn giữa bên dưới (tooltip thật có nhiều dòng).
+    cands = []
     for i, l in enumerate(lines):
-        if not data.find_base(l.text) and not data.find_gem(l.text) and not data.find_other(l.text):
-            continue
-        # khung chữ 2 dòng tên/loại có thể chạm nhau (khoảng cách 0) khi tìm chữ trên ảnh thu nhỏ
-        above = [p for p in lines[:i] if p is not l and -0.5 * l.h < l.y0 - p.y1 < 2.0 * l.h
-                 and p.y0 < l.y0 and abs(p.cx - l.cx) < 0.04 * W]
-        if above:
-            header = [above[-1], l]
-        else:
-            header = [l]
-        break
-    if header is None:
-        # đồ magic: tên có chứa base
-        for l in lines:
-            if data.find_base_in(l.text):
-                header = [l]
-                break
-    if header is None:
+        if data.find_base(l.text) or data.find_gem(l.text) or data.find_other(l.text):
+            # khung chữ 2 dòng tên/loại có thể chạm nhau (khoảng cách 0) khi tìm chữ trên ảnh thu nhỏ
+            above = [p for p in lines[:i] if p is not l and -0.5 * l.h < l.y0 - p.y1 < 2.0 * l.h
+                     and p.y0 < l.y0 and abs(p.cx - l.cx) < 0.04 * W]
+            cands.append([above[-1], l] if above else [l])
+        elif ":" not in l.text and data.find_base_in(l.text):      # dòng chat dạng "tên: lời nhắn" thì bỏ
+            cands.append([l])
+    if not cands:
         return None
 
-    # 2) Gom các dòng căn giữa cùng cột bên dưới tiêu đề
-    cx0 = sum(h.cx for h in header) / len(header)
-    tol = 0.045 * W
-    col = [l for l in lines if l.y0 > header[-1].y0 + 1 and abs(l.cx - cx0) < tol]
-    picked = []
-    last_y = header[-1].y1
-    hs = [h.h for h in header]
-    for l in col:
-        lh = median(hs + [p.h for p in picked]) if picked else median(hs)
-        if l.y0 - last_y > 4.0 * lh:
-            break
-        picked.append(l)
-        last_y = max(last_y, l.y1)
+    def column(header):
+        """Các dòng căn giữa cùng cột bên dưới tiêu đề, tới khi gặp khoảng trống lớn."""
+        cx0 = sum(h.cx for h in header) / len(header)
+        tol = 0.045 * W
+        col = [l for l in lines if l.y0 > header[-1].y0 + 1 and abs(l.cx - cx0) < tol]
+        picked = []
+        last_y = header[-1].y1
+        hs = [h.h for h in header]
+        for l in col:
+            lh = median(hs + [p.h for p in picked]) if picked else median(hs)
+            if l.y0 - last_y > 4.0 * lh:
+                break
+            picked.append(l)
+            last_y = max(last_y, l.y1)
+        return picked
+
+    best = None
+    for header in cands:
+        picked = column(header)
+        # chữ trong tooltip căn giữa nên tâm từng dòng gần như trùng tâm tiêu đề; chữ chat căn trái thì tâm lệch nhau
+        cx0 = sum(h.cx for h in header) / len(header)
+        centered = sum(1 for l in picked if abs(l.cx - cx0) < 0.015 * W)
+        score = centered + (2 if len(header) == 2 else 0)
+        if best is None or score > best[0]:
+            best = (score, header, picked)
+    score, header, picked = best
+    if score < 2:
+        return None          # chỉ là chữ lẻ (chat, tên bảng…), không phải tooltip
     allb = header + picked
     x0 = min(l.x0 for l in allb)
     x1 = max(l.x1 for l in allb)
