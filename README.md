@@ -13,3 +13,7 @@ realm Sony rồi trả ô giá; CouchSubs chuyển ô đó sang app CouchSubs tr
 | `.github/workflows/build.yml` | GitHub Actions build `CouchSubs.Shell.dll` đã vá |
 
 Giấy phép: AGPL-3.0 (theo CouchSubs). Dữ liệu `poe_tv/data` lấy từ Awakened PoE Trade (MIT).
+
+`chia-se/`: bộ cài cho máy khác (gói `poe-tv-cho-ban.zip`). Bộ cài tải CouchSubs gốc beta.70 từ GitHub (kiểm SHA-256),
+thay 3 DLL, cài Python 3.13 + thư viện, tạo lối tắt. Cấu trúc gói: `CAI DAT.cmd`, `HUONG DAN.txt`,
+`tep/{cai-dat.ps1, Chay PoE TV.cmd, couchsubs-dll/, poe_tv/}`, `nguon-ma/`.

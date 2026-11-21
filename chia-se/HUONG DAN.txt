@@ -1,0 +1,52 @@
+﻿PoE TV - tra giá món đồ PoE1 (PS5, realm Sony) và dịch phụ đề tiếng Việt, hiện thẳng trên TV
+==========================================================================================
+
+CẦN CÓ
+- PS5, TV LG và laptop Windows 10/11 (64-bit) cùng một mạng wifi/LAN trong nhà.
+- TV LG đời 2018 trở lên (webOS 4 trở lên). Xem: Cài đặt > Tất cả cài đặt > Chung (hoặc Hỗ trợ) > Thông tin TV.
+- Một tài khoản PlayStation (PSN) PHỤ, miễn phí, không cần PS Plus. Laptop dùng tài khoản này để lấy hình
+  qua Remote Play; bạn vẫn chơi bằng tài khoản chính và tay cầm của mình. Đừng dùng tài khoản chính,
+  vì Remote Play sẽ chiếm luôn phiên đang chơi.
+- Một tài khoản LG developer miễn phí (tạo ở https://webostv.developer.lge.com) để bật Developer Mode trên TV.
+- Muốn dịch tiếng Việt: một khóa Gemini miễn phí của CHÍNH bạn.
+- Laptop còn trống khoảng 1,5 GB.
+
+CÀI (1 lần)
+1. Bấm chuột phải vào file zip > Properties > tick "Unblock" > OK, rồi mới giải nén.
+   (Bỏ qua bước này thì Windows có thể hiện "Windows protected your PC": bấm More info > Run anyway.)
+2. Bấm đúp "CAI DAT.cmd". Nhấn Enter để cài vào C:\poe_tv, hoặc gõ thư mục khác KHÔNG DẤU (ví dụ D:\poe_tv).
+   Bộ cài tự cài Python 3.13, thư viện OCR, tải CouchSubs bản 0.1.0-beta.70 từ GitHub (có kiểm mã băm),
+   thay 3 file DLL đã sửa và tạo lối tắt "PoE TV" ngoài màn hình nền. Mất khoảng 5-15 phút tùy mạng.
+3. Bấm đúp "PoE TV" ngoài màn hình nền. Hai cửa sổ hiện ra:
+   - "PoE TV - may chu tra gia": để nguyên, đừng tắt.
+   - CouchSubs: làm theo trợ lý thiết lập (đăng nhập PSN PHỤ, ghép PS5, chọn TV LG).
+   Windows hỏi tường lửa thì bấm Cho phép (Allow), mạng Private. Không cho phép thì TV không nhận được chữ.
+4. Bật app lên TV LG (CouchSubs tự cài app, chỉ cần bật Developer Mode trên TV):
+   a. Trên TV mở LG Content Store, cài app "Developer Mode", đăng nhập tài khoản LG developer.
+   b. Bật "Dev Mode Status". TV khởi động lại.
+   c. Trong CouchSubs ở bước TV: chọn TV, bấm Connect, chấp nhận trên TV.
+   d. Mở lại app Developer Mode trên TV, bật "Key Server", để nguyên trên màn hình.
+   e. Gõ 6 ký tự Passphrase (phân biệt hoa/thường) hiện ở góc trái dưới TV vào CouchSubs, bấm Install on the TV.
+   Developer Mode có hạn 1000 giờ, CouchSubs tự gia hạn mỗi lần dùng. Lâu không chơi thì vào app Developer Mode bấm EXTEND.
+5. Muốn dịch: trong CouchSubs vào Settings > Translation, chọn Gemini, dán khóa Gemini của bạn.
+
+CHƠI
+- Mỗi lần chơi: bật PS5, mở app CouchSubs trên TV, bấm đúp "PoE TV" trên laptop, bấm bắt đầu trong CouchSubs.
+- Trong cửa sổ CouchSubs có 3 nút: "Tra giá: BẬT/TẮT", "Dịch: BẬT/TẮT", "Dịch cả màn hình".
+- Tra giá: mở tooltip món đồ trong PoE, chờ một chút: cạnh tooltip hiện "Đang tra giá..." rồi ra giá.
+  Mặc định tra league mới nhất của realm Sony (Softcore), chỉ tính hàng mua ngay.
+- Ảnh và kết quả 30 lần tra gần nhất nằm ở <thư mục cài>\poe_tv\logs (để báo lỗi khi tra sai).
+
+LƯU Ý
+- Không mở cùng lúc CouchSubs bản thường (nếu có cài) và bản này. Lối tắt PoE TV tự đóng bản đang mở.
+- Bản này KHÔNG tự cập nhật. Có gói mới thì giải nén, chạy lại CAI DAT.cmd, chọn đúng thư mục cũ.
+- Khóa Gemini, tài khoản PSN, tài khoản LG là của riêng bạn. Đừng gửi cho ai, đừng chép thư mục
+  %LOCALAPPDATA%\CouchSubs sang máy khác (trong đó có khóa và thông tin ghép PS5/TV).
+- Tra giá dùng API trade của GGG (không có trong tài liệu chính thức). Cộng đồng dùng nhiều năm nhưng rủi ro
+  không bằng 0. Lướt quá nhanh nhiều món có thể bị trade khóa tạm vài phút.
+- Bộ tra giá đọc chữ ngay trên laptop, không gửi ảnh game đi đâu; chỉ gửi bộ lọc tìm kiếm lên trang trade.
+- Khi bật dịch, chữ phụ đề tiếng Anh được gửi tới Gemini để dịch. CouchSubs mặc định còn gửi các câu phụ đề
+  tiếng Anh chưa có trong gói game vào kho chung của họ; muốn tắt thì tìm mục này trong Settings của CouchSubs.
+
+Giấy phép: CouchSubs (AGPL-3.0) của yorulmazsinan. Mã nguồn phần đã sửa nằm trong thư mục "nguon-ma".
+Dữ liệu mod/món đồ lấy từ Awakened PoE Trade (MIT).
