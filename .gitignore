@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 poe_tv/logs/
 venv/
+state.json

@@ -31,6 +31,7 @@ import numpy as np
 from . import data, parse, query, tooltip
 
 REGION_ID = "poe-price"
+GAME_NAME = {"poe1": "PoE1", "poe2": "PoE2"}
 SIG_W, SIG_H = 96, 54     # ảnh thu nhỏ để so khung hình
 PIX_DIFF = 20             # một điểm ảnh đổi hơn mức này (0–255) coi là "đổi"
 DETECT_GAP = 0.25         # chưa có ô giá: nghỉ bấy nhiêu giây giữa 2 lần tìm tooltip
@@ -92,9 +93,14 @@ def short_price(amount, currency) -> str:
     return f"{amount:g} {CURRENCY.get(currency, currency)}"
 
 
-def price_lines(it, result, notes) -> list[str]:
+def head(title: str, game: str = "poe1") -> str:
+    """Dòng đầu ô giá. Chế độ PoE2 ghi rõ để lỡ quên chuyển game thì nhìn là biết."""
+    return (("PoE2 · " if game == "poe2" else "") + title)[:MAX_CHARS]
+
+
+def price_lines(title, result, notes) -> list[str]:
     """Nội dung ô giá: tên món, giá rẻ nhất, giá phổ biến + số món, 1 lưu ý quan trọng nhất."""
-    lines = [it.title[:MAX_CHARS]]
+    lines = [title]
     ls = [l for l in result["listings"] if l.get("amount") is not None]
     if not ls:
         lines.append("Không có món nào đang bán")
@@ -120,7 +126,7 @@ def fmt_each(v: float) -> str:
 
 def market_lines(title, mk) -> list[str]:
     """Ô giá theo giao dịch đã khớp trên Currency Exchange (Faustus)."""
-    lines = [title[:MAX_CHARS]]
+    lines = [title]
     if "chaos" in mk:
         lines.append(f"≈ {fmt_each(mk['chaos'])} c/món")
     if "divine" in mk and ("chaos" not in mk or mk["divine"] >= 0.1):
@@ -132,16 +138,17 @@ def market_lines(title, mk) -> list[str]:
     return lines
 
 
-def bulk_lines(title, res) -> list[str]:
-    """Ô giá cho đồ bán theo lô: giá mỗi món rẻ nhất tính bằng chaos và divine, số người bán đang online."""
-    lines = [title[:MAX_CHARS]]
+def bulk_lines(title, res, currencies=(("chaos", "c"), ("divine", "div"))) -> list[str]:
+    """Ô giá cho đồ bán theo lô: giá mỗi món rẻ nhất tính bằng tiền chính của game, số người bán đang online."""
+    lines = [title]
     best = res.get("best") or {}
     if not best:
         return lines + ["Sàn trao đổi: không ai bán"]
-    if "chaos" in best:
-        lines.append(f"Rẻ nhất: {fmt_each(best['chaos']['each'])} c/món")
-    if "divine" in best:
-        lines.append(f"Hoặc {fmt_each(best['divine']['each'])} div/món")
+    first = True
+    for cur, short in currencies:
+        if cur in best:
+            lines.append(f"{'Rẻ nhất' if first else 'Hoặc'}: {fmt_each(best[cur]['each'])} {short}/món")
+            first = False
     lines.append(f"{res.get('sellers', 0)} người bán" + (" (cả offline)" if res.get("offline") else " online"))
     return lines
 
@@ -204,8 +211,13 @@ class Watcher:
     tooltip thì hiện ô và chỉ theo dõi riêng vùng tooltip đó. Vùng đó đổi (đóng tooltip, chuyển món) thì xóa ô và tìm lại.
     """
 
-    def __init__(self, D, trade=None, status="securable", log_dir=None, threaded=True, clock=time.monotonic):
+    def __init__(self, D, trade=None, status="securable", log_dir=None, threaded=True, clock=time.monotonic,
+                 game="poe1", loader=None, state_path=None):
         self.D, self.trade, self.status = D, trade, status
+        self.game = game                                 # "poe1" / "poe2": bấm nút Game trong cửa sổ CouchSubs để đổi
+        self.loader = loader                             # game -> (dữ liệu, Trade); nạp khi chuyển sang game chưa nạp
+        self.games = {game: (D, trade)}
+        self.state_path = state_path
         self.log_dir, self.threaded, self.clock = log_dir, threaded, clock
         self.lock = threading.Lock()
         self.prev = None          # ảnh thu nhỏ của khung trước (chỉ để báo mức động)
@@ -273,21 +285,24 @@ class Watcher:
         t0 = time.time()
         rec = {"at": time.strftime("%H:%M:%S"), "found": False}
         try:
-            tt = tooltip.find(img, self.D)
+            with self.lock:
+                D, trade, game = self.D, self.trade, self.game
+            job["game"] = game
+            tt = tooltip.find(img, D)
             rec["ocr_s"] = round(time.time() - t0, 2)
             if not tt:
                 return
             rec["found"] = True
             H, W = img.shape[:2]
             inner = inner_box(tt.box, W, H)
-            it = parse.parse(tt.header, tt.lines, self.D)
+            it = parse.parse(tt.header, tt.lines, D)
             if it.foulborn:
-                parse.add_mutated(it, tooltip.pink_rows(img, tt), self.D)
-            q, notes = query.build(it, status=self.status)
+                parse.add_mutated(it, tooltip.pink_rows(img, tt), D)
+            q, notes = query.build(it, status=self.status, game=game)
             key = "|".join(letters_key(x) for x in tt.header + [l.text for l in tt.lines[:6]])
-            rec.update(name=it.name, base=it.base, rarity=it.rarity, notes=notes)
-            title = it.title
-            wait = [title[:MAX_CHARS], "Đang tra giá…"]
+            rec.update(name=it.name, base=it.base, rarity=it.rarity, notes=notes, game=game)
+            title = head(it.title, game)
+            wait = [title, "Đang tra giá…"]
             sig = crop_sig(img, inner)
             with self.lock:
                 # OCR mất 1–2 giây: tooltip đã đóng hoặc đổi trong lúc đó thì thôi
@@ -302,34 +317,35 @@ class Watcher:
                     rec.update(text=cached[1], shown=True, cached=True)
                     return
                 self.pending.append(region("\n".join(wait), place(tt.box, W, H, wait)))
-            tag = self.D.trade_tags.get(letters_key(it.name)) if it.rarity == "Other" else None
-            if self.trade is None:
-                lines = [title[:MAX_CHARS], "(chưa bật tra giá)"] + note_lines(notes)[:1]
+            tag = D.trade_tags.get(letters_key(it.name)) if it.rarity == "Other" else None
+            if trade is None:
+                lines = [title, "(chưa bật tra giá)"] + note_lines(notes)[:1]
             elif tag:
                 # đồ bán theo lô (currency, fragment, offering, scarab…): tra trên sàn trao đổi
                 from .trade import RateLimited
                 try:
-                    stem = self.D.icon_stems.get(letters_key(it.name))
-                    mk = self.trade.market(stem) if stem else None
+                    from .trade import MAIN_CURRENCY
+                    stem = D.icon_stems.get(letters_key(it.name))
+                    mk = trade.market(stem) if stem else None
                     if mk:
                         lines = market_lines(title, mk)
                         rec["summary"] = {"market": stem, **mk}
                     else:
-                        res = self.trade.exchange_any(tag)
-                        lines = bulk_lines(title, res)
+                        res = trade.exchange_any(tag)
+                        lines = bulk_lines(title, res, MAIN_CURRENCY[game])
                         rec["summary"] = {"exchange": tag, "url": res["url"], "cached": res.get("cached")}
                     with self.lock:
                         self.recent[key] = (time.time(), lines)
                 except RateLimited as e:
-                    lines = [title[:MAX_CHARS], f"Trade API bận, chờ {int(getattr(e, 'wait', 0)) + 1} giây"]
+                    lines = [title, f"Trade API bận, chờ {int(getattr(e, 'wait', 0)) + 1} giây"]
                 except Exception as e:
-                    lines = [title[:MAX_CHARS], "Lỗi tra giá", str(e)[:MAX_CHARS]]
+                    lines = [title, "Lỗi tra giá", str(e)[:MAX_CHARS]]
                     rec["error"] = str(e)
             else:
                 from .trade import RateLimited
                 try:
                     try:
-                        res = self.trade.search(q)
+                        res = trade.search(q)
                     except RateLimited:
                         raise
                     except Exception:
@@ -338,25 +354,26 @@ class Watcher:
                         if mf.pop("foulborn_item", None) is None:
                             raise
                         rec["foulborn_filter_failed"] = True
-                        res = self.trade.search(q)
+                        res = trade.search(q)
                     if it.foulborn and it.mutated and res["total"] == 0:
                         q["query"]["stats"] = [{"type": "and", "filters": []}]
-                        res = self.trade.search(q)
+                        res = trade.search(q)
                         notes = [n for n in notes if not n.startswith("Foulborn")] + ["Foulborn: chưa ai bán đúng dòng đột biến"]
-                    lines = price_lines(it, res, notes)
+                    lines = price_lines(title, res, notes)
                     if rec.get("foulborn_filter_failed"):
                         lines.append("! Trade không lọc được Foulborn")
                     with self.lock:
                         self.recent[key] = (time.time(), lines)
                     rec["summary"] = {"total": res["total"], "url": res["url"], "cached": res.get("cached")}
                 except RateLimited as e:
-                    lines = [title[:MAX_CHARS], f"Trade API bận, chờ {int(getattr(e, 'wait', 0)) + 1} giây"]
+                    lines = [title, f"Trade API bận, chờ {int(getattr(e, 'wait', 0)) + 1} giây"]
                 except Exception as e:  # mạng, 403…
-                    lines = [title[:MAX_CHARS], "Lỗi tra giá", str(e)[:MAX_CHARS]]
+                    lines = [title, "Lỗi tra giá", str(e)[:MAX_CHARS]]
                     rec["error"] = str(e)
             rec["text"] = lines
             with self.lock:
-                ok = not job["stale"] and self.shown is not None and self.shown["key"] == key
+                ok = (not job["stale"] and self.shown is not None and self.shown["key"] == key
+                      and job.get("game") == self.game)
                 if ok:
                     self.pending.append(region("\n".join(lines), place(tt.box, W, H, lines)))
             rec["shown"] = ok
@@ -384,9 +401,11 @@ class Watcher:
         """Cờ gửi kèm mỗi phản hồi cho CouchSubs: dịch bật/tắt, yêu cầu dịch cả màn hình (một lần)."""
         with self.lock:
             screen, self.screen_pending = self.screen_pending, False
-            return {"price": self.price_on, "translate": self.translate_on, "screen": screen}
+            return {"price": self.price_on, "translate": self.translate_on, "screen": screen, "game": self.game}
 
-    def set(self, price=None, translate=None, screen=False):
+    def set(self, price=None, translate=None, screen=False, game=None):
+        if game is not None and game != self.game:
+            self.switch_game(game)
         with self.lock:
             if price is not None:
                 self.price_on = price
@@ -394,8 +413,44 @@ class Watcher:
                 self.translate_on = translate
             if screen:
                 self.screen_pending = True
-        print(f"[{time.strftime('%H:%M:%S')}] tra giá {'BẬT' if self.price_on else 'TẮT'} · dịch {'BẬT' if self.translate_on else 'TẮT'}"
-              + (" · dịch cả màn hình" if screen else ""), flush=True)
+        print(f"[{time.strftime('%H:%M:%S')}] {GAME_NAME[self.game]} · tra giá {'BẬT' if self.price_on else 'TẮT'}"
+              f" · dịch {'BẬT' if self.translate_on else 'TẮT'}" + (" · dịch cả màn hình" if screen else ""), flush=True)
+
+    def switch_game(self, game):
+        """Đổi PoE1 ⇄ PoE2: nạp dữ liệu game đó nếu chưa có (vài giây, lần đầu), xóa ô giá đang hiện, nhớ lựa chọn."""
+        if game not in GAME_NAME:
+            return
+        if game not in self.games:
+            if self.loader is None:
+                print(f"Không chuyển được sang {GAME_NAME[game]}: chưa có bộ nạp dữ liệu", flush=True)
+                return
+            print(f"Đang nạp dữ liệu {GAME_NAME[game]}…", flush=True)
+            try:
+                self.games[game] = self.loader(game)
+            except Exception as e:
+                print(f"Không nạp được dữ liệu {GAME_NAME[game]}: {e}", flush=True)
+                return
+        with self.lock:
+            self.game = game
+            self.D, self.trade = self.games[game]
+            if self.shown is not None:
+                self.pending.append(region(""))
+                self.shown = None
+            if self.job is not None:
+                self.job["stale"] = True
+            self.recent.clear()
+        if self.state_path:
+            try:
+                with open(self.state_path, "w", encoding="utf-8") as f:
+                    json.dump({"game": game}, f)
+            except OSError:
+                pass
+        tr = self.trade
+        try:
+            league = tr.pick_league() if tr else "-"
+        except Exception as e:
+            league = f"chưa lấy được ({e})"
+        print(f"[{time.strftime('%H:%M:%S')}] Đã chuyển sang {GAME_NAME[game]} · league {league}", flush=True)
 
     def status_line(self):
         """Một dòng tóm tắt 10 giây vừa qua."""
@@ -469,6 +524,7 @@ padding:22px 10px;margin:12px 0;border-radius:14px}} small{{font-size:14px;opaci
 {btn("price", w.price_on, "Tra giá")}
 {btn("translate", w.translate_on, "Dịch phụ đề tiếng Việt")}
 <a class="b" style="background:#1565c0" href="/set?screen=1">Dịch cả màn hình<br><small>bấm lần nữa để tắt</small></a>
+<a class="b" style="background:#6a1b9a" href="/set?game={"poe1" if w.game == "poe2" else "poe2"}">Game: {GAME_NAME[w.game]}<br><small>bấm để chuyển sang {"PoE1" if w.game == "poe2" else "PoE2"}</small></a>
 <p>Dịch cần khóa AI (Gemini miễn phí hoặc Claude) nhập trong CouchSubs › Settings › Translation. Chưa có khóa thì phụ đề giữ tiếng Anh.</p>
 </body></html>"""
 
@@ -515,7 +571,8 @@ def make_handler(watcher: Watcher):
                     from urllib.parse import parse_qs
                     q = {k: v[-1] for k, v in parse_qs(qs).items()}
                     onoff = lambda k: None if k not in q else q[k] == "1"
-                    watcher.set(price=onoff("price"), translate=onoff("translate"), screen=q.get("screen") == "1")
+                    watcher.set(price=onoff("price"), translate=onoff("translate"), screen=q.get("screen") == "1",
+                                game=q.get("game") if q.get("game") in GAME_NAME else None)
                     if q.get("json") == "1":          # nút trong cửa sổ CouchSubs bản sửa
                         return self._json(200, watcher.flags())
                     self.send_response(303)
@@ -553,27 +610,49 @@ def main(argv=None):
                     help="127.0.0.1 = chỉ máy này (mặc định; bật/tắt bằng nút trong CouchSubs); 0.0.0.0 = mở thêm trang bật/tắt trên điện thoại")
     ap.add_argument("--no-trade", action="store_true", help="chỉ đọc món, không tra giá")
     ap.add_argument("--status", default="securable", help="securable = mua ngay (mặc định) | available | online | any")
-    ap.add_argument("--league", default=None)
-    ap.add_argument("--realm", default="sony")
+    ap.add_argument("--league", default=None, help="league PoE1 (mặc định tự lấy league mới nhất của realm)")
+    ap.add_argument("--league2", default=None, help="league PoE2 (mặc định tự lấy league trade2 mới nhất)")
+    ap.add_argument("--realm", default="sony", help="realm PoE1")
+    ap.add_argument("--game", choices=list(GAME_NAME), default=None,
+                    help="game lúc mở; mặc định là game chọn lần trước (nút Game trong CouchSubs), lần đầu là poe1")
     ap.add_argument("--logs", default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs"),
                     help="thư mục lưu ảnh và kết quả các lần tra gần nhất ('' để tắt)")
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
 
-    print("Đang nạp dữ liệu và mô hình OCR…", flush=True)
-    D = data.load()
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    state_path = os.path.join(root, "state.json")
+    game = a.game
+    if game is None:
+        try:
+            with open(state_path, encoding="utf-8") as f:
+                game = json.load(f).get("game")
+        except (OSError, ValueError):
+            game = None
+    if game not in GAME_NAME:
+        game = "poe1"
+
+    def loader(g):
+        """Nạp dữ liệu món đồ/mod và tạo Trade cho một game."""
+        D = data.load(g)
+        tr = None
+        if not a.no_trade:
+            from .trade import Trade
+            tr = Trade(realm=a.realm, league=a.league if g == "poe1" else a.league2, game=g)
+        return D, tr
+
+    print(f"Đang nạp dữ liệu {GAME_NAME[game]} và mô hình OCR…", flush=True)
+    D, tr = loader(game)
     from . import ocr
     ocr.read(np.full((64, 256, 3), 255, np.uint8))     # nạp sẵn mô hình, lần tra đầu không bị chậm
-    tr = None
-    if not a.no_trade:
-        from .trade import Trade
-        tr = Trade(realm=a.realm, league=a.league)
+    if tr is not None:
         try:
-            print(f"League: {tr.pick_league()} (realm {a.realm})", flush=True)
+            print(f"{GAME_NAME[game]} · league: {tr.pick_league()}" + (f" (realm {a.realm})" if game == "poe1" else ""),
+                  flush=True)
         except Exception as e:
             print(f"Chưa lấy được league ({e}); sẽ thử lại khi tra", flush=True)
-    w = Watcher(D, tr, status=a.status, log_dir=a.logs or None)
+    w = Watcher(D, tr, status=a.status, log_dir=a.logs or None, game=game, loader=loader, state_path=state_path)
 
     def report():
         waited = 0

@@ -1,4 +1,4 @@
-"""Nạp dữ liệu món đồ và mod lấy từ Awakened PoE Trade (giấy phép MIT, xem data/LICENSE-awakened-poe-trade.txt)."""
+"""Nạp dữ liệu món đồ và mod: PoE1 lấy từ Awakened PoE Trade (data/, MIT), PoE2 lấy từ Exiled Exchange 2 (data/poe2/, MIT)."""
 from __future__ import annotations
 
 import json
@@ -9,6 +9,7 @@ from pathlib import Path
 from rapidfuzz import fuzz, process
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+GAMES = ("poe1", "poe2")
 
 # Nhóm loại món đồ, theo renderer/src/parser/meta.ts của APT
 WEAPON = {
@@ -18,6 +19,14 @@ WEAPON = {
 }
 ARMOUR = {"Body Armour", "Boots", "Gloves", "Helmet", "Shield"}
 JEWELLERY = {"Amulet", "Ring", "Belt"}
+# PoE2 (tên loại theo dữ liệu Exiled Exchange 2, khác PoE1 nên gộp chung không lẫn)
+WEAPON |= {"One Hand Axe", "Two Hand Axe", "One Hand Mace", "Two Hand Mace", "One Hand Sword", "Two Hand Sword",
+           "Crossbow", "Spear", "Flail", "Talisman"}
+ARMOUR |= {"Buckler", "Focus"}
+# PoE2: những loại có "craftable" nhưng không phải trang bị (tiền tệ, soul core, omen…) → xếp vào nhóm vật phẩm khác
+POE2_NON_EQUIP = {"Currency", "SoulCore", "Omen", "Map", "MapFragment", "MiscMapItem", "PinnacleKey", "VaultKey",
+                  "TowerAugment", "BrequelFruit", "Breachstone", "ExpeditionLogbook", "Incubator", "QuestItem",
+                  "UncutSkillGem"}
 
 # Loại món -> mã danh mục trên trade (theo pathofexile-trade.ts của APT)
 TRADE_CATEGORY = {
@@ -31,6 +40,11 @@ TRADE_CATEGORY = {
     "Two-Handed Mace": "weapon.twomace", "Two-Handed Sword": "weapon.twosword", "Wand": "weapon.wand",
     "Warstaff": "weapon.warstaff", "Cluster Jewel": "jewel.cluster", "Trinket": "accessory.trinket",
     "Tincture": "tincture",
+    # PoE2 (theo pathofexile-trade.ts của Exiled Exchange 2)
+    "One Hand Axe": "weapon.oneaxe", "Two Hand Axe": "weapon.twoaxe", "One Hand Mace": "weapon.onemace",
+    "Two Hand Mace": "weapon.twomace", "One Hand Sword": "weapon.onesword", "Two Hand Sword": "weapon.twosword",
+    "Crossbow": "weapon.crossbow", "Spear": "weapon.spear", "Flail": "weapon.flail", "Talisman": "weapon.talisman",
+    "Buckler": "armour.buckler", "Focus": "armour.focus", "Charm": "flask.charm",
 }
 
 
@@ -58,6 +72,7 @@ class StatMatch:
 
 @dataclass
 class Data:
+    game: str = "poe1"
     bases: dict = field(default_factory=dict)       # letters(base) -> {"name", "category"}
     uniques: dict = field(default_factory=dict)     # letters(name) -> {"name", "base"}
     gems: dict = field(default_factory=dict)        # letters(name) -> name
@@ -161,23 +176,27 @@ def _resolve(cands, category):
     return items[0]
 
 
-_DATA: Data | None = None
+_DATA: dict = {}
 
 
-def load() -> Data:
-    global _DATA
-    if _DATA is not None:
-        return _DATA
-    d = Data()
-    for line in open(DATA_DIR / "items.ndjson", encoding="utf-8"):
+def load(game: str = "poe1") -> Data:
+    if game not in GAMES:
+        raise ValueError(f"game phải là một trong {GAMES}")
+    if game in _DATA:
+        return _DATA[game]
+    folder = DATA_DIR if game == "poe1" else DATA_DIR / game
+    d = Data(game=game)
+    for line in open(folder / "items.ndjson", encoding="utf-8"):
         o = json.loads(line)
         ns, name = o.get("namespace"), o.get("name")
+        if not name:            # dữ liệu PoE2 có vài dòng không tên
+            continue
         if o.get("tradeTag") and name:
             d.trade_tags[letters(name)] = o["tradeTag"]
             icon = (o.get("icon") or "").rsplit("/", 1)[-1]
             if icon.endswith(".png"):
                 d.icon_stems[letters(name)] = icon[:-4]
-        if ns == "ITEM" and o.get("craftable"):
+        if ns == "ITEM" and o.get("craftable") and not (game == "poe2" and o["craftable"]["category"] in POE2_NON_EQUIP):
             d.bases[letters(name)] = {"name": name, "category": o["craftable"]["category"]}
         elif ns == "UNIQUE" and o.get("unique"):
             d.uniques[letters(name)] = {"name": name, "base": o["unique"]["base"]}
@@ -185,7 +204,7 @@ def load() -> Data:
             d.gems[letters(name)] = name
         elif ns in ("ITEM", "DIVINATION_CARD", "CAPTURED_BEAST"):
             d.others[letters(name)] = (name, ns)
-    for line in open(DATA_DIR / "stats.ndjson", encoding="utf-8"):
+    for line in open(folder / "stats.ndjson", encoding="utf-8"):
         o = json.loads(line)
         group = o if "resolve" in o else None
         for entry in (o["stats"] if group else [o]):
@@ -194,5 +213,5 @@ def load() -> Data:
                     continue
                 d.matchers.setdefault(template_key(m["string"]), []).append((entry, m, group))
     d._matcher_keys = list(d.matchers.keys())
-    _DATA = d
+    _DATA[game] = d
     return d

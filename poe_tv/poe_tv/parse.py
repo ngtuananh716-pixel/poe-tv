@@ -28,6 +28,18 @@ PROP_PATTERNS = {
     "requires": r"^REQUIRES",
     "ilvl": r"^ITEM ?LEVEL",
 }
+# PoE2: tên thuộc tính khác PoE1, sát thương nguyên tố ghi riêng từng hệ. Chỉ dùng khi tra PoE2 để không bắt nhầm
+# dòng mod PoE1 bắt đầu bằng "Fire Damage…" (cả khối bị coi là thuộc tính thì mất mod).
+PROP_PATTERNS_POE2 = {
+    **{k: v for k, v in PROP_PATTERNS.items() if k not in ("crit", "block")},
+    "crit": r"^CRITICAL ?(STRIKE|HIT) ?CHANCE",
+    "block": r"^(CHANCE ?TO ?BLOCK|BLOCK ?CHANCE)",
+    "fire": r"^FIRE ?DAMAGE\W*\d+-\d+",
+    "cold": r"^COLD ?DAMAGE\W*\d+-\d+",
+    "lightning": r"^LIGHTNING ?DAMAGE\W*\d+-\d+",
+    "reload": r"^RELOAD ?TIME",
+    "spirit": r"^SPIRIT\W*\d",
+}
 
 
 # Chế độ "Advanced Descriptions" (bấm R3 trong game): có thêm dòng mô tả mod và khoảng giá trị "7(6-9)"
@@ -192,6 +204,7 @@ def parse(header: list[str], lines: list[ocr.Line], data: Data) -> Item:
 
     # ---- đọc thuộc tính và mod theo từng khối ----
     secs = _sections(rows)
+    patterns = PROP_PATTERNS_POE2 if getattr(data, "game", "poe1") == "poe2" else PROP_PATTERNS
     mod_secs = []
     after_req = False
     for sec in secs:
@@ -199,11 +212,15 @@ def parse(header: list[str], lines: list[ocr.Line], data: Data) -> Item:
         is_prop = False
         for t in texts:
             tt = t.replace(" ", "")
-            for key, pat in PROP_PATTERNS.items():
+            for key, pat in patterns.items():
                 if re.match(pat.replace(" ?", ""), tt):
-                    if key in ("phys", "ele", "chaos"):
+                    if key in ("phys", "ele", "chaos", "fire", "cold", "lightning"):
                         # chỉ lấy các cặp "a-b", bỏ số rác dính vào hàng
-                        it.props[key] = [float(x) for pair in re.findall(r"(\d+)\s*-\s*(\d+)", t) for x in pair]
+                        pairs = [float(x) for pair in re.findall(r"(\d+)\s*-\s*(\d+)", t) for x in pair]
+                        if key in ("fire", "cold", "lightning"):      # PoE2: gộp các hệ vào sát thương nguyên tố
+                            it.props.setdefault("ele", []).extend(pairs)
+                        else:
+                            it.props[key] = pairs
                     else:
                         it.props[key] = numbers(t)
                     is_prop = True

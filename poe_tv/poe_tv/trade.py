@@ -1,9 +1,11 @@
-"""Gọi trade API của pathofexile.com (realm Sony), có giới hạn tốc độ và nhớ tạm ngắn hạn."""
+"""Gọi trade API của pathofexile.com, có giới hạn tốc độ và nhớ tạm ngắn hạn.
+PoE1: /api/trade/…/{realm}/{league} (realm Sony). PoE2: /api/trade2/…/{league} (như Exiled Exchange 2; PoE2 không chia realm)."""
 from __future__ import annotations
 
 import json
 import time
 from collections import Counter, defaultdict, deque
+from urllib.parse import quote
 
 import requests
 
@@ -19,9 +21,15 @@ class RateLimited(Exception):
         self.wait = wait
 
 
+# tiền dùng để định giá đồ bán theo lô: (mã trên sàn, chữ viết tắt hiện trên TV)
+MAIN_CURRENCY = {"poe1": (("chaos", "c"), ("divine", "div")), "poe2": (("exalted", "ex"), ("divine", "div"))}
+
+
 class Trade:
-    def __init__(self, realm="sony", league=None, session=None):
-        self.realm = realm
+    def __init__(self, realm="sony", league=None, session=None, game="poe1"):
+        self.game = game
+        self.realm = realm if game == "poe1" else "poe2"
+        self.api = "trade" if game == "poe1" else "trade2"
         # Gọi API với User-Agent ghi rõ tên công cụ, không giả dạng trình duyệt
         self.s = session or requests.Session()
         self.s.headers.update({"User-Agent": USER_AGENT, "Accept": "application/json"})
@@ -79,14 +87,24 @@ class Trade:
     def pick_league(self):
         if self.league:
             return self.league
-        data = self._call("data", "GET", f"{BASE}/api/trade/data/leagues")
-        cands = [l["id"] for l in data["result"] if l.get("realm") == self.realm]
+        data = self._call("data", "GET", f"{BASE}/api/{self.api}/data/leagues")
+        cands = [l["id"] for l in data["result"] if l.get("realm", self.realm) == self.realm]
         for lid in cands:
-            if not any(w in lid for w in ("Hardcore", "HC ", "Ruthless", "Standard")):
+            if not any(w in lid for w in ("Hardcore", "HC ", "HC)", "Ruthless", "Standard", "SSF", "Solo")):
                 self.league = lid
                 return lid
         self.league = cands[0]
         return self.league
+
+    def _path(self, kind, league):
+        """Đường dẫn API search/exchange: PoE1 có realm, PoE2 thì không."""
+        if self.game == "poe1":
+            return f"{BASE}/api/trade/{kind}/{self.realm}/{quote(league)}"
+        return f"{BASE}/api/trade2/{kind}/{quote(league)}"
+
+    def _site(self, kind, league, qid):
+        """Link mở trang trade trên trình duyệt."""
+        return f"{BASE}/{self.api}/{kind}/{self.realm}/{quote(league)}/{qid}"
 
     def search(self, query, fetch=10):
         league = self.pick_league()
@@ -94,12 +112,12 @@ class Trade:
         hit = self.cache.get(key)
         if hit and time.time() - hit[0] < CACHE_TTL:
             return {**hit[1], "cached": True}
-        res = self._call("search", "POST", f"{BASE}/api/trade/search/{self.realm}/{league}", json=query)
+        res = self._call("search", "POST", self._path("search", league), json=query)
         listings = []
         ids = res.get("result", [])[:fetch]
         if ids:
-            got = self._call("fetch", "GET",
-                             f"{BASE}/api/trade/fetch/{','.join(ids)}?query={res['id']}&realm={self.realm}")
+            extra = f"&realm={self.realm}" if self.game == "poe1" else ""
+            got = self._call("fetch", "GET", f"{BASE}/api/{self.api}/fetch/{','.join(ids)}?query={res['id']}{extra}")
             for x in got.get("result", []):
                 if not x:
                     continue
@@ -111,7 +129,7 @@ class Trade:
                     "mods": [m if isinstance(m, str) else str(m) for m in x["item"].get("explicitMods", [])],
                 })
         out = {"total": res.get("total", 0), "league": league, "listings": listings,
-               "url": f"{BASE}/trade/search/{self.realm}/{league}/{res.get('id')}", "cached": False}
+               "url": self._site("search", league, res.get("id")), "cached": False}
         self.cache[key] = (time.time(), out)
         return out
 
@@ -142,7 +160,10 @@ class Trade:
 
     def market(self, stem, hours=3):
         """Giá đã khớp trên Currency Exchange của món có mã nội bộ kết thúc bằng `stem`, gộp `hours` giờ gần nhất.
-        Trả {"chaos": giá c/món, "divine": giá div/món, "volume": số món đã khớp} hoặc None nếu không có giao dịch."""
+        Trả {"chaos": giá c/món, "divine": giá div/món, "volume": số món đã khớp} hoặc None nếu không có giao dịch.
+        Chỉ PoE1: chưa kiểm chứng API này cho PoE2."""
+        if self.game != "poe1":
+            return None
         league = self.pick_league()
         now_h = int(time.time()) // 3600 * 3600
         agg = {"chaos": [0.0, 0.0], "divine": [0.0, 0.0]}   # [tổng tiền, tổng món]
@@ -175,16 +196,17 @@ class Trade:
 
     def exchange(self, tag, status="online"):
         """Tra giá đồ bán theo lô (currency, fragment, offering, scarab…) trên sàn trao đổi: 1 lần gọi là có giá,
-        không cần bước fetch. Trả giá mỗi món tính bằng chaos và bằng divine (ai bán rẻ nhất)."""
+        không cần bước fetch. Trả giá mỗi món tính bằng tiền chính của game (PoE1 chaos/divine, PoE2 exalted/divine),
+        lấy người bán rẻ nhất."""
         league = self.pick_league()
-        have = [c for c in ("chaos", "divine") if c != tag]      # không đổi divine lấy chính divine
+        have = [c for c, _ in MAIN_CURRENCY[self.game] if c != tag]      # không đổi divine lấy chính divine
         body = {"engine": "new", "query": {"status": {"option": status}, "have": have, "want": [tag]},
                 "sort": {"have": "asc"}}
         key = json.dumps(body, sort_keys=True)
         hit = self.cache.get(key)
         if hit and time.time() - hit[0] < CACHE_TTL:
             return {**hit[1], "cached": True}
-        res = self._call("exchange", "POST", f"{BASE}/api/trade/exchange/{self.realm}/{league}", json=body)
+        res = self._call("exchange", "POST", self._path("exchange", league), json=body)
         offers = []
         for r in (res.get("result") or {}).values():
             lst = (r or {}).get("listing") or {}
@@ -200,7 +222,7 @@ class Trade:
             if o["currency"] not in best or o["each"] < best[o["currency"]]["each"]:
                 best[o["currency"]] = o
         out = {"total": res.get("total", 0), "league": league, "best": best, "sellers": len(offers),
-               "url": f"{BASE}/trade/exchange/{self.realm}/{league}/{res.get('id')}", "cached": False}
+               "url": self._site("exchange", league, res.get("id")), "cached": False}
         self.cache[key] = (time.time(), out)
         return out
 

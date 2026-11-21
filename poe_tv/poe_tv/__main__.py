@@ -1,4 +1,4 @@
-"""Chạy thử: python -m poe_tv anh1.jpg [anh2.jpg ...] [--no-trade] [--json] [--status any] [--league Covens]"""
+"""Chạy thử: python -m poe_tv anh1.jpg [anh2.jpg ...] [--no-trade] [--json] [--status any] [--league Covens] [--game poe2]"""
 from __future__ import annotations
 
 import argparse
@@ -25,15 +25,16 @@ def main(argv=None):
     ap.add_argument("--status", default="securable", help="securable = mua ngay (mặc định) | available | online | any")
     ap.add_argument("--league", default=None, help="tên league, mặc định tự chọn league trade mới nhất")
     ap.add_argument("--realm", default="sony")
+    ap.add_argument("--game", choices=["poe1", "poe2"], default="poe1")
     a = ap.parse_args(argv)
 
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    D = data.load()
+    D = data.load(a.game)
     tr = None
     if not a.no_trade:
         from .trade import RateLimited, Trade, summarize
-        tr = Trade(realm=a.realm, league=a.league)
+        tr = Trade(realm=a.realm, league=a.league, game=a.game)
 
     out = []
     for path in a.images:
@@ -49,7 +50,7 @@ def main(argv=None):
         it = parse.parse(tt.header, tt.lines, D)
         if it.foulborn:
             parse.add_mutated(it, tooltip.pink_rows(img, tt), D)
-        q, notes = query.build(it, status=a.status)
+        q, notes = query.build(it, status=a.status, game=a.game)
         rec = {"file": path, "rarity": it.rarity, "name": it.name, "base": it.base, "category": it.category,
                "mods": [{"kind": m.kind, "ref": m.ref, "values": m.values, "score": m.score} for m in it.mods],
                "notes": notes, "query": q, "ocr_seconds": round(time.time() - t0, 2)}

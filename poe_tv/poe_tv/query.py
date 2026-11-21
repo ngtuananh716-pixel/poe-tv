@@ -31,18 +31,29 @@ PSEUDO = {
     "chaos_res": "pseudo.pseudo_total_chaos_resistance", "str": "pseudo.pseudo_total_strength",
     "dex": "pseudo.pseudo_total_dexterity", "int": "pseudo.pseudo_total_intelligence",
 }
+# Dữ liệu PoE2 (Exiled Exchange 2) ghi mod không có dấu "+" ở đầu ("#% to Fire Resistance"): so khớp bỏ dấu "+".
+def _k(ref: str) -> str:
+    return ref.replace("+", "")
+
+
+RES = {_k(k): v for k, v in RES.items()}
+ATTR = {_k(k): v for k, v in ATTR.items()}
+
 # mod quan trọng: luôn đưa vào bộ lọc nếu món có
 IMPORTANT = ("Movement Speed", "to Level of", "Critical Strike Multiplier", "increased maximum Life",
              "increased maximum Energy Shield", "Spell Damage", "Damage over Time Multiplier",
-             "Physical Damage to Attacks", "increased Cast Speed", "Suppress Spell Damage")
+             "Physical Damage to Attacks", "increased Cast Speed", "Suppress Spell Damage",
+             "Critical Damage Bonus", "to Spirit")      # 2 mục cuối là mod PoE2
 
 
 def _min(v):
     return math.floor(v * (1 - RANGE)) if v > 0 else v
 
 
-def build(it: Item, status: str = "securable"):
-    """Trả về (query, ghi_chú[]) để gửi lên /api/trade/search."""
+def build(it: Item, status: str = "securable", game: str = "poe1"):
+    """Trả về (query, ghi_chú[]) để gửi lên /api/trade/search (PoE1) hoặc /api/trade2/search (PoE2).
+    PoE2 gộp bộ lọc vũ khí và giáp vào equipment_filters; không có Foulborn."""
+    poe2 = game == "poe2"
     notes = []
     q = {"query": {"status": {"option": status}, "filters": {}, "stats": [{"type": "and", "filters": []}]},
          "sort": {"price": "asc"}}
@@ -59,6 +70,8 @@ def build(it: Item, status: str = "securable"):
 
     if it.rarity == "Unique":
         qq["name"], qq["type"] = it.name, it.base
+        if poe2:
+            return q, notes
         # đồ Foulborn và đồ thường cùng tên giá khác hẳn nhau: lọc đúng loại (như Awakened PoE Trade)
         mf = flt.setdefault("misc_filters", {"filters": {}})["filters"]
         mf["foulborn_item"] = {"option": "true" if it.foulborn else "false"}
@@ -107,24 +120,26 @@ def build(it: Item, status: str = "securable"):
         if edps >= 30:
             wf["edps"] = {"min": _min(edps)}
         if wf:
-            flt["weapon_filters"] = {"filters": wf}
+            flt["equipment_filters" if poe2 else "weapon_filters"] = {"filters": wf}
         else:
             notes.append("Vũ khí sát thương thấp: lọc theo mod quan trọng thay vì DPS")
 
     # gộp chỉ số tổng như APT
-    life = sum(m.value for m in mods if m.ref == "+# to maximum Life")
-    es_flat = sum(m.value for m in mods if m.ref == "+# to maximum Energy Shield")
+    life = sum(m.value for m in mods if _k(m.ref) == "# to maximum Life")
+    es_flat = sum(m.value for m in mods if _k(m.ref) == "# to maximum Energy Shield")
     attrs = {"str": 0.0, "dex": 0.0, "int": 0.0}
     for m in mods:
-        if m.ref in ATTR:
-            for a in (("str", "dex", "int") if ATTR[m.ref] == "all" else ATTR[m.ref].split()):
+        if _k(m.ref) in ATTR:
+            a_kind = ATTR[_k(m.ref)]
+            for a in (("str", "dex", "int") if a_kind == "all" else a_kind.split()):
                 attrs[a] += m.value
-    ele = sum(m.value * RES[m.ref][0] for m in mods if m.ref in RES)
-    chaos = sum(m.value for m in mods if m.ref in RES and RES[m.ref][1])
+    ele = sum(m.value * RES[_k(m.ref)][0] for m in mods if _k(m.ref) in RES)
+    chaos = sum(m.value for m in mods if _k(m.ref) in RES and RES[_k(m.ref)][1])
 
     defensive = is_armour(it) or is_jewellery(it) or it.category in ("Quiver", "Jewel", "Abyss Jewel")
     if life > 0:
-        stats.append({"id": PSEUDO["life"], "value": {"min": _min(life + attrs["str"] / 2)}})
+        # PoE1: 2 Str = 1 máu (như APT). PoE2 chưa kiểm chứng nên chỉ tính máu cộng thẳng
+        stats.append({"id": PSEUDO["life"], "value": {"min": _min(life + (0 if poe2 else attrs["str"] / 2))}})
     if es_flat > 0 and not is_armour(it):
         stats.append({"id": PSEUDO["es"], "value": {"min": _min(es_flat)}})
     if ele > 0:
@@ -146,10 +161,13 @@ def build(it: Item, status: str = "securable"):
             if it.props.get(key):
                 af[tkey] = {"min": _min(it.props[key][0])}
         if af:
-            flt["armour_filters"] = {"filters": af}
+            if poe2:
+                flt.setdefault("equipment_filters", {"filters": {}})["filters"].update(af)
+            else:
+                flt["armour_filters"] = {"filters": af}
 
     if defensive and life == 0 and es_flat < 40 and not (is_armour(it) and it.props.get("es")):
         notes.append("Món không có máu: giá thật nhiều khả năng THẤP hơn các món tương tự tìm được")
-    if not stats and not flt.get("weapon_filters") and not flt.get("armour_filters"):
+    if not stats and not any(flt.get(k) for k in ("weapon_filters", "armour_filters", "equipment_filters")):
         notes.append("Không có chỉ số đáng lọc: chỉ tra theo loại món")
     return q, notes

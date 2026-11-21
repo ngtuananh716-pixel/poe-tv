@@ -1,0 +1,4 @@
+Dữ liệu món đồ và mod PoE2 lấy từ Exiled Exchange 2 (https://github.com/Kvan7/Exiled-Exchange-2, giấy phép MIT,
+xem LICENSE-exiled-exchange-2.txt), thư mục renderer/public/data/en, commit:
+cca30662bf31eaf38bd711e2ec1a6b899a06c40e 2026-09-06 15:51:34 -0500
+Khi PoE2 có league mới (vd 1.0 ngày 11/12/2026), chép lại 2 file items.ndjson và stats.ndjson từ bản EE2 mới nhất.
