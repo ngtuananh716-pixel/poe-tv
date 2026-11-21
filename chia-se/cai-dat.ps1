@@ -9,9 +9,9 @@ $csVersion = '0.1.0-beta.70'
 $csUrl = "https://github.com/yorulmazsinan/couchsubs/releases/download/v$csVersion/CouchSubsApp-$csVersion-full.nupkg"
 $csSha = '1CB67BC41CBD323ECAA4E4CABF2A0287D1D1725E88043860964273A7E4B21CAC'
 $dllSha = @{
-    'CouchSubs.Shell.dll'       = '3F49623BB1236E35F951D4CC1FEBCEB60D5A3BBCF8E9E7124B7CCA5D1BBA1C04'
+    'CouchSubs.Shell.dll'       = '1F28FFCC0C003D09DE5905B16F5FD24FAF88778D7FC315F96C917C8AFCCB56E7'
     'CouchSubs.Translation.dll' = '64084E4B97A8E11669BA24D15E95EE9B5E03C24E79CD69F95C8E0410934195E2'
-    'CouchSubs.dll'             = 'E3A3D554DC3D177CDCE25060C0F8D7C9EAAD75470D79B8827B3891517A842981'
+    'CouchSubs.dll'             = 'B2B7C773C94FBB1A69A427111561ABE4372278CB72CE0CE661EF3D2C5F9E93D4'
 }
 
 function Say($text, $color = 'Gray') { Write-Host $text -ForegroundColor $color }

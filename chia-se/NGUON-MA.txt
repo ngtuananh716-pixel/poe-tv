@@ -9,15 +9,15 @@ Thay đổi nằm trong couchsubs-patch/:
                          nhận ô giá và đưa sang TV; nút bật/tắt tra giá và dịch.
 - appcontroller.patch   (CouchSubs.Shell/AppController.cs): móc PoeTvBridge vào HandleFrame; dịch tiếng Việt.
 - aitranslator.patch    (CouchSubs.Translation/AiTranslator.cs): lời nhắc dịch sang tiếng Việt.
-- mainview.patch, MainView.PoeTv.cs (CouchSubs.App): 3 nút trong cửa sổ chính.
+- mainview.patch, MainView.PoeTv.cs (CouchSubs.App): 4 nút trong cửa sổ chính (tra giá, dịch, dịch cả màn hình, game PoE1/PoE2).
 
 Cách build lại: xem build.yml (GitHub Actions, ubuntu-latest, .NET 10): checkout tag trên, chép 2 file .cs,
 "git apply" 3 file .patch, rồi dotnet build CouchSubs.Shell, CouchSubs.Translation, CouchSubs.App với
 -p:Version=0.1.0-beta.70.
 
 Mã băm SHA-256 của DLL trong gói:
-3F49623BB1236E35F951D4CC1FEBCEB60D5A3BBCF8E9E7124B7CCA5D1BBA1C04  CouchSubs.Shell.dll
+1F28FFCC0C003D09DE5905B16F5FD24FAF88778D7FC315F96C917C8AFCCB56E7  CouchSubs.Shell.dll
 64084E4B97A8E11669BA24D15E95EE9B5E03C24E79CD69F95C8E0410934195E2  CouchSubs.Translation.dll
-E3A3D554DC3D177CDCE25060C0F8D7C9EAAD75470D79B8827B3891517A842981  CouchSubs.dll
+B2B7C773C94FBB1A69A427111561ABE4372278CB72CE0CE661EF3D2C5F9E93D4  CouchSubs.dll
 
 Lõi tra giá (Python) nằm nguyên mã nguồn trong tep/poe_tv.

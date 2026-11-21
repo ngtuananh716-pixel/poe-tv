@@ -32,14 +32,16 @@ CÀI (1 lần)
 
 CHƠI
 - Mỗi lần chơi: bật PS5, mở app CouchSubs trên TV, bấm đúp "PoE TV" trên laptop, bấm bắt đầu trong CouchSubs.
-- Trong cửa sổ CouchSubs có 3 nút: "Tra giá: BẬT/TẮT", "Dịch: BẬT/TẮT", "Dịch cả màn hình".
+- Trong cửa sổ CouchSubs có 4 nút: "Tra giá: BẬT/TẮT", "Dịch: BẬT/TẮT", "Dịch cả màn hình" và
+  "Game: PoE1/PoE2" (bấm để đổi game cần tra giá; ô giá chế độ PoE2 ghi "PoE2 ·" ở đầu).
 - Tra giá: mở tooltip món đồ trong PoE, chờ một chút: cạnh tooltip hiện "Đang tra giá..." rồi ra giá.
-  Mặc định tra league mới nhất của realm Sony (Softcore), chỉ tính hàng mua ngay.
+  Mặc định tra league Softcore mới nhất (PoE1 realm Sony; PoE2 dùng chung trade), chỉ tính hàng mua ngay.
+  PoE2 đang thử nghiệm: dữ liệu và cách đọc tooltip chưa kiểm bằng ảnh PoE2 thật.
 - Ảnh và kết quả 30 lần tra gần nhất nằm ở <thư mục cài>\poe_tv\logs (để báo lỗi khi tra sai).
 
 LƯU Ý
 - Không mở cùng lúc CouchSubs bản thường (nếu có cài) và bản này. Lối tắt PoE TV tự đóng bản đang mở.
-- Bản này KHÔNG tự cập nhật. Có gói mới thì giải nén, chạy lại CAI DAT.cmd, chọn đúng thư mục cũ.
+- Bản này KHÔNG tự cập nhật. Có gói cập nhật (poe-tv-capnhat.zip) thì giải nén rồi bấm đúp "CAP NHAT.cmd".
 - Khóa Gemini, tài khoản PSN, tài khoản LG là của riêng bạn. Đừng gửi cho ai, đừng chép thư mục
   %LOCALAPPDATA%\CouchSubs sang máy khác (trong đó có khóa và thông tin ghép PS5/TV).
 - Tra giá dùng API trade của GGG (không có trong tài liệu chính thức). Cộng đồng dùng nhiều năm nhưng rủi ro
