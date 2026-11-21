@@ -1,0 +1,113 @@
+# Build CouchSubs bản Mac đã vá (tra giá PoE + dịch tiếng Việt) từ mã gốc v0.1.0-beta.70, không ký Developer ID
+# (ký ad-hoc), lấy gói app TV / trợ giúp cài TV / pocket-tts từ bản Mac chính thức cùng phiên bản, rồi đăng GitHub
+# Release "poe-tv-mac.zip" gồm app + lõi tra giá + bộ cài cho Mac.
+name: build-mac
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "couchsubs-patch-mac/**"
+      - "chia-se-mac/**"
+      - ".github/workflows/build-mac.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-mac
+  cancel-in-progress: true
+
+env:
+  UPSTREAM_TAG: v0.1.0-beta.70
+  APP_NAME: CouchSubs PoE TV.app
+
+jobs:
+  mac:
+    runs-on: macos-26
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Mã gốc CouchSubs
+        run: |
+          git clone --depth 1 --branch "$UPSTREAM_TAG" https://github.com/yorulmazsinan/couchsubs.git upstream
+          cd upstream
+          git submodule update --init --depth 1 third-party/chiaki-ng
+
+      - name: Áp bản vá Mac
+        run: |
+          cp couchsubs-patch-mac/PoeTvBridge.swift upstream/mac/CouchSubs/
+          cp couchsubs-patch-mac/PoeTvButtons.swift upstream/mac/CouchSubs/UI/
+          cd upstream && git apply ../couchsubs-patch-mac/mac.patch && git status --short
+
+      - name: Công cụ
+        run: |
+          brew install cmake ninja pkg-config protobuf xcodegen
+          echo "DEVELOPER_DIR=$(xcode-select -p)" >> "$GITHUB_ENV"
+          xcodebuild -version
+
+      - name: Nhớ đệm thư viện Remote Play (chiaki)
+        id: chiaki
+        uses: actions/cache@v4
+        with:
+          path: upstream/third-party/build/CChiaki.xcframework
+          key: chiaki-mac-${{ env.UPSTREAM_TAG }}-${{ hashFiles('upstream/scripts/build-chiaki-macos.sh', 'upstream/scripts/make-cchiaki-xcframework.sh') }}
+
+      - name: Build thư viện Remote Play (chiaki)
+        if: steps.chiaki.outputs.cache-hit != 'true'
+        working-directory: upstream
+        run: ./scripts/build-chiaki-macos.sh
+
+      - name: Build app
+        working-directory: upstream
+        run: |
+          (cd mac && xcodegen generate --quiet)
+          set -o pipefail
+          xcodebuild -project mac/CouchSubs.xcodeproj -scheme CouchSubs -configuration Release \
+            -derivedDataPath build/mac CODE_SIGN_IDENTITY=- \
+            MARKETING_VERSION="${UPSTREAM_TAG#v}" CURRENT_PROJECT_VERSION="${{ github.run_number }}" build \
+            > build/xcodebuild.log 2>&1 || { grep -E "error:" build/xcodebuild.log | head -40; tail -40 build/xcodebuild.log; exit 1; }
+          ls build/mac/Build/Products/Release
+
+      - name: Ghép gói TV, trợ giúp cài TV, pocket-tts từ bản chính thức
+        run: |
+          curl -fsSL -o official.zip "https://github.com/yorulmazsinan/couchsubs/releases/download/$UPSTREAM_TAG/CouchSubs-macos.zip"
+          ditto -x -k official.zip official
+          SRC="official/CouchSubs.app/Contents"
+          APP="upstream/build/mac/Build/Products/Release/CouchSubs.app"
+          mkdir -p "$APP/Contents/Resources/tv-app"
+          cp -R "$SRC/Resources/tv-app/." "$APP/Contents/Resources/tv-app/"
+          cp "$SRC/MacOS/couchsubs-tv-helper" "$SRC/MacOS/pocket-tts" "$APP/Contents/MacOS/"
+          ls -la "$APP/Contents/Resources/tv-app" "$APP/Contents/MacOS"
+          # ký lại toàn bộ bằng chữ ký ad-hoc (không có Developer ID; người dùng bỏ dấu cách ly khi cài)
+          codesign --force --deep -s - "$APP"
+          codesign --verify --deep --strict "$APP"
+          for ARCH in arm64 x86_64; do lipo "$APP/Contents/MacOS/CouchSubs" -verify_arch $ARCH; done
+          /usr/libexec/PlistBuddy -c "Print :NSAppTransportSecurity" "$APP/Contents/Info.plist"
+
+      - name: Đóng gói poe-tv-mac.zip
+        run: |
+          OUT="dist/poe-tv-mac"
+          mkdir -p "$OUT/tep/poe_tv" "$OUT/nguon-ma"
+          ditto "upstream/build/mac/Build/Products/Release/CouchSubs.app" "$OUT/$APP_NAME"
+          cp "chia-se-mac/CAI DAT.command" "chia-se-mac/HUONG DAN.txt" "$OUT/"
+          chmod +x "$OUT/CAI DAT.command"
+          cp -R poe_tv/poe_tv poe_tv/data poe_tv/requirements.txt "$OUT/tep/poe_tv/"
+          find "$OUT" -name __pycache__ -prune -exec rm -rf {} +
+          cp -R couchsubs-patch couchsubs-patch-mac LICENSE .github/workflows/build.yml .github/workflows/build-mac.yml "$OUT/nguon-ma/"
+          printf 'Mã nguồn phần sửa: couchsubs-patch (Windows), couchsubs-patch-mac (Mac), áp lên CouchSubs %s\n(https://github.com/yorulmazsinan/couchsubs). Cách build: build.yml, build-mac.yml. Giấy phép AGPL-3.0 (LICENSE).\n' "$UPSTREAM_TAG" > "$OUT/nguon-ma/README.txt"
+          (cd dist && ditto -c -k --keepParent poe-tv-mac poe-tv-mac.zip)
+          shasum -a 256 dist/poe-tv-mac.zip | tee dist/poe-tv-mac.zip.sha256
+          ls -la dist
+
+      - name: Đăng GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="mac-${{ github.run_number }}"
+          gh release create "$TAG" dist/poe-tv-mac.zip dist/poe-tv-mac.zip.sha256 \
+            --title "PoE TV cho Mac (thử nghiệm) #${{ github.run_number }}" \
+            --notes "CouchSubs $UPSTREAM_TAG bản sửa (tra giá PoE, dịch tiếng Việt, nút PoE1/PoE2), build từ commit ${GITHUB_SHA}. Ký ad-hoc, chưa chạy thử trên máy Mac thật. Cài theo HUONG DAN.txt trong gói." \
+            --latest

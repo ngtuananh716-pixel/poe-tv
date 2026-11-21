@@ -1,0 +1,173 @@
+diff --git a/core/Sources/CouchSubsCore/AITranslation.swift b/core/Sources/CouchSubsCore/AITranslation.swift
+index c4f782c..cecd457 100644
+--- a/core/Sources/CouchSubsCore/AITranslation.swift
++++ b/core/Sources/CouchSubsCore/AITranslation.swift
+@@ -275,9 +275,12 @@ public enum AIRequest {
+     public static let screenOutputTokens = 8192
+ 
+     public static let systemPrompt = """
+-        You translate English video game subtitles into natural, spoken Turkish, the way people really talk. \
+-        Characters address each other informally (use "sen", not "siz") unless the line is clearly formal. \
++        You translate English video game subtitles and on-screen text into natural, spoken Vietnamese, the way \
++        Vietnamese people really talk. Choose pronouns (tôi, ta, anh, em, cậu, ngươi, ông, bà…) that fit who is \
++        speaking to whom; keep a natural, casual tone unless the line is clearly formal. \
+         Keep character names, place names and speaker labels such as "ATREUS:" exactly as they are. \
++        Keep game terms that players use in English exactly as written: item names, base types, skill and gem names, \
++        currency names (Chaos Orb, Divine Orb…), stat names such as Energy Shield, and all numbers. \
+         Keep line breaks. Keep the meaning and tone; do not add or leave out anything. \
+         The text is read from the screen by OCR and may have misread or missing letters ("Y u ave to ask?", \
+         "Doesn't 00k good."); translate the line the speaker clearly meant. \
+@@ -325,14 +328,14 @@ public enum AIRequest {
+             var lines = ["Previous subtitles, for context only (do not translate them again):"]
+             for line in context {
+                 lines.append("English: \(line.source)")
+-                if let translation = line.translation { lines.append("Turkish: \(translation)") }
++                if let translation = line.translation { lines.append("Vietnamese: \(translation)") }
+             }
+             parts.append(lines.joined(separator: "\n"))
+         }
+         let list = (try? JSONSerialization.data(withJSONObject: sentences, options: [.withoutEscapingSlashes]))
+             .flatMap { String(data: $0, encoding: .utf8) } ?? "[]"
+-        parts.append("Translate each string in this JSON array into Turkish. Reply with only a JSON array of \(sentences.count) "
+-            + "Turkish strings in the same order.\n\(list)")
++        parts.append("Translate each string in this JSON array into Vietnamese. Reply with only a JSON array of \(sentences.count) "
++            + "Vietnamese strings in the same order.\n\(list)")
+         return parts.joined(separator: "\n\n")
+     }
+ 
+diff --git a/core/Sources/CouchSubsCore/Pipeline/AppSettings.swift b/core/Sources/CouchSubsCore/Pipeline/AppSettings.swift
+index 575190b..23a4b02 100644
+--- a/core/Sources/CouchSubsCore/Pipeline/AppSettings.swift
++++ b/core/Sources/CouchSubsCore/Pipeline/AppSettings.swift
+@@ -118,7 +118,7 @@ public struct UserSettings: Codable, Equatable {
+     public var extraAreas: [ExtraArea] = []
+     public var style = SubtitleStyle()
+     public var sourceLanguage = "en"
+-    public var targetLanguage = "tr"
++    public var targetLanguage = "vi"      // poe-tv: bản sửa luôn dịch sang tiếng Việt (gốc "tr")
+     public var dubbing = DubbingSettings()
+     /// Açıksa çeviri `onlineEngine` ile yapılır (anahtarı kayıtlıysa); kapalıysa ya da hizmete ulaşılamazsa Apple'ın
+     /// cihaz üstü çevirisi. Eski sürümlerde yalnız DeepL vardı; o kayıtlar DeepL ile açılır.
+@@ -212,7 +212,9 @@ public struct UserSettings: Codable, Equatable {
+             .prefix(ExtraArea.maxCount))
+         style = try values.decodeIfPresent(SubtitleStyle.self, forKey: .style) ?? defaults.style
+         sourceLanguage = try values.decodeIfPresent(String.self, forKey: .sourceLanguage) ?? defaults.sourceLanguage
+-        targetLanguage = try values.decodeIfPresent(String.self, forKey: .targetLanguage) ?? defaults.targetLanguage
++        // poe-tv: bỏ qua ngôn ngữ đích đã lưu (bản gốc lưu "tr"); bản sửa luôn dịch sang tiếng Việt.
++        _ = try values.decodeIfPresent(String.self, forKey: .targetLanguage)
++        targetLanguage = defaults.targetLanguage
+         dubbing = (try? values.decodeIfPresent(DubbingSettings.self, forKey: .dubbing)) ?? defaults.dubbing
+         onlineTranslation = try values.decodeIfPresent(Bool.self, forKey: .onlineTranslation) ?? defaults.onlineTranslation
+         let engine = (try? values.decodeIfPresent(TranslationEngine.self, forKey: .onlineEngine)) ?? defaults.onlineEngine
+diff --git a/mac/CouchSubs/AppModel.swift b/mac/CouchSubs/AppModel.swift
+index 0b441b0..bcbc3e1 100644
+--- a/mac/CouchSubs/AppModel.swift
++++ b/mac/CouchSubs/AppModel.swift
+@@ -680,6 +680,8 @@ final class AppModel: ObservableObject {
+     /// Çalışan okuma hattının dilleri.
+     @Published private(set) var activeLanguages: (source: String, target: String)?
+     private var server = SubtitleServer(port: AppIdentity.serverPort)
++    /// poe-tv: tra giá món đồ PoE và nút bật/tắt (PoeTvBridge.swift, PoeTvButtons trong MainView.swift).
++    let poeTv = PoeTvBridge()
+     /// Oturumun konuşan renkleri (TV'ye gidenle aynı; bilgisayar ekranındaki pencereler buradan boyar).
+     var speakerBook: SpeakerColorBook { server.speakerBook }
+     private var serverStarted = false
+@@ -2156,6 +2158,9 @@ final class AppModel: ObservableObject {
+                                   cache: Self.translationCache(engine: provider.engineID(model: model), source: source, target: target),
+                                   game: game, instruction: settings.aiInstruction,
+                                   paidTier: provider == .gemini && settings.geminiPaidTier)
++        } else if target == "vi" {
++            // poe-tv: DeepL ghi cứng tiếng Thổ → dùng bộ dịch miễn phí của Apple (tiếng Việt) thay vì ra tiếng Thổ.
++            return local
+         } else if let key = store.load(String.self, for: storeKey) {
+             online = DeepLTranslator(key: key, fallback: local,
+                                      cache: Self.translationCache(engine: DeepLTranslator.engineID, source: source, target: target))
+@@ -2179,7 +2184,9 @@ final class AppModel: ObservableObject {
+ 
+     /// Çevrimiçi çeviri yalnız İngilizce→Türkçe için ve seçili motor hazırsa açılır.
+     var onlineTranslationActive: Bool {
+-        settings.onlineTranslation && settings.sourceLanguage == "en" && settings.targetLanguage == "tr" && isReady(settings.onlineEngine)
++        // poe-tv: bản sửa dịch sang tiếng Việt (targetLanguage "vi") bằng AI.
++        settings.onlineTranslation && settings.sourceLanguage == "en" && (settings.targetLanguage == "tr" || settings.targetLanguage == "vi")
++            && isReady(settings.onlineEngine)
+     }
+ 
+     /// Motor kullanılabilir mi: bulut motorlarında anahtar kayıtlıdır; yerel modelde anahtar gerekmez, adres ve model adı
+@@ -2545,6 +2552,9 @@ final class AppModel: ObservableObject {
+         lastFrame = frame
+         subtitleOffTip.frameArrived(at: Date(), streaming: sessionState == .streaming)
+         updateSubtitleOffTip()
++        // poe-tv: khung hình đi sang máy chủ tra giá; dịch đang tắt thì phần đọc phụ đề không chạy.
++        if poeTv.takeScreenRequest() { translateScreen() }
++        if poeTv.offer(frame, server: server) { return }
+         guard pipeline != nil else { return }
+         // Ek alanlar altyazıyla aynı OCR kuyruğunu kullanır; saniyede bir tur yeterlidir.
+         // Kullanıcının ek alanı yoksa bilinen oyunun hazır alanları (GameAreaPresets; ör. GTA 6 yardım kutusu ve mesajlar).
+diff --git a/mac/CouchSubs/CouchSubsApp.swift b/mac/CouchSubs/CouchSubsApp.swift
+index bd87974..a46922c 100644
+--- a/mac/CouchSubs/CouchSubsApp.swift
++++ b/mac/CouchSubs/CouchSubsApp.swift
+@@ -25,7 +25,8 @@ struct CouchSubsApp: App {
+     #if !APP_STORE
+     /// Sparkle: her açılışta ve uygulama açıkken saatte bir GitHub'daki son sürüme bakar; testlerde başlamaz.
+     private let updater = SPUStandardUpdaterController(
+-        startingUpdater: ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil,
++        // poe-tv: bản sửa không tự cập nhật (bản chính thức sẽ đè mất phần sửa).
++        startingUpdater: false,
+         updaterDelegate: nil, userDriverDelegate: nil)
+     #endif
+ 
+@@ -44,8 +45,7 @@ struct CouchSubsApp: App {
+                     stream.attach(model)
+                     CrashNotice.shared.checkOnce()
+                     #if !APP_STORE
+-                    guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
+-                    updater.updater.checkForUpdatesInBackground()
++                    // poe-tv: không kiểm tra cập nhật.
+                     #endif
+                 }
+                 .appSurface()
+@@ -59,7 +59,6 @@ struct CouchSubsApp: App {
+             CommandGroup(replacing: .appInfo) {
+                 Button("About CouchSubs") { model.showAbout = true }
+                 #if !APP_STORE
+-                Button("Check for updates…") { updater.checkForUpdates(nil) }
+                 #endif
+             }
+             CommandGroup(replacing: .appSettings) {
+diff --git a/mac/CouchSubs/UI/MainView.swift b/mac/CouchSubs/UI/MainView.swift
+index cdf758c..a7397fe 100644
+--- a/mac/CouchSubs/UI/MainView.swift
++++ b/mac/CouchSubs/UI/MainView.swift
+@@ -116,6 +116,8 @@ struct MainControls: View {
+                 StartStopButton()
+                 TestSubtitleButton()
+             }
++            // poe-tv: tra giá PoE, dịch tiếng Việt, dịch cả màn hình, chọn PoE1/PoE2 (PoeTvButtons.swift).
++            if PoeTvBridge.enabled { PoeTvButtons(bridge: model.poeTv) }
+             if model.testTVNotConnected && model.tvClients == 0 {
+                 HintText(text: "The test subtitle did not reach the TV because the TV app is not connected. Open CouchSubs on the TV. If the TV shows a 6-digit code, don't type it anywhere: approve it in the “Pair this TV?” window that opens on this computer, then test again.")
+             }
+diff --git a/mac/project.yml b/mac/project.yml
+index a15ddb8..fe51756 100644
+--- a/mac/project.yml
++++ b/mac/project.yml
+@@ -75,6 +75,9 @@ targets:
+         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+         LSApplicationCategoryType: public.app-category.utilities
+         NSLocalNetworkUsageDescription: CouchSubs finds your PS5 and TV on the local network to send translated subtitles.
++        # poe-tv: gọi máy chủ tra giá http://127.0.0.1:8788
++        NSAppTransportSecurity:
++          NSAllowsLocalNetworking: true
+         # WebRTC kitaplığı (Xbox ev yayını) kamera ve mikrofon arayüzlerini içerir; ikisi de açılmaz, Xbox'a ses gönderilmez.
+         NSMicrophoneUsageDescription: CouchSubs never records or sends your voice. The streaming library used for Xbox includes microphone support, which stays off.
+         NSCameraUsageDescription: CouchSubs does not use the camera. The video library used for Xbox streaming includes camera support, which stays off.
+@@ -83,7 +86,7 @@ targets:
+         # (özel anahtar depoda değil; scripts/package-mac.sh imzalar).
+         SUFeedURL: https://github.com/yorulmazsinan/couchsubs/releases/latest/download/appcast.xml
+         SUPublicEDKey: hZ5yMZAZtlZZuf2lmp46zoV7K5BPyhcliz4J0b9ljQg=
+-        SUEnableAutomaticChecks: true
++        SUEnableAutomaticChecks: false
+         # Uygulama uzun süre açık kalınca da yeni sürüm görünsün: saatte bir.
+         SUScheduledCheckInterval: 3600
+         # Paket sunucusu (server/packs); derleme ayarı PACKS_API_BASE_URL boşsa paket indirme kapalı (PackUpdater).

@@ -17,3 +17,7 @@ Giấy phép: AGPL-3.0 (theo CouchSubs). Dữ liệu `poe_tv/data` lấy từ Aw
 `chia-se/`: bộ cài cho máy khác (gói `poe-tv-cho-ban.zip`). Bộ cài tải CouchSubs gốc beta.70 từ GitHub (kiểm SHA-256),
 thay 3 DLL, cài Python 3.13 + thư viện, tạo lối tắt. Cấu trúc gói: `CAI DAT.cmd`, `HUONG DAN.txt`,
 `tep/{cai-dat.ps1, Chay PoE TV.cmd, couchsubs-dll/, poe_tv/}`, `nguon-ma/`.
+
+**Bản Mac** (thử nghiệm): `couchsubs-patch-mac/` (cầu nối Swift, 4 nút, dịch tiếng Việt, tắt tự cập nhật) +
+`.github/workflows/build-mac.yml` (macOS runner, ký ad-hoc, ghép gói TV/trợ giúp từ bản Mac chính thức cùng phiên bản,
+đăng Release `poe-tv-mac.zip`). Bộ cài Mac: `chia-se-mac/` (Python 3.13 qua uv, cài vào `~/poe_tv`).

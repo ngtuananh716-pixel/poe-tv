@@ -1,0 +1,54 @@
+PoE TV cho Mac - tra giá món đồ PoE (PS5) và dịch phụ đề tiếng Việt, hiện thẳng trên TV
+=====================================================================================
+
+BẢN THỬ NGHIỆM: bản Mac được build mà chưa chạy thử trên máy Mac thật. Gặp lỗi thì chụp màn hình gửi lại.
+
+CẦN CÓ
+- MacBook chạy macOS 13 (Ventura) trở lên, chip Apple hay Intel đều được.
+- PS5, TV LG và MacBook cùng một mạng wifi/LAN trong nhà.
+- TV LG đời 2018 trở lên (webOS 4+). Xem: Cài đặt > Tất cả cài đặt > Chung (hoặc Hỗ trợ) > Thông tin TV.
+- Một tài khoản PlayStation (PSN) PHỤ, miễn phí, không cần PS Plus (laptop lấy hình bằng tài khoản này;
+  bạn vẫn chơi bằng tài khoản chính). Một tài khoản LG developer miễn phí (https://webostv.developer.lge.com).
+- Muốn dịch tiếng Việt: khóa Gemini miễn phí của CHÍNH bạn. Chưa có khóa thì trên macOS 26 trở lên app thử bộ dịch
+  miễn phí của Apple (chưa kiểm chứng có tiếng Việt hay không).
+- Máy còn trống khoảng 1,5 GB.
+
+CÀI (1 lần; cập nhật cũng làm y hệt với gói mới)
+1. Giải nén poe-tv-mac.zip (bấm đúp file zip).
+2. Mở Terminal (Spotlight: bấm Cmd+Space, gõ Terminal, Enter).
+3. Trong Terminal gõ  bash  và một dấu cách, rồi KÉO file "CAI DAT.command" trong thư mục vừa giải nén thả vào
+   cửa sổ Terminal, nhấn Enter.
+   (Không bấm đúp CAI DAT.command: macOS sẽ chặn vì file chưa có chữ ký của Apple.)
+4. Chờ 3-10 phút. Bộ cài:
+   - chép app "CouchSubs PoE TV" và lõi tra giá vào thư mục ~/poe_tv (thư mục nhà của bạn),
+   - tải Python 3.13 riêng bằng uv (https://astral.sh/uv, công cụ quản lý Python), không cần mật khẩu máy,
+   - cài thư viện đọc chữ, tạo lối tắt "PoE TV" ngoài màn hình nền.
+5. Bấm đúp "PoE TV" ngoài màn hình nền. Một cửa sổ Terminal là máy chủ tra giá: để nguyên, đừng đóng.
+   App CouchSubs PoE TV tự mở. macOS hỏi "find devices on your local network": bấm Allow.
+   Nếu macOS vẫn báo app không mở được: System Settings > Privacy & Security > kéo xuống, bấm "Open Anyway".
+6. Làm theo trợ lý thiết lập trong app: đăng nhập PSN PHỤ, ghép PS5, chọn TV LG. Với TV LG:
+   a. Trên TV cài app "Developer Mode" từ LG Content Store, đăng nhập tài khoản LG developer.
+   b. Bật "Dev Mode Status", TV khởi động lại.
+   c. Trong app ở bước TV: chọn TV, bấm Connect, chấp nhận trên TV.
+   d. Mở lại app Developer Mode trên TV, bật "Key Server", để nguyên trên màn hình.
+   e. Gõ 6 ký tự Passphrase hiện ở góc trái dưới TV vào app, bấm Install on the TV.
+7. Muốn dịch: trong app vào Settings > Translation, chọn Gemini, dán khóa Gemini của bạn.
+
+CHƠI
+- Mỗi lần chơi: bật PS5, mở app CouchSubs trên TV, bấm đúp "PoE TV" trên Mac, bấm Start translating.
+- Dưới nút Start có 4 nút: "Tra giá: BẬT/TẮT", "Dịch: BẬT/TẮT", "Dịch cả màn hình", "Game: PoE1/PoE2".
+- Mở tooltip món đồ trong PoE, chờ một chút: cạnh tooltip hiện "Đang tra giá..." rồi ra giá.
+  PoE1 tra realm Sony; PoE2 đang thử nghiệm (ô giá ghi "PoE2 ·" ở đầu).
+- Ảnh và kết quả 30 lần tra gần nhất ở ~/poe_tv/poe_tv/logs (gửi kèm khi báo tra sai).
+
+LƯU Ý
+- App này là bản sửa của CouchSubs, KHÔNG tự cập nhật. Có gói mới thì làm lại bước CÀI.
+- Khóa Gemini, tài khoản PSN, tài khoản LG là của riêng bạn, đừng gửi cho ai.
+- Tra giá dùng API trade của GGG (không có trong tài liệu chính thức); cộng đồng dùng nhiều năm nhưng rủi ro không
+  bằng 0. Lướt quá nhanh nhiều món có thể bị trade khóa tạm vài phút.
+- Khi bật dịch, chữ phụ đề tiếng Anh được gửi tới Gemini để dịch. CouchSubs mặc định gửi câu phụ đề tiếng Anh chưa có
+  trong gói game vào kho chung của họ; muốn tắt thì tìm mục này trong Settings.
+- Gỡ: xóa thư mục ~/poe_tv và file "PoE TV" ngoài màn hình nền.
+
+Giấy phép: CouchSubs (AGPL-3.0) của yorulmazsinan; mã nguồn phần đã sửa nằm trong thư mục "nguon-ma"
+và tại https://github.com/ngtuananh716-pixel/poe-tv . Dữ liệu mod/món đồ từ Awakened PoE Trade và Exiled Exchange 2 (MIT).
