@@ -68,6 +68,19 @@ jobs:
           path: upstream/third-party/build/CChiaki.xcframework
           key: ${{ steps.chiaki.outputs.cache-primary-key }}
 
+      # project.yml lấy gói app TV (dist/tv-app), trợ giúp cài TV và pocket-tts từ dist/: dùng đúng các file của bản Mac
+      # chính thức cùng phiên bản thay vì tự build (cần Android, .NET, webOS CLI).
+      - name: Gói TV, trợ giúp cài TV, pocket-tts từ bản chính thức
+        run: |
+          curl -fsSL -o official.zip "https://github.com/yorulmazsinan/couchsubs/releases/download/$UPSTREAM_TAG/CouchSubs-macos.zip"
+          ditto -x -k official.zip official
+          SRC="official/CouchSubs.app/Contents"
+          mkdir -p upstream/dist/tv-app upstream/dist/tv-helper upstream/dist/tts
+          cp -R "$SRC/Resources/tv-app/." upstream/dist/tv-app/
+          cp "$SRC/MacOS/couchsubs-tv-helper" upstream/dist/tv-helper/
+          cp "$SRC/MacOS/pocket-tts" upstream/dist/tts/
+          ls -la upstream/dist/tv-app upstream/dist/tv-helper upstream/dist/tts
+
       - name: Build app
         working-directory: upstream
         run: |
@@ -80,16 +93,12 @@ jobs:
             > build/xcodebuild.log 2>&1 || { grep -E "error:" build/xcodebuild.log | head -40; tail -40 build/xcodebuild.log; exit 1; }
           ls build/mac/Build/Products/Release
 
-      - name: Ghép gói TV, trợ giúp cài TV, pocket-tts từ bản chính thức
+      - name: Ký ad-hoc và kiểm tra app
         run: |
-          curl -fsSL -o official.zip "https://github.com/yorulmazsinan/couchsubs/releases/download/$UPSTREAM_TAG/CouchSubs-macos.zip"
-          ditto -x -k official.zip official
-          SRC="official/CouchSubs.app/Contents"
           APP="upstream/build/mac/Build/Products/Release/CouchSubs.app"
-          mkdir -p "$APP/Contents/Resources/tv-app"
-          cp -R "$SRC/Resources/tv-app/." "$APP/Contents/Resources/tv-app/"
-          cp "$SRC/MacOS/couchsubs-tv-helper" "$SRC/MacOS/pocket-tts" "$APP/Contents/MacOS/"
           ls -la "$APP/Contents/Resources/tv-app" "$APP/Contents/MacOS"
+          test -x "$APP/Contents/MacOS/couchsubs-tv-helper" && test -x "$APP/Contents/MacOS/pocket-tts"
+          ls "$APP/Contents/Resources/tv-app/"*.ipk
           # ký lại toàn bộ bằng chữ ký ad-hoc (không có Developer ID; người dùng bỏ dấu cách ly khi cài)
           codesign --force --deep -s - "$APP"
           codesign --verify --deep --strict "$APP"
