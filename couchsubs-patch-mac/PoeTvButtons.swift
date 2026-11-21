@@ -3,6 +3,7 @@
 // Dịch cả màn hình (một lần), Game PoE1/PoE2. Trạng thái nằm ở máy chủ poe_tv (cửa sổ Terminal "PoE TV"); nút chỉ gửi
 // lệnh rồi hiện trạng thái máy chủ trả về.
 
+import Combine
 import SwiftUI
 
 struct PoeTvButtons: View {

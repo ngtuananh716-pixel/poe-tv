@@ -145,6 +145,6 @@ final class PoeTvBridge: ObservableObject {
             context.draw(image, in: CGRect(x: 0, y: 0, width: width, height: height))
             return true
         }
-        return ok ? (data, width, height, stride) : nil
+        return ok ? (data: data, width: width, height: height, stride: stride) : nil
     }
 }
