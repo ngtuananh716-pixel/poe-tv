@@ -41,7 +41,9 @@ TT_SIG = (96, 96)         # số ô của bản đồ chữ vùng tooltip
 TEXT_LEVEL = 110          # điểm ảnh sáng hơn mức này (0–255) coi là chữ
 MISS_SAVE_GAP = 30        # không thấy tooltip: cứ bấy nhiêu giây lưu lại 1 ảnh để xem
 RECENT_S = 600            # mở lại đúng món đã tra trong bấy nhiêu giây thì hiện giá cũ ngay, không tra lại
-NEXT_MS = 300             # CouchSubs gửi khung kế tiếp sau bấy nhiêu ms
+NEXT_MS = 300             # CouchSubs gửi khung kế tiếp sau bấy nhiêu ms (đang mở túi đồ / đang hiện ô giá)
+IDLE_NEXT_MS = 1000       # không mở túi đồ: 1 khung/giây là đủ để biết lúc mở (đỡ nóng máy)
+OFF_NEXT_MS = 1500        # tắt tra giá: chỉ cần giữ liên lạc để nhận nút bật/tắt
 LINE = 0.026              # chiều cao một dòng chữ trên TV (tỉ lệ chiều cao màn hình)
 MAX_SAVED = 30            # số ảnh tra gần nhất giữ lại trong thư mục logs
 MAX_CHARS = 30            # mỗi dòng trong ô giá tối đa bấy nhiêu ký tự
@@ -423,6 +425,15 @@ class Watcher:
                 self.last_miss_saved = time.time()      # thỉnh thoảng lưu 1 ảnh không thấy tooltip để xem lại
                 self._save(img, rec)
 
+    def next_ms(self) -> int:
+        """Bao lâu nữa CouchSubs gửi khung kế tiếp: thưa khi không cần, dày khi đang mở túi đồ hoặc đang hiện ô giá."""
+        with self.lock:
+            if not self.price_on:
+                return OFF_NEXT_MS
+            if self.shown is None and self.job is None and self.gap == UI_IDLE_GAP:
+                return IDLE_NEXT_MS
+            return NEXT_MS
+
     def flags(self) -> dict:
         """Cờ gửi kèm mỗi phản hồi cho CouchSubs: dịch bật/tắt, yêu cầu dịch cả màn hình (một lần)."""
         with self.lock:
@@ -591,7 +602,7 @@ def make_handler(watcher: Watcher):
                 w, h = int(self.headers.get("X-Width", "0")), int(self.headers.get("X-Height", "0"))
                 stride = int(self.headers.get("X-Stride", str(w * 4)))
                 regions = watcher.on_frame(decode(body, w, h, stride))
-                self._json(200, {"regions": regions, "next_ms": NEXT_MS, **watcher.flags()})
+                self._json(200, {"regions": regions, "next_ms": watcher.next_ms(), **watcher.flags()})
             except Exception as e:
                 self._json(400, {"error": str(e), "next_ms": 2000})
 

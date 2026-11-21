@@ -171,3 +171,30 @@ index a15ddb8..fe51756 100644
          # Uygulama uzun süre açık kalınca da yeni sürüm görünsün: saatte bir.
          SUScheduledCheckInterval: 3600
          # Paket sunucusu (server/packs); derleme ayarı PACKS_API_BASE_URL boşsa paket indirme kapalı (PackUpdater).
+diff --git a/remoteplay/Sources/RemotePlay/StreamSession.swift b/remoteplay/Sources/RemotePlay/StreamSession.swift
+index 0af46f0..52e4d10 100644
+--- a/remoteplay/Sources/RemotePlay/StreamSession.swift
++++ b/remoteplay/Sources/RemotePlay/StreamSession.swift
+@@ -4,6 +4,12 @@ import CChiaki
+ import CoreGraphics
+ import Foundation
+ 
++/// poe-tv: số ảnh tối đa mỗi giây app tạo từ luồng PS5. Bản sửa hạ xuống khi tắt dịch phụ đề (tra giá chỉ cần vài
++/// khung mỗi giây), đỡ tốn CPU và nóng máy. Gốc: 20.
++public enum PoeTvFrameRate {
++    public static var maxPerSecond: Double = 20
++}
++
+ /// Saniyede en fazla belirli sayıda karenin geçmesine izin verir.
+ struct FrameThrottle {
+     let minInterval: TimeInterval
+@@ -17,7 +23,8 @@ struct FrameThrottle {
+ 
+     mutating func shouldPass() -> Bool {
+         let current = now()
+-        if let last, current.timeIntervalSince(last) < minInterval { return false }
++        let interval = max(minInterval, 1.0 / max(1, PoeTvFrameRate.maxPerSecond))
++        if let last, current.timeIntervalSince(last) < interval { return false }
+         last = current
+         return true
+     }

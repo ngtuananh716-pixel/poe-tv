@@ -8,6 +8,7 @@
 import CoreGraphics
 import CouchSubsCore
 import Foundation
+import RemotePlay
 
 @MainActor
 final class PoeTvBridge: ObservableObject {
@@ -19,7 +20,10 @@ final class PoeTvBridge: ObservableObject {
     private static let retryMs: UInt64 = 3000
 
     @Published private(set) var priceOn = true
-    @Published private(set) var translateOn = false
+    @Published private(set) var translateOn = false {
+        // Tắt dịch: chỉ tra giá, 4 ảnh/giây là đủ (máy chủ hỏi khung 0,3–1,5 giây một lần); bật dịch: như gốc (20).
+        didSet { PoeTvFrameRate.maxPerSecond = translateOn || !Self.enabled ? 20 : 4 }
+    }
     @Published private(set) var game = "poe1"
     @Published private(set) var connected = false
 
@@ -35,6 +39,10 @@ final class PoeTvBridge: ObservableObject {
         config.connectionProxyDictionary = [:]          // 127.0.0.1: không đi qua proxy hệ thống
         return URLSession(configuration: config)
     }()
+
+    init() {
+        PoeTvFrameRate.maxPerSecond = Self.enabled ? 4 : 20
+    }
 
     /// Bao lâu (giây) chưa nhận trạng thái từ máy chủ; nút trong cửa sổ hỏi lại khi lâu không có khung hình.
     var secondsSinceUpdate: TimeInterval { Date().timeIntervalSince(updatedAt) }

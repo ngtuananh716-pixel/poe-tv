@@ -1,6 +1,7 @@
 """Bọc engine OCR (RapidOCR chạy bằng ONNX, không cần mạng)."""
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 
 import cv2
@@ -9,9 +10,29 @@ import numpy as np
 _ENGINE = None
 
 
+def threads() -> int:
+    """Số luồng CPU cho OCR: mặc định một nửa số luồng máy, tối đa 4 (đỡ nóng máy, nhất là MacBook).
+    Đặt biến môi trường POE_TV_THREADS để đổi."""
+    raw = os.environ.get("POE_TV_THREADS", "")
+    if raw.isdigit() and int(raw) > 0:
+        return int(raw)
+    return max(1, min(4, (os.cpu_count() or 4) // 2))
+
+
 def engine():
     global _ENGINE
     if _ENGINE is None:
+        # RapidOCR 1.2.3 không cho chỉnh số luồng: thay SessionOptions trước khi nó tạo phiên ONNX.
+        import rapidocr_onnxruntime.utils as rutils
+        base = rutils.SessionOptions
+
+        def limited():
+            opt = base()
+            opt.intra_op_num_threads = threads()
+            opt.inter_op_num_threads = 1
+            return opt
+
+        rutils.SessionOptions = limited
         from rapidocr_onnxruntime import RapidOCR
         _ENGINE = RapidOCR()
     return _ENGINE
