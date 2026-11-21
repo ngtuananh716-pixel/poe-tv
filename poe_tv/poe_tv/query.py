@@ -63,7 +63,21 @@ def build(it: Item, status: str = "securable"):
         mf = flt.setdefault("misc_filters", {"filters": {}})["filters"]
         mf["foulborn_item"] = {"option": "true" if it.foulborn else "false"}
         if it.foulborn:
-            notes.append("Foulborn: chưa lọc theo dòng mod đột biến, giá là món Foulborn rẻ nhất cùng tên")
+            used = []
+            for sm, vals, txt in it.mutated:
+                ids = sm.trade_ids.get("explicit") or []     # trade tìm dòng đột biến bằng mã explicit (như APT)
+                if not ids:
+                    continue
+                f = {"id": ids[0]}
+                if vals:
+                    v = sum(vals) / len(vals)
+                    f["value"] = {"min": v if abs(v) <= 5 else _min(v)}
+                stats.append(f)
+                used.append(txt)
+            if used:
+                notes.append("Foulborn: có lọc theo dòng đột biến: " + "; ".join(used))
+            else:
+                notes.append("Foulborn: chưa lọc theo dòng mod đột biến, giá là món Foulborn rẻ nhất cùng tên")
         return q, notes
     if it.rarity == "Gem":
         qq["type"] = it.name

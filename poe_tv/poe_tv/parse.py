@@ -88,6 +88,7 @@ class Item:
     unmatched: list = field(default_factory=list)
     corrupted: bool = False
     foulborn: bool = False      # unique "Foulborn …": có một dòng mod đột biến (từ 3.26)
+    mutated: list = field(default_factory=list)   # dòng đột biến nhận ra qua màu hồng: [(StatMatch, values, text)]
 
     @property
     def title(self):
@@ -258,3 +259,20 @@ def is_armour(it: Item):
 
 def is_jewellery(it: Item):
     return it.category in JEWELLERY
+
+
+def add_mutated(it: Item, rows_text: list[str], data: Data, min_score: float = 90):
+    """Gắn các dòng đột biến (chữ hồng của đồ Foulborn) vào món đồ để lọc trade theo đúng dòng đó."""
+    for raw in rows_text:
+        txt = clean_numbers(raw)
+        sm, score = data.match_mod(txt, it.category)
+        if not sm or score < min_score:
+            continue
+        vals = numbers(txt)
+        if sm.n_values and len(vals) > sm.n_values:
+            vals = vals[-sm.n_values:]
+        if sm.fixed_value is not None and not vals:
+            vals = [sm.fixed_value]
+        if sm.negate:
+            vals = [-v for v in vals]
+        it.mutated.append((sm, vals, txt))

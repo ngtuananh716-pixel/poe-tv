@@ -116,11 +116,68 @@ class Trade:
         return out
 
 
+    def exchange_any(self, tag):
+        """Như exchange; không ai online bán thì tính cả người offline."""
+        res = self.exchange(tag, "online")
+        if not res["best"]:
+            res = {**self.exchange(tag, "any"), "offline": True}
+        return res
+
+    # ---- Currency Exchange trong game (Faustus): giao dịch đã khớp theo giờ, API công khai của GGG ----
+    CX_URL = "https://web.poecdn.com/api/currency-exchange/{realm}/{hour}"
+    CHAOS_ID, DIVINE_ID = "CurrencyRerollRare", "CurrencyModValues"
+
+    def _cx_hour(self, hour):
+        key = ("cx", hour)
+        if key in self.cache:
+            return self.cache[key][1]
+        try:
+            r = self.s.get(self.CX_URL.format(realm=self.realm, hour=hour), timeout=15)
+            data = r.json().get("markets", []) if r.status_code == 200 else None
+        except (requests.RequestException, ValueError):
+            data = None
+        if data is not None:
+            self.cache[key] = (time.time(), data)
+        return data
+
+    def market(self, stem, hours=3):
+        """Giá đã khớp trên Currency Exchange của món có mã nội bộ kết thúc bằng `stem`, gộp `hours` giờ gần nhất.
+        Trả {"chaos": giá c/món, "divine": giá div/món, "volume": số món đã khớp} hoặc None nếu không có giao dịch."""
+        league = self.pick_league()
+        now_h = int(time.time()) // 3600 * 3600
+        agg = {"chaos": [0.0, 0.0], "divine": [0.0, 0.0]}   # [tổng tiền, tổng món]
+        got = 0
+        for k in range(1, hours + 2):
+            if got >= hours:
+                break
+            markets = self._cx_hour(now_h - 3600 * k)
+            if markets is None:
+                continue
+            got += 1
+            for m in markets:
+                if m.get("league") != league:
+                    continue
+                a, _, b = (m.get("market_id") or "").partition("|")
+                vol = m.get("volume_traded") or {}
+                for mine, other in ((a, b), (b, a)):
+                    if not mine.endswith("/" + stem):
+                        continue
+                    for cur, cid in (("chaos", self.CHAOS_ID), ("divine", self.DIVINE_ID)):
+                        if other.endswith("/" + cid) and vol.get(mine) and vol.get(other):
+                            agg[cur][0] += vol[other]
+                            agg[cur][1] += vol[mine]
+        out = {cur: tot / n for cur, (tot, n) in agg.items() if n}
+        if not out:
+            return None
+        out["volume"] = int(max(n for _, n in agg.values()))
+        out["hours"] = got
+        return out
+
     def exchange(self, tag, status="online"):
         """Tra giá đồ bán theo lô (currency, fragment, offering, scarab…) trên sàn trao đổi: 1 lần gọi là có giá,
         không cần bước fetch. Trả giá mỗi món tính bằng chaos và bằng divine (ai bán rẻ nhất)."""
         league = self.pick_league()
-        have = ["divine"] if tag == "chaos" else ["chaos", "divine"]
+        have = [c for c in ("chaos", "divine") if c != tag]      # không đổi divine lấy chính divine
         body = {"engine": "new", "query": {"status": {"option": status}, "have": have, "want": [tag]},
                 "sort": {"have": "asc"}}
         key = json.dumps(body, sort_keys=True)

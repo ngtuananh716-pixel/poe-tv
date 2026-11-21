@@ -47,6 +47,8 @@ def main(argv=None):
             print(f"[{path}] Không tìm thấy tooltip món đồ")
             continue
         it = parse.parse(tt.header, tt.lines, D)
+        if it.foulborn:
+            parse.add_mutated(it, tooltip.pink_rows(img, tt), D)
         q, notes = query.build(it, status=a.status)
         rec = {"file": path, "rarity": it.rarity, "name": it.name, "base": it.base, "category": it.category,
                "mods": [{"kind": m.kind, "ref": m.ref, "values": m.values, "score": m.score} for m in it.mods],

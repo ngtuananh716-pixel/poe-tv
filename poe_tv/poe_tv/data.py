@@ -63,6 +63,7 @@ class Data:
     gems: dict = field(default_factory=dict)        # letters(name) -> name
     others: dict = field(default_factory=dict)      # tiền tệ, thẻ bài... letters(name) -> (name, namespace)
     trade_tags: dict = field(default_factory=dict)  # letters(name) -> mã trên sàn trao đổi theo lô (vd "offer", "chaos")
+    icon_stems: dict = field(default_factory=dict)  # letters(name) -> tên ảnh icon (vd Divine Orb -> CurrencyModValues)
     matchers: dict = field(default_factory=dict)    # template_key -> list[(entry, matcher)]
     _matcher_keys: list = field(default_factory=list)
 
@@ -173,6 +174,9 @@ def load() -> Data:
         ns, name = o.get("namespace"), o.get("name")
         if o.get("tradeTag") and name:
             d.trade_tags[letters(name)] = o["tradeTag"]
+            icon = (o.get("icon") or "").rsplit("/", 1)[-1]
+            if icon.endswith(".png"):
+                d.icon_stems[letters(name)] = icon[:-4]
         if ns == "ITEM" and o.get("craftable"):
             d.bases[letters(name)] = {"name": name, "category": o["craftable"]["category"]}
         elif ns == "UNIQUE" and o.get("unique"):

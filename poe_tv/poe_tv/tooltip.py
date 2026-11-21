@@ -102,3 +102,24 @@ def find(img: np.ndarray, data: Data, fine: bool | None = False, fast: bool = Tr
     for l in got:
         l.x0 += cx0; l.x1 += cx0; l.y0 += box[1]; l.y1 += box[1]
     return Tooltip(box=box, header=names, lines=got)
+
+
+def pink_rows(img: np.ndarray, tt: Tooltip) -> list[str]:
+    """Các hàng chữ màu hồng trong tooltip (dòng mod đột biến của đồ Foulborn).
+    Đo 21/11/2026 trên ảnh TV: dòng hồng R199 G99 B150; tên unique R205 G113 B95; chữ mô tả R209 G141 B128;
+    mod thường xanh tím (B > R). Hồng = G/R < 0,58 và B/R > 0,62."""
+    from .parse import _rows
+    out = []
+    body = [l for l in tt.lines if l.text not in tt.header]
+    for row in _rows(body):
+        px = []
+        for l in row:
+            c = img[max(0, int(l.y0)):int(l.y1), max(0, int(l.x0)):int(l.x1)].reshape(-1, 3)
+            px.append(c[c.max(1) > 120])
+        px = np.concatenate(px) if px else np.zeros((0, 3))
+        if len(px) < 30:
+            continue
+        b, g, r = px.astype(float).mean(0)
+        if r > 140 and g / r < 0.58 and b / r > 0.62:
+            out.append(" ".join(l.text for l in sorted(row, key=lambda l: l.x0)))
+    return out

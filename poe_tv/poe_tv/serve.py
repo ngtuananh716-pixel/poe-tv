@@ -118,17 +118,31 @@ def fmt_each(v: float) -> str:
     return f"{v:.2f}".rstrip("0").rstrip(".")
 
 
+def market_lines(title, mk) -> list[str]:
+    """Ô giá theo giao dịch đã khớp trên Currency Exchange (Faustus)."""
+    lines = [title[:MAX_CHARS]]
+    if "chaos" in mk:
+        lines.append(f"≈ {fmt_each(mk['chaos'])} c/món")
+    if "divine" in mk and ("chaos" not in mk or mk["divine"] >= 0.1):
+        if mk["divine"] >= 0.1:
+            lines.append(f"≈ {fmt_each(mk['divine'])} div/món")
+        else:                                   # chaos orb và đồ rẻ: ghi ngược cho dễ đọc
+            lines.append(f"1 div ≈ {fmt_each(1 / mk['divine'])} món")
+    lines.append(f"Faustus: {mk['volume']} món đã khớp, {mk['hours']} giờ qua")
+    return lines
+
+
 def bulk_lines(title, res) -> list[str]:
     """Ô giá cho đồ bán theo lô: giá mỗi món rẻ nhất tính bằng chaos và divine, số người bán đang online."""
     lines = [title[:MAX_CHARS]]
     best = res.get("best") or {}
     if not best:
-        return lines + ["Sàn trao đổi: không ai bán", "(chỉ tính người đang online)"]
+        return lines + ["Sàn trao đổi: không ai bán"]
     if "chaos" in best:
         lines.append(f"Rẻ nhất: {fmt_each(best['chaos']['each'])} c/món")
     if "divine" in best:
         lines.append(f"Hoặc {fmt_each(best['divine']['each'])} div/món")
-    lines.append(f"{res.get('sellers', 0)} người bán online")
+    lines.append(f"{res.get('sellers', 0)} người bán" + (" (cả offline)" if res.get("offline") else " online"))
     return lines
 
 
@@ -141,6 +155,10 @@ def note_lines(notes) -> list[str]:
             continue
         elif n.startswith("Không có chỉ số đáng lọc"):
             out.append("! Chỉ tra theo loại món")
+        elif n.startswith("Foulborn: có lọc"):
+            out.append("Đã lọc đúng dòng đột biến")
+        elif n.startswith("Foulborn: chưa ai bán"):
+            out.append("! Chưa ai bán đúng dòng đột biến")
         elif n.startswith("Foulborn"):
             out.append("! Chưa lọc dòng đột biến")
         else:
@@ -254,6 +272,8 @@ class Watcher:
             H, W = img.shape[:2]
             inner = inner_box(tt.box, W, H)
             it = parse.parse(tt.header, tt.lines, self.D)
+            if it.foulborn:
+                parse.add_mutated(it, tooltip.pink_rows(img, tt), self.D)
             q, notes = query.build(it, status=self.status)
             key = "|".join(letters_key(x) for x in tt.header + [l.text for l in tt.lines[:6]])
             rec.update(name=it.name, base=it.base, rarity=it.rarity, notes=notes)
@@ -280,9 +300,15 @@ class Watcher:
                 # đồ bán theo lô (currency, fragment, offering, scarab…): tra trên sàn trao đổi
                 from .trade import RateLimited
                 try:
-                    res = self.trade.exchange(tag)
-                    lines = bulk_lines(title, res)
-                    rec["summary"] = {"exchange": tag, "url": res["url"], "cached": res.get("cached")}
+                    stem = self.D.icon_stems.get(letters_key(it.name))
+                    mk = self.trade.market(stem) if stem else None
+                    if mk:
+                        lines = market_lines(title, mk)
+                        rec["summary"] = {"market": stem, **mk}
+                    else:
+                        res = self.trade.exchange_any(tag)
+                        lines = bulk_lines(title, res)
+                        rec["summary"] = {"exchange": tag, "url": res["url"], "cached": res.get("cached")}
                     with self.lock:
                         self.recent[key] = (time.time(), lines)
                 except RateLimited as e:
@@ -304,6 +330,10 @@ class Watcher:
                             raise
                         rec["foulborn_filter_failed"] = True
                         res = self.trade.search(q)
+                    if it.foulborn and it.mutated and res["total"] == 0:
+                        q["query"]["stats"] = [{"type": "and", "filters": []}]
+                        res = self.trade.search(q)
+                        notes = [n for n in notes if not n.startswith("Foulborn")] + ["Foulborn: chưa ai bán đúng dòng đột biến"]
                     lines = price_lines(it, res, notes)
                     if rec.get("foulborn_filter_failed"):
                         lines.append("! Trade không lọc được Foulborn")
