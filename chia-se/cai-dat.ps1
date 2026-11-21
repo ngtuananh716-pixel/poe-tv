@@ -69,7 +69,7 @@ Say "Python: $py" Green
 
 # 3. Lõi tra giá + thư viện -------------------------------------------------
 Step '3/6 Lõi tra giá và thư viện OCR (vài phút)'
-& robocopy "$src\poe_tv" "$dir\poe_tv" /E /NFL /NDL /NJH /NJS /NP | Out-Null
+& robocopy "$src\poe_tv" "$dir\poe_tv" /E /R:2 /W:1 /NFL /NDL /NJH /NJS /NP | Out-Null
 if ($LASTEXITCODE -ge 8) { Fail 'Không chép được thư mục poe_tv.' }
 $venvPy = Join-Path $dir 'venv\Scripts\python.exe'
 if (-not (Test-Path $venvPy)) {

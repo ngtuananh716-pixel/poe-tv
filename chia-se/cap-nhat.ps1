@@ -28,25 +28,35 @@ if (-not ((Test-Path "$dir\couchsubs\CouchSubs.exe") -and (Test-Path "$dir\poe_t
 }
 Say "Cập nhật: $dir" Green
 
-# 2. Kiểm gói trước khi đụng vào máy
+# 2. Kiểm gói và quyền ghi trước khi đụng vào máy
+Say 'Đang kiểm gói và quyền ghi...'
+$probe = Join-Path "$dir\poe_tv" ".ghi-thu-$PID.tmp"
+try { Set-Content -Path $probe -Value 'x' -ErrorAction Stop; Remove-Item $probe -ErrorAction SilentlyContinue }
+catch { Fail "Không ghi được vào $dir. Bấm chuột phải CAP NHAT.cmd > Run as administrator rồi chạy lại." }
 foreach ($name in $dllSha.Keys) {
     if ((Get-FileHash "$src\couchsubs-dll\$name" -Algorithm SHA256).Hash -ne $dllSha[$name]) { Fail "$name trong gói bị hỏng. Xin gói khác." }
 }
 
-# 3. Đóng CouchSubs và cửa sổ máy chủ tra giá (chỉ python của chính thư mục này)
+# 3. Đóng CouchSubs và cửa sổ máy chủ tra giá
+Say 'Đang đóng CouchSubs và máy chủ tra giá...'
 Get-Process CouchSubs -ErrorAction SilentlyContinue | Stop-Process -Force
 # venv\Scripts\python.exe chỉ là trình mở, máy chủ thật là tiến trình python con: tìm theo dòng lệnh "poe_tv.serve"
-Get-CimInstance Win32_Process -Filter "Name='python.exe'" -ErrorAction SilentlyContinue |
+Get-CimInstance Win32_Process -Filter "Name='python.exe'" -OperationTimeoutSec 15 -ErrorAction SilentlyContinue |
     Where-Object { $_.CommandLine -like '*poe_tv.serve*' } |
     ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 Start-Sleep -Seconds 1
 
-# 4. Mã tra giá + dữ liệu (giữ nguyên logs, state.json)
-& robocopy "$src\poe_tv" "$dir\poe_tv" /E /NFL /NDL /NJH /NJS /NP | Out-Null
-if ($LASTEXITCODE -ge 8) { Fail 'Không chép được mã tra giá.' }
+# 4. Mã tra giá + dữ liệu (giữ nguyên logs, state.json). /R:2 /W:1: file bị khóa thì thử 2 lần rồi báo, không treo.
+Say 'Đang chép mã tra giá và dữ liệu...'
+$log = & robocopy "$src\poe_tv" "$dir\poe_tv" /E /R:2 /W:1 /NFL /NDL /NJH /NJS /NP
+if ($LASTEXITCODE -ge 8) {
+    $log | Select-Object -Last 15 | ForEach-Object { Say $_ Yellow }
+    Fail 'Không chép được mã tra giá (xem dòng vàng ở trên). Thử chạy lại bằng Run as administrator.'
+}
 Say 'Đã chép mã tra giá và dữ liệu PoE1/PoE2.' Green
 
 # 5. 3 DLL CouchSubs (giữ bản cũ đuôi .bak để quay lại nếu cần)
+Say 'Đang thay 3 DLL CouchSubs...'
 foreach ($name in $dllSha.Keys) {
     $to = Join-Path "$dir\couchsubs" $name
     if (Test-Path $to) { Copy-Item $to "$to.bak" -Force }
