@@ -39,6 +39,11 @@ object PoeTv {
     private val _status = MutableStateFlow(Status())
     val status: StateFlow<Status> = _status
 
+    /** Bản gọn: không tải quảng cáo, không hiện chữ ký/logo của nhà phát triển. */
+    val NO_PROMO = true
+    /** Bản gọn: không gom và gửi câu phụ đề đọc được lên máy chủ chung của nhà phát triển. */
+    val NO_POOL = true
+
     /** Đọc phụ đề tiếng Thổ của CouchSubs: tắt khi tra giá (đỡ tốn pin; dịch tiếng Việt trên điện thoại làm sau). */
     @Volatile var translateOn = false
         private set

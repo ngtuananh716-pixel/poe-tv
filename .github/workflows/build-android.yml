@@ -47,6 +47,8 @@ jobs:
           cp couchsubs-patch-android/test/resources/poetv/fixture.json "$D/test/resources/poetv/"
           # giao diện mặc định của bản gốc là tiếng Thổ: điện thoại để tiếng Việt thì hiện tiếng Anh
           cp -r "$D/main/res/values-en" "$D/main/res/values-vi"
+          # bản gọn: bỏ gói dịch game có sẵn (~27 MB; PoE không dùng)
+          rm -rf upstream/core/Sources/CouchSubsCore/Resources/packs
           cd upstream && git apply ../couchsubs-patch-android/android.patch && git status --short
 
       - uses: actions/setup-python@v5
@@ -104,10 +106,17 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
-      - name: Đăng Release "android" (thay bản cũ)
+      - name: Đăng Release "android" (thay bản cũ, giữ bản cũ ở tag android-<số>)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # giữ lại bản đang đăng (để quay về nếu bản mới lỗi): chép sang Release "android-<số bản>"
+          old=$(gh release view android --json name -q .name 2>/dev/null | grep -oE '[0-9]+' | tail -1 || true)
+          if [ -n "$old" ] && ! gh release view "android-$old" >/dev/null 2>&1; then
+            mkdir -p old && gh release download android -D old
+            gh release create "android-$old" old/* --title "PoE TV Android (bản $old, cũ)" \
+              --notes "Bản cũ giữ lại để quay về nếu cần (phải gỡ bản mới trước khi cài bản cũ)." --latest=false
+          fi
           gh release delete android --yes --cleanup-tag 2>/dev/null || true
           gh release create android dist/poe-tv-android.apk dist/poe-tv-android.apk.sha256 \
             --title "PoE TV Android (bản ${{ github.run_number }})" \
