@@ -17,7 +17,10 @@ import com.couchsubs.mobile.ui.Tile
 import com.couchsubs.mobile.ui.TileLabel
 import com.couchsubs.mobile.ui.Tokens
 
-/** Ô điều khiển tra giá PoE trên màn hình chính: bật/tắt tra giá, chọn PoE1/PoE2, dòng trạng thái gần nhất. */
+/**
+ * Ô điều khiển tra giá PoE trên màn hình chính: bật/tắt tra giá, chọn PoE1/PoE2; chế độ lọc (RỘNG/CHẶT, MỌI/ĐÚNG BASE,
+ * Dòng CHÍNH/TẤT CẢ); dòng trạng thái gần nhất.
+ */
 @Composable
 fun PoeTvTile(modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -31,6 +34,17 @@ fun PoeTvTile(modifier: Modifier = Modifier) {
             }
             SecondaryButton("Game: ${PoeTv.GAME_NAME[s.game]}", Modifier.weight(1f)) {
                 PoeTv.setGame(context, if (s.game == "poe1") "poe2" else "poe1")
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(Tokens.Space.gap)) {
+            SecondaryButton(if (s.strict) "Lọc: CHẶT (100%)" else "Lọc: RỘNG (90%)", Modifier.weight(1f)) {
+                PoeTv.setFilter(context, strict = !s.strict)
+            }
+            SecondaryButton(if (s.byBase) "Base: ĐÚNG BASE" else "Base: MỌI BASE", Modifier.weight(1f)) {
+                PoeTv.setFilter(context, byBase = !s.byBase)
+            }
+            SecondaryButton(if (s.allLines) "Dòng: TẤT CẢ" else "Dòng: CHÍNH", Modifier.weight(1f)) {
+                PoeTv.setFilter(context, allLines = !s.allLines)
             }
         }
         if (s.note.isNotEmpty()) Text(s.note, style = Tokens.Type.caption, color = Tokens.Color.text)

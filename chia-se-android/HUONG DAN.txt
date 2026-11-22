@@ -20,13 +20,19 @@ CÀI (lần đầu)
    - chọn nơi hiện chữ: TV (LG), mở app CouchSubs trên TV để TV ghép với điện thoại.
 4. Ở màn hình chính có ô "Tra giá PoE (PoE TV)":
    - "Tra giá: BẬT/TẮT" để bật tắt;
-   - "Game: PoE1/PoE2" để chọn game đang chơi.
+   - "Game: PoE1/PoE2" để chọn game đang chơi;
+   - hàng nút chế độ lọc (bấm là đổi, món đang mở được tra lại ngay):
+     "Lọc: RỘNG (90%) / CHẶT (100%)": tìm món có chỉ số từ 90% hay từ đúng 100% món của mình;
+     "Base: MỌI BASE / ĐÚNG BASE": so với mọi base cùng loại đồ hay chỉ đúng base này (đồ trắng luôn đúng base);
+     "Dòng: CHÍNH / TẤT CẢ": chỉ các dòng chính (máu, kháng, thuộc tính, mod quan trọng) hay mọi dòng; TẤT CẢ mà quá
+     ít món khớp thì tự nới bớt 1–2 dòng (ô giá ghi "! Ít món khớp … → tự nới").
    Bấm nút bắt đầu (Start translation) để kết nối PS5.
 
 DÙNG
 - Chỉ tra khi đang mở túi đồ / stash / cửa sổ mua bán (lúc đánh quái không hiện ô giá che màn hình).
 - Bỏ qua đồ bán theo lô (currency, fragment, scarab, essence, thẻ bài…) và đồ chưa giám định.
-- Ô giá hiện cạnh tooltip trên TV; dòng trạng thái trong ô "Tra giá PoE" trên điện thoại cho biết đang làm gì.
+- Ô giá hiện cạnh tooltip trên TV: tên món; Min (rẻ nhất); ≈ giá ước tính (khoảng giá); Tin cậy cao/vừa/thấp;
+  số món đang bán; các dòng đã dùng để lọc. Dòng trạng thái trong ô "Tra giá PoE" trên điện thoại cho biết đang làm gì.
 - TẮT app CouchSubs trên laptop khi dùng điện thoại (TV chỉ nên nối với một máy).
 - Nên cắm sạc điện thoại: nhận hình PS5 và đọc chữ liên tục khá tốn pin, máy ấm lên là bình thường.
   Trong Cài đặt Android > Ứng dụng > CouchSubs PoE TV > Pin: chọn "Không hạn chế" để tắt màn hình vẫn chạy.

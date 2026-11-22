@@ -6,6 +6,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URLEncoder
 import java.util.ArrayDeque
@@ -29,6 +30,9 @@ class Trade(val game: String, private val http: OkHttpClient = DEFAULT_CLIENT) {
     private val sent = HashMap<String, ArrayDeque<Double>>()
     private val blockedUntil = HashMap<String, Double>()
     private val cache = HashMap<String, Pair<Double, Result>>()
+    private val xcache = HashMap<String, Pair<Double, Map<String, Double>>>()
+    private var ratesAt = 0.0
+    private var ratesVal: Map<String, Double>? = null
 
     private fun now() = System.currentTimeMillis() / 1000.0
 
@@ -131,7 +135,69 @@ class Trade(val game: String, private val http: OkHttpClient = DEFAULT_CLIENT) {
         return out
     }
 
+    /**
+     * Sàn trao đổi (như exchange của bản Python): giá rẻ nhất mỗi món [tag], tính bằng từng loại tiền chính của game
+     * (PoE1 chaos/divine, PoE2 exalted/divine). 1 lần gọi là có giá, không cần bước fetch.
+     */
+    fun exchangeBest(tag: String, status: String = "online"): Map<String, Double> {
+        val lg = pickLeague()
+        val have = JSONArray()
+        for (c in MAIN_CURRENCY.getValue(game)) if (c != tag) have.put(c)          // không đổi divine lấy chính divine
+        val body = JSONObject().put("engine", "new")
+            .put("query", JSONObject().put("status", JSONObject().put("option", status)).put("have", have)
+                .put("want", JSONArray().put(tag)))
+            .put("sort", JSONObject().put("have", "asc"))
+        val key = body.toString()
+        synchronized(this) { xcache[key]?.let { (at, r) -> if (now() - at < CACHE_TTL) return r } }
+        val res = call("exchange", post(path("exchange", lg), body))
+        val best = HashMap<String, Double>()
+        val result = res.optJSONObject("result")
+        if (result != null) for (k in result.keys()) {
+            val offers = result.optJSONObject(k)?.optJSONObject("listing")?.optJSONArray("offers") ?: continue
+            if (offers.length() != 1) continue
+            val o = offers.optJSONObject(0) ?: continue
+            val itemAmount = o.optJSONObject("item")?.optDouble("amount", 0.0) ?: 0.0
+            if (itemAmount == 0.0 || itemAmount.isNaN()) continue
+            val ex = o.optJSONObject("exchange") ?: continue
+            val each = ex.optDouble("amount", Double.NaN) / itemAmount
+            val cur = ex.optString("currency")
+            if (each.isNaN() || cur.isEmpty()) continue
+            val was = best[cur]
+            if (was == null || each < was) best[cur] = each
+        }
+        synchronized(this) { xcache[key] = now() to best }
+        return best
+    }
+
+    /** Như [exchangeBest]; không ai online bán thì tính cả người offline. */
+    fun exchangeAnyBest(tag: String): Map<String, Double> = exchangeBest(tag, "online").ifEmpty { exchangeBest(tag, "any") }
+
+    /**
+     * Giá các loại tiền tính bằng tiền nhỏ của game (PoE1: chaos, PoE2: exalted), lấy trên sàn trao đổi của league,
+     * nhớ 30 phút (như get_rates của bản Python). Không lấy được thì null (ô giá hiện giá phổ biến như cũ).
+     */
+    fun rates(): Map<String, Double>? {
+        synchronized(this) { if (ratesAt > 0 && now() - ratesAt < RATE_TTL) return ratesVal }
+        val (small, big) = MAIN_CURRENCY.getValue(game)
+        var out: Map<String, Double>? = null
+        val b = exchangeAnyBest(big)[small]
+        if (b != null && b > 0) {
+            val r = linkedMapOf(small to 1.0, big to b)
+            if (game == "poe2") {
+                try {                                     // PoE2 vẫn có người rao giá bằng chaos
+                    exchangeAnyBest("chaos")[small]?.takeIf { it > 0 }?.let { r["chaos"] = it }
+                } catch (e: Exception) { }
+            }
+            out = r
+        }
+        synchronized(this) { ratesAt = now(); ratesVal = out }
+        return out
+    }
+
     companion object {
+        /** Tiền nhỏ, tiền lớn của mỗi game (để quy giá). */
+        val MAIN_CURRENCY = mapOf("poe1" to listOf("chaos", "divine"), "poe2" to listOf("exalted", "divine"))
+        const val RATE_TTL = 1800.0
         const val BASE = "https://www.pathofexile.com"
         const val USER_AGENT = "poe-tv-pricecheck/0.1 (personal console price check)"
         const val CACHE_TTL = 600.0

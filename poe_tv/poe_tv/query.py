@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+import re
 
 from .data import TRADE_CATEGORY
 from .parse import Item, is_armour, is_jewellery, is_weapon
@@ -39,67 +40,124 @@ def _k(ref: str) -> str:
 RES = {_k(k): v for k, v in RES.items()}
 ATTR = {_k(k): v for k, v in ATTR.items()}
 
-# mod quan trọng: luôn đưa vào bộ lọc nếu món có
-IMPORTANT = ("Movement Speed", "to Level of", "Critical Strike Multiplier", "increased maximum Life",
-             "increased maximum Energy Shield", "Spell Damage", "Damage over Time Multiplier",
-             "Physical Damage to Attacks", "increased Cast Speed", "Suppress Spell Damage",
-             "Critical Damage Bonus", "to Spirit")      # 2 mục cuối là mod PoE2
-
-
-# Nhãn ngắn của các bộ lọc, hiện dưới giá trên TV ("Lọc: Máu≥94 · K.NT≥95")
+# Mod quan trọng: (chuỗi nhận ra trong câu mẫu, nhãn ngắn hiện trên TV). Mặc định (Dòng: CHÍNH) chỉ lọc các mod này
+# cùng các tổng (máu, ES, kháng, thuộc tính); Dòng: TẤT CẢ lọc thêm mọi dòng explicit đọc được.
+IMPORTANT_LABEL = (
+    ("Movement Speed", "Tốc chạy"), ("to Level of", "+Cấp skill"), ("Critical Strike Multiplier", "Crit multi"),
+    ("Critical Damage Bonus", "Crit dmg"), ("increased maximum Life", "%Máu"),
+    ("increased maximum Energy Shield", "%ES"), ("Spell Damage", "Spell dmg"),
+    ("Damage over Time Multiplier", "DoT multi"), ("to Attacks", "atk"),
+    ("increased Cast Speed", "Cast speed"), ("Suppress Spell Damage", "Suppress"), ("to Spirit", "Spirit"),
+    ("increased Attack Speed", "Attack speed"), ("Critical Strike Chance", "Crit"), ("Critical Hit Chance", "Crit"),
+    ("Rarity of Items", "Rarity"), ("increased Skill Speed", "Skill speed"),
+)
+IMPORTANT = tuple(k for k, _ in IMPORTANT_LABEL)
+ELEMENTS = (("Physical", "Phys"), ("Fire", "Fire"), ("Cold", "Cold"), ("Lightning", "Lightning"), ("Chaos", "Chaos"))
+# Nhãn ngắn của các bộ lọc, hiện dưới giá trên TV ("• Máu ≥ 94")
 PSEUDO_LABEL = {v: k for k, v in {
     "Máu": "pseudo.pseudo_total_life", "ES": "pseudo.pseudo_total_energy_shield", "Mana": "pseudo.pseudo_total_mana",
     "K.NT": "pseudo.pseudo_total_elemental_resistance", "K.Chaos": "pseudo.pseudo_total_chaos_resistance",
     "Str": "pseudo.pseudo_total_strength", "Dex": "pseudo.pseudo_total_dexterity", "Int": "pseudo.pseudo_total_intelligence",
 }.items()}
-IMPORTANT_LABEL = (("Movement Speed", "Tốc chạy"), ("to Level of", "+Cấp skill"), ("Critical Strike Multiplier", "Crit multi"),
-                   ("Critical Damage Bonus", "Crit dmg"), ("increased maximum Life", "%Máu"),
-                   ("increased maximum Energy Shield", "%ES"), ("Spell Damage", "Spell dmg"),
-                   ("Damage over Time Multiplier", "DoT multi"), ("Physical Damage to Attacks", "Phys atk"),
-                   ("increased Cast Speed", "Cast speed"), ("Suppress Spell Damage", "Suppress"), ("to Spirit", "Spirit"))
 EQUIP_LABEL = {"pdps": "pDPS", "edps": "eDPS", "ar": "Giáp", "ev": "Né", "es": "ES"}
+# dòng đã gộp vào tổng (máu, ES cộng thẳng, kháng, thuộc tính): Dòng: TẤT CẢ không lọc riêng lần nữa
+FOLDED = {"# to maximum Life", "# to maximum Energy Shield"}
+# Dòng: TẤT CẢ không lọc riêng các dòng local đã nằm trong DPS (vũ khí) hay Giáp/Né/ES (giáp)
+LOCAL_WEAPON = re.compile(r"^(#% increased Physical Damage|Adds # to # (Physical|Fire|Cold|Lightning|Chaos) Damage)$", re.I)
+LOCAL_ARMOUR = re.compile(r"^(# to (Armour|Evasion Rating|maximum Energy Shield)|"
+                          r"#% increased (Armour|Evasion Rating|Energy Shield)( and (Armour|Evasion|Energy Shield))?)$", re.I)
+_SHORT_DROP = {"increased", "to", "of", "the", "Adds", "all", "with", "Items", "found", "damage", "Damage"}
 
 
-def labels(q: dict, it: Item) -> list[str]:
-    """Các dòng đã dùng để lọc (đồ không phải unique), viết ngắn để hiện trên TV."""
+def mod_label(ref: str) -> str:
+    """Nhãn ngắn của một mod: theo bảng mod quan trọng, không có thì lấy vài chữ chính của câu mẫu (≤ 20 ký tự)."""
+    for key, lab in IMPORTANT_LABEL:
+        if key in ref:
+            if key == "to Attacks":
+                return next((short for word, short in ELEMENTS if word in ref), "") + " atk"
+            return lab
+    words = [w for w in re.sub(r"[#%+]", " ", ref).split() if w not in _SHORT_DROP]
+    out = ""
+    for w in words:
+        if len(out) + len(w) + (1 if out else 0) > 20:
+            break
+        out = f"{out} {w}" if out else w
+    return out or ref[:20]
+
+
+def _num(v) -> str:
+    return f"{v:g}"
+
+
+def labels(q: dict, it: Item) -> dict:
+    """Các bộ lọc đã dùng (đồ không phải unique), viết ngắn để hiện trên TV:
+    {"req": [bắt buộc], "count": [nhóm đếm], "need": số dòng cần đủ, "of": số dòng trong nhóm}."""
+    out = {"req": [], "count": [], "need": 0, "of": 0}
     if it.rarity == "Unique":
-        return []
-    out = []
+        return out
     qq = q["query"]
     flt = qq.get("filters", {})
+    req = out["req"]
+    if qq.get("type") and it.rarity not in ("Gem", "Other"):      # gem, tiền tệ...: tên đã ở dòng đầu
+        req.append(f"Base: {qq['type']}")
     for key in ("weapon_filters", "armour_filters", "equipment_filters"):
         for k, f in ((flt.get(key) or {}).get("filters") or {}).items():
             if "min" in f:
-                out.append(f"{EQUIP_LABEL.get(k, k)}≥{f['min']:g}")
+                req.append(f"{EQUIP_LABEL.get(k, k)} ≥ {_num(f['min'])}")
     mf = (flt.get("misc_filters") or {}).get("filters") or {}
+    if "ilvl" in mf:
+        req.append(f"iLvl ≥ {_num(mf['ilvl']['min'])}")
     if "gem_level" in mf:
-        out.append(f"Cấp≥{mf['gem_level']['min']:g}")
+        req.append(f"Cấp ≥ {_num(mf['gem_level']['min'])}")
     if "quality" in mf:
-        out.append(f"CL≥{mf['quality']['min']:g}")
+        req.append(f"CL ≥ {_num(mf['quality']['min'])}")
     if (mf.get("corrupted") or {}).get("option") == "true":
-        out.append("Corrupted")
+        req.append("Corrupted")
     refs = {}
     for m in it.mods:
         sid = ((m.trade_ids or {}).get("explicit") or [None])[0]
         if sid and sid not in refs:
             refs[sid] = m.ref
-    for f in qq["stats"][0]["filters"]:
+
+    def lab(f):
         name = PSEUDO_LABEL.get(f["id"])
+        ref = refs.get(f["id"], "")
         if name is None:
-            ref = refs.get(f["id"], "")
-            name = next((lab for key, lab in IMPORTANT_LABEL if key in ref), None) or ref.replace("#", "").strip()[:14]
+            name = mod_label(ref)
         v = (f.get("value") or {}).get("min")
-        out.append(f"{name}≥{v:g}" if v is not None else name)
+        if v is None:
+            return name
+        return f"{name} ≥ {_num(v)}{'%' if '#%' in ref else ''}"
+
+    for g in qq.get("stats", []):
+        if g["type"] == "count":
+            out["count"] = [lab(f) for f in g["filters"]]
+            out["need"] = g["value"]["min"]
+            out["of"] = len(g["filters"])
+        else:
+            req.extend(lab(f) for f in g["filters"])
     return out
 
 
-def _min(v):
-    return math.floor(v * (1 - RANGE)) if v > 0 else v
+def _min(v, rng=RANGE):
+    """Mức tối thiểu khi lọc: rộng (mặc định) = 90% giá trị, chặt (rng=0) = đúng giá trị."""
+    return math.floor(v * (1 - rng)) if v > 0 else v
 
 
-def build(it: Item, status: str = "securable", game: str = "poe1"):
+def build(it: Item, status: str = "securable", game: str = "poe1", strict: bool = False, by_base: bool = False,
+          all_lines: bool = False):
     """Trả về (query, ghi_chú[]) để gửi lên /api/trade/search (PoE1) hoặc /api/trade2/search (PoE2).
-    PoE2 gộp bộ lọc vũ khí và giáp vào equipment_filters; không có Foulborn."""
+    PoE2 gộp bộ lọc vũ khí và giáp vào equipment_filters; không có Foulborn.
+    strict: chặt, lấy chỉ số từ 100% (mặc định rộng: từ 90%, như Awakened PoE Trade).
+    by_base: lọc đúng base (mặc định mọi base cùng loại đồ; đồ trắng luôn lọc đúng base).
+    all_lines: lọc mọi dòng explicit đọc được (mặc định chỉ tổng máu/kháng/thuộc tính và mod quan trọng).
+    Từ 3 dòng trở lên thì xếp vào nhóm đếm: mặc định cần đủ (số dòng − 1), all_lines cần đủ hết (bên gọi tự nới
+    khi quá ít món). Giáp/Né/ES và DPS vũ khí luôn bắt buộc."""
+    rng = 0.0 if strict else RANGE
+
+    def mn(v):
+        return _min(v, rng)
+
     poe2 = game == "poe2"
     notes = []
     q = {"query": {"status": {"option": status}, "filters": {}, "stats": [{"type": "and", "filters": []}]},
@@ -131,7 +189,7 @@ def build(it: Item, status: str = "securable", game: str = "poe1"):
                 f = {"id": ids[0]}
                 if vals:
                     v = sum(vals) / len(vals)
-                    f["value"] = {"min": v if abs(v) <= 5 else _min(v)}
+                    f["value"] = {"min": v if abs(v) <= 5 else mn(v)}
                 stats.append(f)
                 used.append(txt)
             if used:
@@ -151,6 +209,12 @@ def build(it: Item, status: str = "securable", game: str = "poe1"):
         qq["type"] = it.base or it.name
         return q, notes
 
+    if it.rarity in ("Normal", "Magic") and it.props.get("ilvl"):
+        # đồ làm base: item level quyết định mod có thể ra (tooltip chỉ có dòng này khi game hiện)
+        flt.setdefault("misc_filters", {"filters": {}})["filters"]["ilvl"] = {"min": int(it.props["ilvl"][0])}
+    if (it.rarity == "Normal" or by_base) and it.base:
+        qq["type"] = it.base            # đồ trắng: giá nằm ở chính base
+
     cat = TRADE_CATEGORY.get(it.category)
     tf = {"rarity": {"option": "nonunique"}}
     if cat:
@@ -163,9 +227,9 @@ def build(it: Item, status: str = "securable", game: str = "poe1"):
         wf = {}
         pdps, edps = it.pdps, it.edps
         if pdps >= 30:
-            wf["pdps"] = {"min": _min(pdps)}
+            wf["pdps"] = {"min": mn(pdps)}
         if edps >= 30:
-            wf["edps"] = {"min": _min(edps)}
+            wf["edps"] = {"min": mn(edps)}
         if wf:
             flt["equipment_filters" if poe2 else "weapon_filters"] = {"filters": wf}
         else:
@@ -183,30 +247,45 @@ def build(it: Item, status: str = "securable", game: str = "poe1"):
     ele = sum(m.value * RES[_k(m.ref)][0] for m in mods if _k(m.ref) in RES)
     chaos = sum(m.value for m in mods if _k(m.ref) in RES and RES[_k(m.ref)][1])
 
+    pool = []          # các dòng chỉ số (xếp vào nhóm đếm nếu từ 3 dòng)
     defensive = is_armour(it) or is_jewellery(it) or it.category in ("Quiver", "Jewel", "Abyss Jewel")
     if life > 0:
         # PoE1: 2 Str = 1 máu (như APT). PoE2 chưa kiểm chứng nên chỉ tính máu cộng thẳng
-        stats.append({"id": PSEUDO["life"], "value": {"min": _min(life + (0 if poe2 else attrs["str"] / 2))}})
+        pool.append({"id": PSEUDO["life"], "value": {"min": mn(life + (0 if poe2 else attrs["str"] / 2))}})
     if es_flat > 0 and not is_armour(it):
-        stats.append({"id": PSEUDO["es"], "value": {"min": _min(es_flat)}})
+        pool.append({"id": PSEUDO["es"], "value": {"min": mn(es_flat)}})
     if ele > 0:
-        stats.append({"id": PSEUDO["ele_res"], "value": {"min": _min(ele)}})
+        pool.append({"id": PSEUDO["ele_res"], "value": {"min": mn(ele)}})
     if chaos > 0:
-        stats.append({"id": PSEUDO["chaos_res"], "value": {"min": _min(chaos)}})
+        pool.append({"id": PSEUDO["chaos_res"], "value": {"min": mn(chaos)}})
     for a, v in attrs.items():
         if v >= 40:
-            stats.append({"id": PSEUDO[a], "value": {"min": _min(v)}})
+            pool.append({"id": PSEUDO[a], "value": {"min": mn(v)}})
+    used_ids = set()
     for m in mods:
-        if any(k in m.ref for k in IMPORTANT) and m.kind == "explicit":
-            ids = (m.trade_ids or {}).get("explicit") or []
-            if ids and m.value is not None:
-                stats.append({"id": ids[0], "value": {"min": _min(m.value)}})
+        if m.kind != "explicit" or m.value is None:
+            continue
+        important = any(k in m.ref for k in IMPORTANT)
+        folded = (_k(m.ref) in FOLDED or _k(m.ref) in RES or _k(m.ref) in ATTR
+                  or (is_weapon(it) and LOCAL_WEAPON.match(_k(m.ref)))
+                  or (is_armour(it) and LOCAL_ARMOUR.match(_k(m.ref))))
+        if not important and not (all_lines and not folded):
+            continue
+        ids = (m.trade_ids or {}).get("explicit") or []
+        if ids and ids[0] not in used_ids:
+            used_ids.add(ids[0])
+            pool.append({"id": ids[0], "value": {"min": mn(m.value)}})
+    if len(pool) >= 3:
+        qq["stats"].append({"type": "count", "value": {"min": len(pool) if all_lines else len(pool) - 1},
+                            "filters": pool})
+    else:
+        stats.extend(pool)
 
     if is_armour(it):
         af = {}
         for key, tkey in (("armour", "ar"), ("evasion", "ev"), ("es", "es")):
             if it.props.get(key):
-                af[tkey] = {"min": _min(it.props[key][0])}
+                af[tkey] = {"min": mn(it.props[key][0])}
         if af:
             if poe2:
                 flt.setdefault("equipment_filters", {"filters": {}})["filters"].update(af)
@@ -215,6 +294,6 @@ def build(it: Item, status: str = "securable", game: str = "poe1"):
 
     if defensive and life == 0 and es_flat < 40 and not (is_armour(it) and it.props.get("es")):
         notes.append("Món không có máu: giá thật nhiều khả năng THẤP hơn các món tương tự tìm được")
-    if not stats and not any(flt.get(k) for k in ("weapon_filters", "armour_filters", "equipment_filters")):
+    if not pool and not any(flt.get(k) for k in ("weapon_filters", "armour_filters", "equipment_filters")):
         notes.append("Không có chỉ số đáng lọc: chỉ tra theo loại món")
     return q, notes

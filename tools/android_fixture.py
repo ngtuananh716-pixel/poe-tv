@@ -4,7 +4,7 @@ Chạy: cd poe_tv && python ../tools/android_fixture.py ../couchsubs-patch-andro
 import json, sys
 import cv2
 from poe_tv import data, ocr, parse, query, tooltip
-from poe_tv.serve import filter_lines
+from poe_tv.serve import filter_lines, price_lines
 
 import re
 import sys as _sys
@@ -44,6 +44,10 @@ for name, game, path in SAMPLES:
                           "mods": [{"ref": m.ref, "values": m.values, "kind": m.kind} for m in it.mods],
                           "props": it.props, "query": q, "notes": notes,
                           "labels": query.labels(q, it), "filter_lines": filter_lines(query.labels(q, it))}
+        qa, _ = query.build(it, status="securable", game=game, all_lines=True)
+        qs, _ = query.build(it, status="securable", game=game, strict=True, by_base=True)
+        case["expect"].update({"query_all": qa, "labels_all": query.labels(qa, it),
+                               "filter_lines_all": filter_lines(query.labels(qa, it)), "query_strict_base": qs})
     cases.append(case)
 # kiểm riêng phần khớp: mod, tên món
 D = data.load("poe1")
@@ -77,5 +81,28 @@ for t in ["Heavy Bel", "Vortex Cal", "Sapphire Rng", "Chaos Orh",
 for t in ["Heavy Belt of the Whale", "Sapphire Ring of Fire", "Chain: hello"]:
     bi = D.find_base_in(t)
     names.append({"text": t, "base": None, "unique": None, "other": None, "gem": None, "base_in": bi["name"] if bi else None, "only_in": True})
-json.dump({"cases": cases, "mods": checks, "names": names}, open(sys.argv[1], "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+# ô giá: giá ước tính, khoảng, độ tin cậy (tỉ giá giả định), giá phổ biến khi không có tỉ giá
+L = lambda pairs: [{"amount": a, "currency": c} for a, c in pairs]
+LAB = {"req": ["Giáp ≥ 530"], "count": ["K.NT ≥ 67", "Rarity ≥ 16%", "Lightning atk ≥ 21"], "need": 2, "of": 3}
+price_cases = []
+for title, total, ls, notes, lab, rates, game in [
+    ("Utility Belt", 185, L([(3, "divine"), (4, "divine"), (5, "divine"), (6, "divine"), (6, "divine"), (6, "divine"),
+                             (7, "divine"), (8, "divine"), (10, "divine"), (12, "divine")]), [],
+     {"req": [], "count": ["Máu ≥ 94", "K.NT ≥ 95", "K.Chaos ≥ 16"], "need": 2, "of": 3},
+     {"exalted": 1.0, "divine": 300.0}, "poe2"),
+    ("Detailed Mitts", 4, L([(1, "exalted"), (80, "exalted"), (150, "exalted"), (2, "divine")]),
+     ["Món không có máu: giá thật nhiều khả năng THẤP hơn các món tương tự tìm được"], LAB,
+     {"exalted": 1.0, "divine": 300.0}, "poe2"),
+    ("Heavy Belt", 50, L([(20, "chaos"), (25, "chaos"), (30, "chaos"), (1, "divine")]), [], None,
+     {"chaos": 1.0, "divine": 180.0}, "poe1"),
+    ("Heavy Belt", 50, L([(20, "chaos"), (25, "chaos"), (30, "chaos"), (1, "divine")]), [], None, None, "poe1"),
+    ("Vaal Regalia", 64, L([(2.5, "divine"), (12.5, "chaos"), (0.5, "divine")]), ["Ít món khớp đủ 5/5 → tự nới"],
+     {"req": ["Base: Vaal Regalia", "iLvl ≥ 86"], "count": [], "need": 0, "of": 0}, {"chaos": 1.0, "divine": 180.0}, "poe1"),
+    ("Ring", 30, L([(12, "chaos"), (13, "chaos")]), [], None, {"chaos": 1.0, "divine": 180.0}, "poe1"),
+    ("Foul Staff", 0, [], [], {"req": ["pDPS ≥ 197"] + [f"Mod {i} ≥ {i}" for i in range(12)], "count": [], "need": 0, "of": 0},
+     None, "poe1"),
+]:
+    price_cases.append({"title": title, "total": total, "listings": ls, "notes": notes, "labels": lab, "rates": rates,
+                        "game": game, "lines": price_lines(title, {"total": total, "listings": ls}, notes, lab, rates, game)})
+json.dump({"cases": cases, "mods": checks, "names": names, "price_cases": price_cases}, open(sys.argv[1], "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print("ok", [ (c["name"], c.get("expect", {}).get("title")) for c in cases])

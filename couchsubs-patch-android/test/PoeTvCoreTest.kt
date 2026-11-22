@@ -84,6 +84,37 @@ class PoeTvCoreTest {
         }
     }
 
+    private fun labelsOf(o: JSONObject) = FilterLabels(
+        o.getJSONArray("req").toList().map { it as String }, o.getJSONArray("count").toList().map { it as String },
+        o.getInt("need"), o.getInt("of"),
+    )
+
+    /** Ô giá: Min, giá ước tính (khoảng), độ tin cậy, số món, các dòng lọc, lưu ý — so với bản Python. */
+    @Test fun priceBoxMatchesPython() {
+        val cases = fixture.getJSONArray("price_cases")
+        assertTrue(cases.length() >= 5)
+        for (i in 0 until cases.length()) {
+            val c = cases.getJSONObject(i)
+            val ls = c.getJSONArray("listings")
+            val listings = (0 until ls.length()).map { j ->
+                val l = ls.getJSONObject(j)
+                PriceBox.Listing(l.getDouble("amount"), l.getString("currency"))
+            }
+            val notes = c.getJSONArray("notes").toList().map { it as String }
+            val lab = if (c.isNull("labels")) null else labelsOf(c.getJSONObject("labels"))
+            val rates = if (c.isNull("rates")) null else c.getJSONObject("rates").let { r ->
+                r.keySet().associateWith { k -> r.getDouble(k) }
+            }
+            val title = c.getString("title")
+            assertEquals("price case $i $title", c.getJSONArray("lines").toList(),
+                PriceBox.priceLines(title, c.getInt("total"), listings, notes, lab, rates, c.getString("game")))
+        }
+        assertEquals("12", PriceBox.fmtEach(12.5))
+        assertEquals("14", PriceBox.fmtEach(13.5))
+        assertEquals("2.5", PriceBox.fmtEach(2.5))
+        assertEquals("0.5", PriceBox.fmtEach(0.5))
+    }
+
     @Test fun tooltipsParseAndQuery() {
         val cases = fixture.getJSONArray("cases")
         for (i in 0 until cases.length()) {
@@ -133,8 +164,17 @@ class PoeTvCoreTest {
             assertTrue("$name query\n${e.getJSONObject("query")}\n$q", e.getJSONObject("query").similar(q))
             assertEquals(name, e.getJSONArray("notes").toList(), notes)
             val labels = Query.labels(q, it)
-            assertEquals("$name labels", e.getJSONArray("labels").toList(), labels)
+            assertEquals("$name labels", labelsOf(e.getJSONObject("labels")), labels)
             assertEquals("$name filter lines", e.getJSONArray("filter_lines").toList(), PriceBox.filterLines(labels))
+            // Dòng: TẤT CẢ (nhóm đếm cần đủ hết) và Lọc CHẶT + ĐÚNG BASE
+            val (qa, _) = Query.build(it, "securable", game, allLines = true)
+            assertTrue("$name query all\n${e.getJSONObject("query_all")}\n$qa", e.getJSONObject("query_all").similar(qa))
+            val la = Query.labels(qa, it)
+            assertEquals("$name labels all", labelsOf(e.getJSONObject("labels_all")), la)
+            assertEquals("$name filter lines all", e.getJSONArray("filter_lines_all").toList(), PriceBox.filterLines(la))
+            val (qs, _) = Query.build(it, "securable", game, strict = true, byBase = true)
+            assertTrue("$name query strict base\n${e.getJSONObject("query_strict_base")}\n$qs",
+                e.getJSONObject("query_strict_base").similar(qs))
             val box = PriceBox.place(tt.box, c.getInt("width"), c.getInt("height"), 3)
             assertTrue(name, box[2] <= 1.0 && box[0] >= 0.0)
         }

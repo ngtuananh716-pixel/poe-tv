@@ -227,6 +227,37 @@ class Trade:
         return out
 
 
+RATE_TTL = 1800          # tỉ giá nhớ 30 phút
+
+
+def _rates_from(trade, small, big):
+    r = {small: 1.0}
+    b = (trade.exchange_any(big).get("best") or {}).get(small)
+    if not b or not b.get("each"):
+        return None
+    r[big] = float(b["each"])
+    return r
+
+
+def get_rates(trade):
+    """Giá các loại tiền tính bằng tiền nhỏ của game (PoE1: chaos, PoE2: exalted), lấy trên sàn trao đổi của league,
+    nhớ 30 phút. Không lấy được thì trả None (ô giá quay về cách hiện cũ)."""
+    hit = getattr(trade, "_rates", None)
+    if hit and time.time() - hit[0] < RATE_TTL:
+        return hit[1]
+    (small, _), (big, _) = MAIN_CURRENCY[trade.game]
+    r = _rates_from(trade, small, big)
+    if r and trade.game == "poe2":
+        try:                                   # PoE2 vẫn có người rao giá bằng chaos
+            c = (trade.exchange_any("chaos").get("best") or {}).get(small)
+            if c and c.get("each"):
+                r["chaos"] = float(c["each"])
+        except Exception:
+            pass
+    trade._rates = (time.time(), r)
+    return r
+
+
 DEFAULT_LEAGUE = "Covens"   # league 3.30; đổi khi sang league mới nếu không tự lấy được
 
 

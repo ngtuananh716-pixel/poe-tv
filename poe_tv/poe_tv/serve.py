@@ -44,7 +44,9 @@ RECENT_S = 600            # mở lại đúng món đã tra trong bấy nhiêu g
 NEXT_MS = 300             # CouchSubs gửi khung kế tiếp sau bấy nhiêu ms (đang mở túi đồ / đang hiện ô giá)
 IDLE_NEXT_MS = 1000       # không mở túi đồ: 1 khung/giây là đủ để biết lúc mở (đỡ nóng máy)
 OFF_NEXT_MS = 1500        # tắt tra giá: chỉ cần giữ liên lạc để nhận nút bật/tắt
-LINE = 0.026              # chiều cao một dòng chữ trên TV (tỉ lệ chiều cao màn hình)
+LINE = 0.021              # chiều cao một dòng chữ trên TV (tỉ lệ chiều cao màn hình); 22/11/2026 giảm ~20% (từ 0.026)
+RELAX_MIN = 5             # Dòng: TẤT CẢ ra ít hơn bấy nhiêu món thì tự nới (bớt 1 dòng, rồi 2 dòng)
+MAX_BULLETS = 10          # ô giá hiện tối đa bấy nhiêu dòng chỉ số
 MAX_SAVED = 30            # số ảnh tra gần nhất giữ lại trong thư mục logs
 MAX_CHARS = 30            # mỗi dòng trong ô giá tối đa bấy nhiêu ký tự
 
@@ -97,45 +99,96 @@ def short_price(amount, currency) -> str:
 
 
 def head(title: str, game: str = "poe1") -> str:
-    """Dòng đầu ô giá. Chế độ PoE2 ghi rõ để lỡ quên chuyển game thì nhìn là biết."""
-    return (("PoE2 · " if game == "poe2" else "") + title)[:MAX_CHARS]
+    """Dòng đầu ô giá: tên món (22/11/2026 Tuấn Anh bỏ chữ "PoE2 ·")."""
+    return title[:MAX_CHARS]
 
 
-def filter_lines(labels, max_lines=3) -> list[str]:
-    """Các bộ lọc đã dùng, gói thành dòng ≤ MAX_CHARS ký tự: "Lọc: Máu≥94 · K.NT≥95", "K.Chaos≥16"."""
-    if not labels:
+def filter_lines(lab) -> list[str]:
+    """Các bộ lọc đã dùng, mỗi chỉ số một dòng:
+    "Lọc:" + "• …" (bắt buộc), rồi "Đủ ≥N/M dòng:" + "• …" (nhóm đếm); chỉ có nhóm đếm thì "Lọc (đủ ≥N/M dòng):"."""
+    if not lab or not (lab.get("req") or lab.get("count")):
         return []
-    lines, cur, first = [], "Lọc: ", True
-    for lab in labels:
-        piece = lab if first else " · " + lab
-        if first or len(cur) + len(piece) <= MAX_CHARS:
-            cur += piece
-        else:
-            lines.append(cur)
-            cur = lab
-        first = False
-    lines.append(cur)
-    lines = [l[:MAX_CHARS] for l in lines]
-    if len(lines) > max_lines:
-        lines = lines[:max_lines]
-        lines[-1] = lines[-1][:MAX_CHARS - 1] + "…"
-    return lines
+    req, cnt, need, of = lab.get("req") or [], lab.get("count") or [], lab.get("need", 0), lab.get("of", 0)
+    group = f"tất cả {of} dòng" if need >= of else f"đủ ≥{need}/{of} dòng"
+    lines = []
+    if req:
+        lines.append("Lọc:")
+        lines += ["• " + x for x in req]
+        if cnt:
+            lines.append(group[0].upper() + group[1:] + ":")
+    else:
+        lines.append(f"Lọc ({group}):")
+    lines += ["• " + x for x in cnt]
+    bullets = sum(1 for l in lines if l.startswith("• "))
+    if bullets > MAX_BULLETS:                       # quá dài: giữ MAX_BULLETS − 1 dòng đầu, dòng cuối ghi số còn lại
+        kept, out, left = 0, [], bullets - (MAX_BULLETS - 1)
+        for l in lines:
+            if l.startswith("• "):
+                kept += 1
+                if kept > MAX_BULLETS - 1:
+                    continue
+            out.append(l)
+        lines = out + [f"• … +{left} dòng"]
+    return [l[:MAX_CHARS] for l in lines]
 
 
-def price_lines(title, result, notes, labels=()) -> list[str]:
-    """Nội dung ô giá: tên món, giá rẻ nhất, giá phổ biến + số món, các dòng đã dùng để lọc, 1 lưu ý quan trọng nhất."""
+def estimate(listings, total, rates, game="poe1"):
+    """Giá ước tính kiểu PoE Overlay: quy các món rẻ nhất (tối đa 10) về tiền nhỏ của game theo tỉ giá, lấy trung vị;
+    khoảng giá bỏ các giá "câu khách" thấp hơn 1/5 trung vị; độ tin cậy theo số món đang bán và độ chênh giá.
+    Trả (các dòng, có ước tính được không)."""
+    if not rates:
+        return [], False
+    vals = sorted(l["amount"] * rates[l["currency"]] for l in listings
+                  if l.get("amount") and l.get("currency") in rates)
+    if not vals:
+        return [], False
+    n = len(vals)
+    med = vals[n // 2] if n % 2 else (vals[n // 2 - 1] + vals[n // 2]) / 2
+    kept = [v for v in vals if v >= med / 5] or vals
+    lo, hi = kept[0], kept[-1]
+    spread = hi / lo if lo > 0 else float("inf")
+    rel = "cao" if total >= 20 and n >= 8 and spread <= 3 else "vừa" if total >= 5 and spread <= 10 else "thấp"
+    (small, s_short), (big, b_short) = MAIN_CURRENCY_SHORT[game]
+    unit_big = rates.get(big)
+
+    def unit(v):
+        return "big" if unit_big and v >= unit_big else "small"
+
+    def num(v):
+        return fmt_each(v / unit_big) if unit(v) == "big" else fmt_each(v)
+
+    def full(v):
+        return f"{num(v)} {b_short if unit(v) == 'big' else s_short}"
+
+    same = unit(lo) == unit(med) == unit(hi)
+    rng = f"{num(lo)}–{num(hi)}" if same else f"{full(lo)}–{full(hi)}"
+    return [f"≈ {full(med)} ({rng})"[:MAX_CHARS], f"Tin cậy: {rel}"], True
+
+
+# tiền nhỏ và tiền lớn để quy giá: (mã, chữ viết tắt)
+MAIN_CURRENCY_SHORT = {"poe1": (("chaos", "c"), ("divine", "div")), "poe2": (("exalted", "ex"), ("divine", "div"))}
+
+
+def price_lines(title, result, notes, labels=None, rates=None, game="poe1") -> list[str]:
+    """Nội dung ô giá: tên món; Min (giá rẻ nhất); giá ước tính (khoảng) và độ tin cậy, mỗi thứ một dòng (không có tỉ
+    giá thì giá phổ biến); số món đang bán; các bộ lọc đã dùng (mỗi chỉ số một dòng); 1 lưu ý quan trọng nhất."""
     lines = [title]
     ls = [l for l in result["listings"] if l.get("amount") is not None]
     if not ls:
         lines.append("Không có món nào đang bán")
     else:
-        lines.append(f"Rẻ nhất: {short_price(ls[0]['amount'], ls[0]['currency'])}")
-        counts = {}
-        for l in ls:
-            k = short_price(l["amount"], l["currency"])
-            counts[k] = counts.get(k, 0) + 1
-        common = max(counts.items(), key=lambda kv: kv[1])[0]
-        lines.append(f"Phổ biến: {common} · {result['total']} món")
+        lines.append(f"Min: {short_price(ls[0]['amount'], ls[0]['currency'])}")
+        est, ok = estimate(ls, result["total"], rates, game)
+        if ok:
+            lines.extend(est)
+        else:
+            counts = {}
+            for l in ls:
+                k = short_price(l["amount"], l["currency"])
+                counts[k] = counts.get(k, 0) + 1
+            common = max(counts.items(), key=lambda kv: kv[1])[0]
+            lines.append(f"Phổ biến: {common}")
+        lines.append(f"{result['total']} món đang bán")
     lines.extend(filter_lines(labels))
     lines.extend(note_lines(notes)[:1])
     return lines
@@ -189,6 +242,8 @@ def note_lines(notes) -> list[str]:
             out.append("! Chỉ tra theo loại món")
         elif n.startswith("Foulborn: có lọc"):
             out.append("Đã lọc đúng dòng đột biến")
+        elif n.startswith("Ít món khớp"):
+            out.append("! " + n[:MAX_CHARS - 2])
         elif n.startswith("Foulborn: chưa ai bán"):
             out.append("! Chưa ai bán đúng dòng đột biến")
         elif n.startswith("Foulborn"):
@@ -263,6 +318,9 @@ class Watcher:
         self.changed_frames = 0   # số khung liên tiếp vùng tooltip khác đi (cần 2 khung mới xóa, đỡ nháy)
         self.price_on = True      # bật/tắt trên trang điện thoại
         self.translate_on = False # dịch phụ đề tiếng Việt (CouchSubs bản sửa đọc cờ này)
+        self.strict = False       # chế độ lọc chặt (chỉ số từ 100%); mặc định rộng (từ 90%)
+        self.by_base = False      # lọc đúng base; mặc định mọi base cùng loại đồ (đồ trắng luôn đúng base)
+        self.all_lines = False    # lọc mọi dòng; mặc định chỉ dòng chính (tổng máu/kháng, mod quan trọng)
         self.screen_pending = False
         self.recent = {}          # nội dung tooltip → (lúc tra, các dòng ô giá): mở lại món vừa xem thì hiện ngay
 
@@ -316,6 +374,7 @@ class Watcher:
         try:
             with self.lock:
                 D, trade, game = self.D, self.trade, self.game
+                strict, by_base, all_lines = self.strict, self.by_base, self.all_lines
             job["game"] = game
             if self.inventory_only:
                 is_open, marks = tooltip.inventory_open(img)
@@ -345,7 +404,8 @@ class Watcher:
                 return
             if it.foulborn:
                 parse.add_mutated(it, tooltip.pink_rows(img, tt), D)
-            q, notes = query.build(it, status=self.status, game=game)
+            q, notes = query.build(it, status=self.status, game=game, strict=strict, by_base=by_base,
+                                   all_lines=all_lines)
             key = "|".join(letters_key(x) for x in tt.header + [l.text for l in tt.lines[:6]])
             rec.update(name=it.name, base=it.base, rarity=it.rarity, notes=notes, game=game)
             title = head(it.title, game)
@@ -402,15 +462,34 @@ class Watcher:
                             raise
                         rec["foulborn_filter_failed"] = True
                         res = trade.search(q)
+                    # Dòng: TẤT CẢ ra quá ít món: nới nhóm đếm, bớt 1 dòng rồi 2 dòng
+                    cg = next((g for g in q["query"]["stats"] if g["type"] == "count"), None)
+                    if all_lines and cg and res["total"] < RELAX_MIN:
+                        n_all = len(cg["filters"])
+                        for need in (n_all - 1, n_all - 2):
+                            if need < 1:
+                                break
+                            cg["value"]["min"] = need
+                            res = trade.search(q)
+                            if res["total"] >= RELAX_MIN:
+                                break
+                        notes = [f"Ít món khớp đủ {n_all}/{n_all} → tự nới"] + notes
                     if it.foulborn and it.mutated and res["total"] == 0:
                         q["query"]["stats"] = [{"type": "and", "filters": []}]
                         res = trade.search(q)
                         notes = [n for n in notes if not n.startswith("Foulborn")] + ["Foulborn: chưa ai bán đúng dòng đột biến"]
-                    lines = price_lines(title, res, notes, query.labels(q, it))
+                    try:
+                        from .trade import get_rates
+                        rates = get_rates(trade) if res["listings"] else None
+                    except Exception:
+                        rates = None             # không có tỉ giá: ô giá hiện giá phổ biến như cũ
+                    lines = price_lines(title, res, notes, query.labels(q, it), rates, game)
                     if rec.get("foulborn_filter_failed"):
                         lines.append("! Trade không lọc được Foulborn")
                     with self.lock:
-                        self.recent[key] = (time.time(), lines)
+                        # đã đổi chế độ lọc / game trong lúc tra: giá này của chế độ cũ, không nhớ
+                        if (game, strict, by_base, all_lines) == (self.game, self.strict, self.by_base, self.all_lines):
+                            self.recent[key] = (time.time(), lines)
                     rec["summary"] = {"total": res["total"], "url": res["url"], "cached": res.get("cached")}
                 except RateLimited as e:
                     lines = [title, f"Trade API bận, chờ {int(getattr(e, 'wait', 0)) + 1} giây"]
@@ -462,7 +541,7 @@ class Watcher:
             screen, self.screen_pending = self.screen_pending, False
             return {"price": self.price_on, "translate": self.translate_on, "screen": screen, "game": self.game}
 
-    def set(self, price=None, translate=None, screen=False, game=None):
+    def set(self, price=None, translate=None, screen=False, game=None, strict=None, base=None, lines=None):
         """Nút trong CouchSubs gọi /set; không kèm thay đổi nào thì chỉ là hỏi trạng thái (mỗi vài giây), không in gì."""
         if game is not None and game != self.game:
             self.switch_game(game)
@@ -474,11 +553,33 @@ class Watcher:
                 self.translate_on = translate
             if screen:
                 self.screen_pending = True
+            if strict is not None and strict != self.strict:
+                self.strict = strict
+                self._mode_changed()
+                print(f"[{time.strftime('%H:%M:%S')}] Chế độ lọc: {'CHẶT (100%)' if strict else 'RỘNG (90%)'}", flush=True)
+            if base is not None and base != self.by_base:
+                self.by_base = base
+                self._mode_changed()
+                print(f"[{time.strftime('%H:%M:%S')}] Base: {'ĐÚNG BASE' if base else 'MỌI BASE'}", flush=True)
+            if lines is not None and lines != self.all_lines:
+                self.all_lines = lines
+                self._mode_changed()
+                print(f"[{time.strftime('%H:%M:%S')}] Dòng: {'TẤT CẢ' if lines else 'CHÍNH'}", flush=True)
             changed = before != (self.price_on, self.translate_on)
         if not (changed or screen):
             return
         print(f"[{time.strftime('%H:%M:%S')}] {GAME_NAME[self.game]} · tra giá {'BẬT' if self.price_on else 'TẮT'}"
               f" · dịch {'BẬT' if self.translate_on else 'TẮT'}" + (" · dịch cả màn hình" if screen else ""), flush=True)
+
+    def _mode_changed(self):
+        """Đổi chế độ lọc (gọi khi đang giữ lock): quên giá đã nhớ (của chế độ cũ), xóa ô đang hiện để món đang mở được
+        tra lại ngay theo chế độ mới."""
+        if self.shown is not None:
+            self.pending.append(region(""))
+            self.shown = None
+        if self.job is not None:
+            self.job["stale"] = True
+        self.recent.clear()
 
     def switch_game(self, game):
         """Đổi PoE1 ⇄ PoE2: nạp dữ liệu game đó nếu chưa có (vài giây, lần đầu), xóa ô giá đang hiện, nhớ lựa chọn."""
@@ -588,6 +689,9 @@ padding:22px 10px;margin:12px 0;border-radius:14px}} small{{font-size:14px;opaci
 {btn("price", w.price_on, "Tra giá")}
 {btn("translate", w.translate_on, "Dịch phụ đề tiếng Việt")}
 <a class="b" style="background:#1565c0" href="/set?screen=1">Dịch cả màn hình<br><small>bấm lần nữa để tắt</small></a>
+<a class="b" style="background:#ef6c00" href="/set?strict={"0" if w.strict else "1"}">Lọc: {"CHẶT (100%)" if w.strict else "RỘNG (90%)"}<br><small>bấm để chuyển sang {"rộng" if w.strict else "chặt"}</small></a>
+<a class="b" style="background:#ef6c00" href="/set?base={"0" if w.by_base else "1"}">Base: {"ĐÚNG BASE" if w.by_base else "MỌI BASE"}<br><small>bấm để chuyển sang {"mọi base" if w.by_base else "đúng base"}</small></a>
+<a class="b" style="background:#ef6c00" href="/set?lines={"0" if w.all_lines else "1"}">Dòng: {"TẤT CẢ" if w.all_lines else "CHÍNH"}<br><small>bấm để chuyển sang {"chính" if w.all_lines else "tất cả"}</small></a>
 <a class="b" style="background:#6a1b9a" href="/set?game={"poe1" if w.game == "poe2" else "poe2"}">Game: {GAME_NAME[w.game]}<br><small>bấm để chuyển sang {"PoE1" if w.game == "poe2" else "PoE2"}</small></a>
 <p>Dịch cần khóa AI (Gemini miễn phí hoặc Claude) nhập trong CouchSubs › Settings › Translation. Chưa có khóa thì phụ đề giữ tiếng Anh.</p>
 </body></html>"""
@@ -636,7 +740,8 @@ def make_handler(watcher: Watcher):
                     q = {k: v[-1] for k, v in parse_qs(qs).items()}
                     onoff = lambda k: None if k not in q else q[k] == "1"
                     watcher.set(price=onoff("price"), translate=onoff("translate"), screen=q.get("screen") == "1",
-                                game=q.get("game") if q.get("game") in GAME_NAME else None)
+                                game=q.get("game") if q.get("game") in GAME_NAME else None, strict=onoff("strict"),
+                                base=onoff("base"), lines=onoff("lines"))
                     if q.get("json") == "1":          # nút trong cửa sổ CouchSubs bản sửa
                         return self._json(200, watcher.flags())
                     self.send_response(303)

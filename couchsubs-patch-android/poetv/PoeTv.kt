@@ -29,12 +29,20 @@ object PoeTv {
     const val CHECK_MS = 300L            // đang hiện ô giá: so vùng tooltip mỗi bấy nhiêu ms
     const val TT_CHANGED = 0.5           // bản đồ chữ vùng tooltip khác quá tỉ lệ này = đã đóng hoặc sang món khác
     const val RECENT_MS = 600_000L       // mở lại đúng món đã tra trong 10 phút thì hiện giá cũ ngay
+    const val RELAX_MIN = 5              // Dòng: TẤT CẢ ra ít hơn bấy nhiêu món thì tự nới (bớt 1 dòng, rồi 2 dòng)
     private const val SIG = 96
     private const val TEXT_LEVEL = 110
     val GAME_NAME = mapOf("poe1" to "PoE1", "poe2" to "PoE2")
     private val FULL = CropRegion(top = 0.0, bottom = 1.0, left = 0.0, right = 1.0)
 
-    data class Status(val price: Boolean = true, val game: String = "poe1", val note: String = "", val last: String = "")
+    /**
+     * [strict]: Lọc CHẶT (chỉ số từ 100%) hay RỘNG (từ 90%); [byBase]: ĐÚNG BASE hay MỌI BASE;
+     * [allLines]: Dòng TẤT CẢ (mọi dòng explicit, tự nới khi ít món) hay CHÍNH (tổng máu/kháng + mod quan trọng).
+     */
+    data class Status(
+        val price: Boolean = true, val game: String = "poe1", val note: String = "", val last: String = "",
+        val strict: Boolean = false, val byBase: Boolean = false, val allLines: Boolean = false,
+    )
 
     private val _status = MutableStateFlow(Status())
     val status: StateFlow<Status> = _status
@@ -48,7 +56,7 @@ object PoeTv {
     @Volatile var translateOn = false
         private set
 
-    private class Job(val game: String) {
+    private class Job(val game: String, val strict: Boolean, val byBase: Boolean, val allLines: Boolean) {
         @Volatile var stale = false
     }
 
@@ -85,13 +93,16 @@ object PoeTv {
         }
         val p = context.getSharedPreferences("poetv", Context.MODE_PRIVATE)
         val game = p.getString("game", "poe1").takeIf { it in GAME_NAME } ?: "poe1"
-        _status.value = _status.value.copy(price = p.getBoolean("price", true), game = game)
+        _status.value = _status.value.copy(price = p.getBoolean("price", true), game = game,
+            strict = p.getBoolean("strict", false), byBase = p.getBoolean("by_base", false),
+            allLines = p.getBoolean("all_lines", false))
     }
 
     private fun save(context: Context?) {
         val s = _status.value
         context?.getSharedPreferences("poetv", Context.MODE_PRIVATE)?.edit()
-            ?.putBoolean("price", s.price)?.putString("game", s.game)?.apply()
+            ?.putBoolean("price", s.price)?.putString("game", s.game)?.putBoolean("strict", s.strict)
+            ?.putBoolean("by_base", s.byBase)?.putBoolean("all_lines", s.allLines)?.apply()
     }
 
     private fun note(text: String) { _status.value = _status.value.copy(note = text) }
@@ -148,8 +159,28 @@ object PoeTv {
             shown = null
             job?.stale = true
             recent.clear()
+            _status.value = _status.value.copy(game = game)
         }
-        _status.value = _status.value.copy(game = game)
+        save(context)
+    }
+
+    /**
+     * Đổi chế độ lọc (Lọc RỘNG/CHẶT, Base MỌI/ĐÚNG, Dòng CHÍNH/TẤT CẢ): quên giá đã nhớ (là của chế độ cũ), xóa ô đang
+     * hiện để món đang mở được tra lại ngay theo chế độ mới, lưu lựa chọn.
+     */
+    fun setFilter(context: Context, strict: Boolean? = null, byBase: Boolean? = null, allLines: Boolean? = null) {
+        init(context)
+        val s = _status.value
+        val ns = strict ?: s.strict
+        val nb = byBase ?: s.byBase
+        val nl = allLines ?: s.allLines
+        if (ns == s.strict && nb == s.byBase && nl == s.allLines) return
+        synchronized(lock) {
+            shown?.let { clear(it) }
+            job?.stale = true
+            recent.clear()
+            _status.value = _status.value.copy(strict = ns, byBase = nb, allLines = nl)
+        }
         save(context)
     }
 
@@ -179,7 +210,7 @@ object PoeTv {
                 return
             }
             if (job != null || now - lastDone < gap || worker == null) return
-            start = Job(st.game).also { job = it }
+            start = Job(st.game, st.strict, st.byBase, st.allLines).also { job = it }
         }
         val j = start ?: return
         val pixels = SubtitleReader.copyRegion(frame, FULL)
@@ -275,7 +306,7 @@ object PoeTv {
             }
             item!!
             if (item.foulborn) px.color?.let { rgb -> Parse.addMutated(item, TooltipFinder.pinkRows(tt, rgb, W, H), data) }
-            val (q, notes0) = Query.build(item, "securable", j.game)
+            val (q, notes0) = Query.build(item, "securable", j.game, j.strict, j.byBase, j.allLines)
             var notes: List<String> = notes0
             val key = PriceBox.key(tt)
             val title = PriceBox.head(item.title, j.game)
@@ -295,6 +326,19 @@ object PoeTv {
             note("${item.title} → đang tra giá…")
             val lines: List<String> = try {
                 var res = trade.search(q)
+                // Dòng: TẤT CẢ ra quá ít món: nới nhóm đếm, bớt 1 dòng rồi 2 dòng
+                val groups = q.getJSONObject("query").getJSONArray("stats")
+                val cg = (0 until groups.length()).map { i -> groups.getJSONObject(i) }.firstOrNull { g -> g.getString("type") == "count" }
+                if (j.allLines && cg != null && res.total < RELAX_MIN) {
+                    val nAll = cg.getJSONArray("filters").length()
+                    for (need in listOf(nAll - 1, nAll - 2)) {
+                        if (need < 1) break
+                        cg.getJSONObject("value").put("min", need)
+                        res = trade.search(q)
+                        if (res.total >= RELAX_MIN) break
+                    }
+                    notes = listOf("Ít món khớp đủ $nAll/$nAll → tự nới") + notes
+                }
                 if (item.foulborn && item.mutated.isNotEmpty() && res.total == 0) {
                     // chưa ai bán đúng dòng đột biến: tra lại món Foulborn cùng tên
                     q.getJSONObject("query").put("stats", org.json.JSONArray().put(
@@ -302,8 +346,16 @@ object PoeTv {
                     res = trade.search(q)
                     notes = notes.filter { n -> !n.startsWith("Foulborn") } + "Foulborn: chưa ai bán đúng dòng đột biến"
                 }
-                PriceBox.priceLines(title, res.total, res.listings, notes, Query.labels(q, item)).also { l ->
-                    synchronized(lock) { recent[key] = SystemClock.elapsedRealtime() to l }
+                val rates = if (res.listings.isEmpty()) null else try { trade.rates() } catch (e: Exception) {
+                    null        // không có tỉ giá: ô giá hiện giá phổ biến như cũ
+                }
+                PriceBox.priceLines(title, res.total, res.listings, notes, Query.labels(q, item), rates, j.game).also { l ->
+                    // đã đổi chế độ lọc / game trong lúc tra: giá này của chế độ cũ, không nhớ
+                    synchronized(lock) {
+                        val st = _status.value
+                        if (j.game == st.game && j.strict == st.strict && j.byBase == st.byBase && j.allLines == st.allLines)
+                            recent[key] = SystemClock.elapsedRealtime() to l
+                    }
                 }
             } catch (e: Trade.RateLimited) {
                 listOf(title, "Trade API bận, chờ ${e.waitSeconds.toInt() + 1} giây")
