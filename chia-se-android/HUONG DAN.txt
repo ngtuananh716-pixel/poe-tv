@@ -1,7 +1,7 @@
 PoE TV TRÊN ĐIỆN THOẠI ANDROID (tra giá món đồ, không cần laptop)
 ===================================================================
 
-Cần: điện thoại Android 8 trở lên (đã chạy được trên Android 10, vd Mi MIX 3), cùng mạng Wi-Fi với PS5 và TV LG; TV đã cài sẵn app CouchSubs (như khi dùng laptop).
+Cần: điện thoại Android 8 trở lên (app yêu cầu tối thiểu Android 8.0), cùng mạng Wi-Fi với PS5 và TV LG; TV đã cài sẵn app CouchSubs (như khi dùng laptop).
 Chưa có: dịch phụ đề tiếng Việt trên điện thoại (sẽ làm sau). iPhone chưa dùng được tra giá — vẫn dùng laptop/Mac.
 
 CÀI (lần đầu)
