@@ -1,0 +1,112 @@
+diff --git a/couchsubs-android/app/build.gradle b/couchsubs-android/app/build.gradle
+index 53a1f0a..fbbe110 100644
+--- a/couchsubs-android/app/build.gradle
++++ b/couchsubs-android/app/build.gradle
+@@ -47,7 +47,8 @@ android {
+     ndkVersion '27.0.12077973'
+ 
+     defaultConfig {
+-        applicationId 'com.couchsubs.mobile'
++        // PoE TV: tên gói riêng để cài song song với CouchSubs bản Play
++        applicationId 'com.couchsubs.mobile.poetv'
+         minSdk 26
+         targetSdk 36
+         // Masaüstü sürüm çizgisiyle aynı ad; kod beta numarasıdır ve her yayında artar. CI etiketten verebilir:
+@@ -120,6 +121,8 @@ android {
+         targetCompatibility JavaVersion.VERSION_17
+     }
+     kotlinOptions { jvmTarget = '17' }
++    // PoE TV: build bản release trên CI không dừng vì cảnh báo lint (bản gốc chỉ build debug trên CI)
++    lint { checkReleaseBuilds false; abortOnError false }
+     buildFeatures {
+         compose true
+         buildConfig true
+diff --git a/couchsubs-android/app/src/main/AndroidManifest.xml b/couchsubs-android/app/src/main/AndroidManifest.xml
+index c954004..e063dcf 100644
+--- a/couchsubs-android/app/src/main/AndroidManifest.xml
++++ b/couchsubs-android/app/src/main/AndroidManifest.xml
+@@ -24,7 +24,7 @@
+         android:allowBackup="false"
+         android:enableOnBackInvokedCallback="true"
+         android:icon="@mipmap/icon"
+-        android:label="CouchSubs"
++        android:label="CouchSubs PoE TV"
+         android:largeHeap="true"
+         android:theme="@style/Theme.CouchSubs"
+         android:usesCleartextTraffic="true">
+diff --git a/couchsubs-android/app/src/main/java/com/couchsubs/mobile/service/LiveState.kt b/couchsubs-android/app/src/main/java/com/couchsubs/mobile/service/LiveState.kt
+index a706339..c195b0c 100644
+--- a/couchsubs-android/app/src/main/java/com/couchsubs/mobile/service/LiveState.kt
++++ b/couchsubs-android/app/src/main/java/com/couchsubs/mobile/service/LiveState.kt
+@@ -68,7 +68,7 @@ data class LiveStatus(
+     fun withFrames(frames: Long, now: Long): LiveStatus {
+         val since = com.couchsubs.mobile.remoteplay.SubtitleOffTip.framesSince(framesSince, streaming, framesReceived, frames, now)
+         return copy(framesReceived = frames, framesSince = since,
+-            subtitleOffTip = running && !demo &&
++            subtitleOffTip = running && !demo && com.couchsubs.mobile.poetv.PoeTv.translateOn &&
+                 com.couchsubs.mobile.remoteplay.SubtitleOffTip.visible(streaming, shownLines > 0, since?.let { now - it }))
+     }
+ 
+diff --git a/couchsubs-android/app/src/main/java/com/couchsubs/mobile/service/TranslationService.kt b/couchsubs-android/app/src/main/java/com/couchsubs/mobile/service/TranslationService.kt
+index 74ac6f4..f20573c 100644
+--- a/couchsubs-android/app/src/main/java/com/couchsubs/mobile/service/TranslationService.kt
++++ b/couchsubs-android/app/src/main/java/com/couchsubs/mobile/service/TranslationService.kt
+@@ -499,6 +499,11 @@ class TranslationService : Service() {
+             subtitlePort = subtitleServer.start()
+             subtitleServer.sendStyle(settings.style)
+             liveServer = subtitleServer
++            // PoE TV: ô giá món đồ (vùng chữ "poe-price") lên TV qua chính máy chủ này.
++            com.couchsubs.mobile.poetv.PoeTv.attach(this) { text, box ->
++                subtitleServer.sendRegion(com.couchsubs.mobile.poetv.PriceBox.REGION_ID, text, box,
++                    if (box == null) null else com.couchsubs.mobile.poetv.PriceBox.LINE)
++            }
+             launchTv(subtitleServer.accessKey)
+         } catch (error: Exception) {
+             Log.e(TAG, "SSE server", error)
+@@ -617,9 +622,17 @@ class TranslationService : Service() {
+ 
+         val onFrame: (com.couchsubs.mobile.remoteplay.VideoFrame) -> Unit = { frame ->
+             val now = System.currentTimeMillis()
++            // PoE TV: tra giá món đồ (chỉ khi mở túi đồ/stash/cửa sổ mua bán).
++            try {
++                com.couchsubs.mobile.poetv.PoeTv.offer(frame)
++            } catch (error: Exception) {
++                Log.w(TAG, "poetv", error)
++            }
+             if (screenRequested.compareAndSet(true, false)) startScreen(frame)
+             // Menü açıkken (tekerlek, duraklatma menüsü) altyazı okunmaz: menünün alt ortadaki etiketleri altyazı sanılmasın.
+-            if (!reading.get() && !detector.menu && now - lastRead >= 1000 / MAX_READS_PER_SECOND) {
++            // PoE TV: không đọc phụ đề khi chưa bật dịch (đỡ tốn pin, máy đỡ nóng).
++            if (com.couchsubs.mobile.poetv.PoeTv.translateOn &&
++                !reading.get() && !detector.menu && now - lastRead >= 1000 / MAX_READS_PER_SECOND) {
+                 val area = region
+                 // Karenin geldiği an: gecikme buradan TV'ye gidene kadar ölçülür (hattın saatiyle).
+                 val capturedAt = com.couchsubs.mobile.core.monotonicClock()
+@@ -1022,6 +1035,7 @@ class TranslationService : Service() {
+         pipeline?.reset()
+         pipeline?.shutdown()
+         pipeline = null
++        com.couchsubs.mobile.poetv.PoeTv.detach()
+         liveServer = null
+         server?.stop()
+         LiveState.update { it.copy(pairing = null) }
+diff --git a/couchsubs-android/app/src/main/java/com/couchsubs/mobile/ui/MainScreens.kt b/couchsubs-android/app/src/main/java/com/couchsubs/mobile/ui/MainScreens.kt
+index 93eedd7..21bd699 100644
+--- a/couchsubs-android/app/src/main/java/com/couchsubs/mobile/ui/MainScreens.kt
++++ b/couchsubs-android/app/src/main/java/com/couchsubs/mobile/ui/MainScreens.kt
+@@ -184,6 +184,7 @@ fun MainScreen(
+                         NoteTile(stringResource(R.string.main_unpaired_note), Tokens.Color.secondary)
+                     }
+                     AnimatedNote(status.error)
++                    com.couchsubs.mobile.poetv.PoeTvTile()
+                     TvAppUpdateCard(onTvUpdate)
+                     // Telefon ana ekranı (TASARIM.md): PS5 ve Altyazı durum karoları ilgili ayarı açar (`›`).
+                     TwoColumns(
+@@ -323,6 +324,7 @@ private fun RunningScreen(status: LiveStatus, topBar: @Composable () -> Unit, on
+             NoteTile(stringResource(R.string.subtitle_off_tip), Tokens.Color.secondary)
+             if (Services.settings.watchSubtitleBackground) NoteTile(stringResource(R.string.subtitle_background_tip), Tokens.Color.secondary)
+         }
++        if (!status.demo) com.couchsubs.mobile.poetv.PoeTvTile()
+         if (!status.demo) GameSection(status)
+         Tile(Modifier.fillMaxWidth()) {
+             TileLabel(stringResource(R.string.running_now))

@@ -1,0 +1,115 @@
+# Build CouchSubs bản Android đã vá (tra giá PoE chạy ngay trên điện thoại, không cần laptop) từ mã gốc
+# v0.1.0-beta.70, ký bằng khóa cố định của kho này (couchsubs-patch-android/poetv-release.jks) để cài bản mới đè lên
+# bản cũ được, rồi đăng ở Release tag "android" (luôn là bản mới nhất; không đụng link "latest" của bản Mac).
+name: build-android
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "couchsubs-patch-android/**"
+      - "poe_tv/poe_tv/**"
+      - "poe_tv/data/**"
+      - "tools/android_data.py"
+      - ".github/workflows/build-android.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-android
+  cancel-in-progress: true
+
+env:
+  UPSTREAM_TAG: v0.1.0-beta.70
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Mã gốc CouchSubs
+        run: |
+          git clone --depth 1 --branch "$UPSTREAM_TAG" https://github.com/yorulmazsinan/couchsubs.git upstream
+          cd upstream
+          git submodule update --init --depth 1 third-party/chiaki-ng
+          git -C third-party/chiaki-ng submodule update --init --depth 1 third-party/nanopb third-party/jerasure third-party/gf-complete third-party/curl
+
+      - name: Áp bản vá Android
+        run: |
+          D=upstream/couchsubs-android/app/src
+          mkdir -p "$D/main/java/com/couchsubs/mobile/poetv" "$D/test/java/com/couchsubs/mobile/poetv" "$D/test/resources/poetv" "$D/main/assets/poetv"
+          cp couchsubs-patch-android/poetv/*.kt "$D/main/java/com/couchsubs/mobile/poetv/"
+          cp couchsubs-patch-android/test/PoeTvCoreTest.kt "$D/test/java/com/couchsubs/mobile/poetv/"
+          cp couchsubs-patch-android/test/resources/poetv/fixture.json "$D/test/resources/poetv/"
+          # giao diện mặc định của bản gốc là tiếng Thổ: điện thoại để tiếng Việt thì hiện tiếng Anh
+          cp -r "$D/main/res/values-en" "$D/main/res/values-vi"
+          cd upstream && git apply ../couchsubs-patch-android/android.patch && git status --short
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Dữ liệu món đồ, mod (PoE1 + PoE2) cho Android
+        run: |
+          pip install --quiet "rapidfuzz==3.14.*"
+          cd poe_tv
+          PYTHONPATH=. python ../tools/android_data.py ../upstream/couchsubs-android/app/src/main/assets/poetv
+          cp data/LICENSE-awakened-poe-trade.txt data/poe2/LICENSE-exiled-exchange-2.txt ../upstream/couchsubs-android/app/src/main/assets/poetv/
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.11.1
+
+      - name: Kiểm thử lõi tra giá (so với kết quả bản Python)
+        working-directory: upstream/couchsubs-android
+        run: gradle testDebugUnitTest --tests 'com.couchsubs.mobile.poetv.*' -Pcouchsubs.skipNative=true --no-daemon
+
+      # nanopb cần Python có protobuf; chiaki-ng cần protoc (như android-app.yml của bản gốc)
+      - name: Python và protoc cho chiaki
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq protobuf-compiler > /dev/null
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet protobuf grpcio-tools
+          echo "COUCHSUBS_PYTHON=$RUNNER_TEMP/venv/bin/python3" >> "$GITHUB_ENV"
+      - name: NDK và CMake
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;27.0.12077973" "cmake;3.22.1" > /dev/null
+
+      - name: Build APK
+        working-directory: upstream/couchsubs-android
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          ANDROID_KEYSTORE_FILE: ${{ github.workspace }}/couchsubs-patch-android/poetv-release.jks
+          ANDROID_KEYSTORE_PASSWORD: poetv-public
+        run: |
+          gradle assembleRelease -Pcouchsubs.patchChiaki=true -Pcouchsubs.requireTvPackages=true \
+            -Pcouchsubs.abis=arm64-v8a \
+            -Pcouchsubs.versionName="0.1.0-beta.70-poetv.${{ github.run_number }}" \
+            -Pcouchsubs.versionCode=${{ github.run_number }} --no-daemon
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          ls -la app/build/outputs/apk/release/
+          cp app/build/outputs/apk/release/*.apk "$GITHUB_WORKSPACE/dist/poe-tv-android.apk"
+          cd "$GITHUB_WORKSPACE/dist" && sha256sum poe-tv-android.apk > poe-tv-android.apk.sha256 && cat poe-tv-android.apk.sha256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: poe-tv-android
+          path: dist/*
+          if-no-files-found: error
+
+      - name: Đăng Release "android" (thay bản cũ)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete android --yes --cleanup-tag 2>/dev/null || true
+          gh release create android dist/poe-tv-android.apk dist/poe-tv-android.apk.sha256 \
+            --title "PoE TV Android (bản ${{ github.run_number }})" \
+            --notes "Tra giá PoE ngay trên điện thoại Android 12+ (không cần laptop). Cài: mở link poe-tv-android.apk trên điện thoại. Mã nguồn: kho này + CouchSubs $UPSTREAM_TAG (AGPL-3.0)." \
+            --latest=false

@@ -1,0 +1,1601 @@
+{
+ "cases": [
+  {
+   "name": "foe_thread",
+   "width": 2184,
+   "height": 1968,
+   "lines": [
+    {
+     "text": "R2",
+     "x0": 1890.52490234375,
+     "y0": 172.33123779296875,
+     "x1": 2038.9686279296875,
+     "y1": 271.2937316894531
+    },
+    {
+     "text": "L2",
+     "x0": 158.68124389648438,
+     "y0": 174.03749084472656,
+     "x1": 291.76873779296875,
+     "y1": 269.5874938964844
+    },
+    {
+     "text": "R1",
+     "x0": 1617.52490234375,
+     "y0": 445.33123779296875,
+     "x1": 1767.6749267578125,
+     "y1": 544.293701171875
+    },
+    {
+     "text": "L1",
+     "x0": 441.9187316894531,
+     "y0": 453.86248779296875,
+     "x1": 564.7687377929688,
+     "y1": 539.1749877929688
+    },
+    {
+     "text": "STASH OPTIONS (",
+     "x0": 1786.4437255859375,
+     "y0": 508.46246337890625,
+     "x1": 1953.6561279296875,
+     "y1": 539.1749877929688
+    },
+    {
+     "text": "Press Rto customise",
+     "x0": 1225.08740234375,
+     "y0": 511.8749694824219,
+     "x1": 1457.137451171875,
+     "y1": 539.1749877929688
+    },
+    {
+     "text": "(R3)",
+     "x0": 1943.418701171875,
+     "y0": 513.5812377929688,
+     "x1": 1977.543701171875,
+     "y1": 534.0562133789062
+    },
+    {
+     "text": "138",
+     "x0": 1288.21875,
+     "y0": 581.8312377929688,
+     "x1": 1335.99365234375,
+     "y1": 598.8937377929688
+    },
+    {
+     "text": "188",
+     "x0": 1624.3499755859375,
+     "y0": 581.8312377929688,
+     "x1": 1665.2999267578125,
+     "y1": 598.8937377929688
+    },
+    {
+     "text": "20",
+     "x0": 1525.387451171875,
+     "y0": 583.5374755859375,
+     "x1": 1552.6873779296875,
+     "y1": 595.481201171875
+    },
+    {
+     "text": "GENERAI",
+     "x0": 1361.58740234375,
+     "y0": 621.074951171875,
+     "x1": 1446.89990234375,
+     "y1": 644.9624633789062
+    },
+    {
+     "text": "R3",
+     "x0": 863.3624877929688,
+     "y0": 624.4874877929688,
+     "x1": 885.543701171875,
+     "y1": 638.137451171875
+    },
+    {
+     "text": "LEAGUI",
+     "x0": 1789.856201171875,
+     "y0": 624.4874877929688,
+     "x1": 1847.86865234375,
+     "y1": 641.5499877929688
+    },
+    {
+     "text": "FOE THREAD",
+     "x0": 1550.981201171875,
+     "y0": 653.4937133789062,
+     "x1": 1675.5374755859375,
+     "y1": 677.3812255859375
+    },
+    {
+     "text": "HEAVY BELT",
+     "x0": 1552.6873779296875,
+     "y0": 682.5,
+     "x1": 1673.8311767578125,
+     "y1": 704.6812133789062
+    },
+    {
+     "text": "REQUIRESLEVEL59",
+     "x0": 1525.387451171875,
+     "y0": 723.449951171875,
+     "x1": 1706.2498779296875,
+     "y1": 745.6312255859375
+    },
+    {
+     "text": "+34TOSTRENGTH",
+     "x0": 1532.21240234375,
+     "y0": 759.2811889648438,
+     "x1": 1701.1312255859375,
+     "y1": 784.8749389648438
+    },
+    {
+     "text": "+49TOSTRENGTH",
+     "x0": 1532.21240234375,
+     "y0": 795.1124877929688,
+     "x1": 1697.7186279296875,
+     "y1": 817.293701171875
+    },
+    {
+     "text": "16TO MAXIMUM ENERGY SHIELD",
+     "x0": 1462.2562255859375,
+     "y0": 817.293701171875,
+     "x1": 1774.4998779296875,
+     "y1": 846.2999877929688
+    },
+    {
+     "text": "+32%TOCOLDRESISTANCE",
+     "x0": 1487.8499755859375,
+     "y0": 846.2999877929688,
+     "x1": 1740.3748779296875,
+     "y1": 868.481201171875
+    },
+    {
+     "text": "9%INCREASEDFLASKCHARGESGAINED",
+     "x0": 1428.1312255859375,
+     "y0": 870.1874389648438,
+     "x1": 1796.68115234375,
+     "y1": 895.7811889648438
+    },
+    {
+     "text": "Take Item",
+     "x0": 1411.0687255859375,
+     "y0": 994.7437133789062,
+     "x1": 1515.14990234375,
+     "y1": 1018.6312255859375
+    },
+    {
+     "text": "86731",
+     "x0": 936.731201171875,
+     "y0": 1100.53125,
+     "x1": 991.3312377929688,
+     "y1": 1119.2999267578125
+    },
+    {
+     "text": "FILTER O+&",
+     "x0": 1306.9874267578125,
+     "y0": 1426.4249267578125,
+     "x1": 1448.606201171875,
+     "y1": 1458.8436279296875
+    },
+    {
+     "text": "CLEAR FILTER",
+     "x0": 1772.793701171875,
+     "y0": 1429.83740234375,
+     "x1": 1919.5311279296875,
+     "y1": 1457.137451171875
+    },
+    {
+     "text": "Enter",
+     "x0": 1446.89990234375,
+     "y0": 1431.543701171875,
+     "x1": 1501.4998779296875,
+     "y1": 1455.43115234375
+    },
+    {
+     "text": "13",
+     "x0": 1731.8436279296875,
+     "y0": 1434.9561767578125,
+     "x1": 1752.3187255859375,
+     "y1": 1448.606201171875
+    },
+    {
+     "text": "R Reorder Tabs",
+     "x0": 1402.5374755859375,
+     "y0": 1491.262451171875,
+     "x1": 1583.39990234375,
+     "y1": 1523.68115234375
+    },
+    {
+     "text": "Navigate",
+     "x0": 643.2562255859375,
+     "y0": 1492.9686279296875,
+     "x1": 743.9249877929688,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "Pick Up",
+     "x0": 1107.356201171875,
+     "y0": 1492.9686279296875,
+     "x1": 1197.7874755859375,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "JClose",
+     "x0": 1248.9749755859375,
+     "y0": 1492.9686279296875,
+     "x1": 1318.93115234375,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "Compare/ MoreActions",
+     "x0": 801.9374389648438,
+     "y0": 1494.6749267578125,
+     "x1": 1056.168701171875,
+     "y1": 1521.9749755859375
+    }
+   ],
+   "expect": {
+    "box": [
+     1384,
+     633,
+     1840,
+     915
+    ],
+    "header": [
+     "FOE THREAD",
+     "HEAVY BELT"
+    ],
+    "rarity": "Rare",
+    "name": "Foe Thread",
+    "base": "Heavy Belt",
+    "category": "Belt",
+    "title": "Heavy Belt",
+    "mods": [
+     {
+      "ref": "+# to Strength",
+      "values": [
+       34.0
+      ],
+      "kind": "implicit"
+     },
+     {
+      "ref": "+# to Strength",
+      "values": [
+       49.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "+# to maximum Energy Shield",
+      "values": [
+       16.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "+#% to Cold Resistance",
+      "values": [
+       32.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Flask Charges gained",
+      "values": [
+       9.0
+      ],
+      "kind": "explicit"
+     }
+    ],
+    "props": {
+     "requires": [
+      59.0
+     ]
+    },
+    "query": {
+     "query": {
+      "status": {
+       "option": "securable"
+      },
+      "filters": {
+       "type_filters": {
+        "filters": {
+         "rarity": {
+          "option": "nonunique"
+         },
+         "category": {
+          "option": "accessory.belt"
+         }
+        }
+       }
+      },
+      "stats": [
+       {
+        "type": "and",
+        "filters": [
+         {
+          "id": "pseudo.pseudo_total_energy_shield",
+          "value": {
+           "min": 14
+          }
+         },
+         {
+          "id": "pseudo.pseudo_total_elemental_resistance",
+          "value": {
+           "min": 28
+          }
+         },
+         {
+          "id": "pseudo.pseudo_total_strength",
+          "value": {
+           "min": 74
+          }
+         }
+        ]
+       }
+      ]
+     },
+     "sort": {
+      "price": "asc"
+     }
+    },
+    "notes": [
+     "Món không có máu: giá thật nhiều khả năng THẤP hơn các món tương tự tìm được"
+    ]
+   }
+  },
+  {
+   "name": "vortex_call",
+   "width": 2184,
+   "height": 1968,
+   "lines": [
+    {
+     "text": "R2",
+     "x0": 1890.52490234375,
+     "y0": 172.33123779296875,
+     "x1": 2038.9686279296875,
+     "y1": 271.2937316894531
+    },
+    {
+     "text": "L2",
+     "x0": 158.68124389648438,
+     "y0": 174.03749084472656,
+     "x1": 291.76873779296875,
+     "y1": 269.5874938964844
+    },
+    {
+     "text": "VORTEX CALL",
+     "x0": 1151.71875,
+     "y0": 438.5062255859375,
+     "x1": 1284.80615234375,
+     "y1": 462.39373779296875
+    },
+    {
+     "text": "R1",
+     "x0": 1617.52490234375,
+     "y0": 443.6249694824219,
+     "x1": 1767.6749267578125,
+     "y1": 544.293701171875
+    },
+    {
+     "text": "L1",
+     "x0": 429.9749755859375,
+     "y0": 445.33123779296875,
+     "x1": 566.4749755859375,
+     "y1": 546.0
+    },
+    {
+     "text": "FOUL STAFF",
+     "x0": 1156.83740234375,
+     "y0": 465.8062438964844,
+     "x1": 1276.27490234375,
+     "y1": 489.6937255859375
+    },
+    {
+     "text": "WARSTAFEsS",
+     "x0": 1165.36865234375,
+     "y0": 503.3437194824219,
+     "x1": 1284.80615234375,
+     "y1": 535.762451171875
+    },
+    {
+     "text": "STASH OPTIONS R3",
+     "x0": 1786.4437255859375,
+     "y0": 508.46246337890625,
+     "x1": 1984.36865234375,
+     "y1": 539.1749877929688
+    },
+    {
+     "text": "R3 to customise",
+     "x0": 1288.21875,
+     "y0": 513.5812377929688,
+     "x1": 1463.96240234375,
+     "y1": 540.8812255859375
+    },
+    {
+     "text": "QUALITY:+12%",
+     "x0": 1144.8936767578125,
+     "y0": 532.3499755859375,
+     "x1": 1308.6937255859375,
+     "y1": 556.2374877929688
+    },
+    {
+     "text": "PHYSICALDAMAGE:110-203",
+     "x0": 1083.46875,
+     "y0": 554.53125,
+     "x1": 1353.05615234375,
+     "y1": 585.2437133789062
+    },
+    {
+     "text": "15820",
+     "x0": 1421.30615234375,
+     "y0": 573.2999877929688,
+     "x1": 1564.6312255859375,
+     "y1": 605.71875
+    },
+    {
+     "text": "ELEMENTAL DAMAGE: 8-172",
+     "x0": 1088.58740234375,
+     "y0": 583.5374755859375,
+     "x1": 1353.05615234375,
+     "y1": 610.8374633789062
+    },
+    {
+     "text": "CRITICAL STRIKE CHANCE:8.70%",
+     "x0": 1064.699951171875,
+     "y0": 612.543701171875,
+     "x1": 1371.824951171875,
+     "y1": 634.7249755859375
+    },
+    {
+     "text": "R2",
+     "x0": 336.1312255859375,
+     "y0": 624.4874877929688,
+     "x1": 361.7249755859375,
+     "y1": 638.137451171875
+    },
+    {
+     "text": "ATTACKSPERSECOND:1.40",
+     "x0": 1093.7061767578125,
+     "y0": 639.84375,
+     "x1": 1347.9375,
+     "y1": 662.0249633789062
+    },
+    {
+     "text": "WEAPON RANGE: 1.3 METRES",
+     "x0": 1086.8812255859375,
+     "y0": 663.731201171875,
+     "x1": 1354.762451171875,
+     "y1": 691.03125
+    },
+    {
+     "text": "REQUIRES LEVEL 55, 94 STR, 94 INT",
+     "x0": 1052.7562255859375,
+     "y0": 696.1499633789062,
+     "x1": 1382.0625,
+     "y1": 728.5687255859375
+    },
+    {
+     "text": "+22%CHANCE TO BLOCKATTACK DAMAGE",
+     "x0": 1018.6312255859375,
+     "y0": 733.6874389648438,
+     "x1": 1412.77490234375,
+     "y1": 762.6937255859375
+    },
+    {
+     "text": "21%INCREASEDPHYSICALDAMAGE",
+     "x0": 1049.34375,
+     "y0": 771.2249755859375,
+     "x1": 1383.7686767578125,
+     "y1": 798.5249633789062
+    },
+    {
+     "text": "ADDS16TO29PHYSICALDAMAGE",
+     "x0": 1052.7562255859375,
+     "y0": 795.1124877929688,
+     "x1": 1380.356201171875,
+     "y1": 825.824951171875
+    },
+    {
+     "text": "ADDS8TO172LIGHTNINGDAMAGE",
+     "x0": 1049.34375,
+     "y0": 822.4124755859375,
+     "x1": 1390.59375,
+     "y1": 849.7124633789062
+    },
+    {
+     "text": "16%INCREASED CRITICALSTRIKECHANCE",
+     "x0": 1020.3374633789062,
+     "y0": 848.0062255859375,
+     "x1": 1412.77490234375,
+     "y1": 875.3062133789062
+    },
+    {
+     "text": "+248TOACCURACYRATING",
+     "x0": 1086.8812255859375,
+     "y0": 873.5999755859375,
+     "x1": 1351.3499755859375,
+     "y1": 900.8999633789062
+    },
+    {
+     "text": "8%INCREASEDATTACK SPEED",
+     "x0": 1074.9375,
+     "y0": 899.1937255859375,
+     "x1": 1359.8812255859375,
+     "y1": 926.4937133789062
+    },
+    {
+     "text": "TakeItem",
+     "x0": 1269.449951171875,
+     "y0": 979.387451171875,
+     "x1": 1378.64990234375,
+     "y1": 1004.981201171875
+    },
+    {
+     "text": "FILTER+",
+     "x0": 1310.39990234375,
+     "y0": 1424.71875,
+     "x1": 1416.1875,
+     "y1": 1457.137451171875
+    },
+    {
+     "text": "+&CLEAR FILTER",
+     "x0": 1723.3123779296875,
+     "y0": 1424.71875,
+     "x1": 1921.2374267578125,
+     "y1": 1458.8436279296875
+    },
+    {
+     "text": "Ente",
+     "x0": 1445.1937255859375,
+     "y0": 1426.4249267578125,
+     "x1": 1501.4998779296875,
+     "y1": 1455.43115234375
+    },
+    {
+     "text": "Navigate",
+     "x0": 641.5499877929688,
+     "y0": 1492.9686279296875,
+     "x1": 745.6312255859375,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "(3) Compare / More Actions",
+     "x0": 762.6937255859375,
+     "y0": 1492.9686279296875,
+     "x1": 1056.168701171875,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "Pick Up",
+     "x0": 1107.356201171875,
+     "y0": 1492.9686279296875,
+     "x1": 1197.7874755859375,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "close",
+     "x0": 1250.68115234375,
+     "y0": 1492.9686279296875,
+     "x1": 1317.2249755859375,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "RReorderTabs",
+     "x0": 1405.949951171875,
+     "y0": 1494.6749267578125,
+     "x1": 1583.39990234375,
+     "y1": 1521.9749755859375
+    }
+   ],
+   "expect": {
+    "box": [
+     974,
+     418,
+     1456,
+     946
+    ],
+    "header": [
+     "VORTEX CALL",
+     "FOUL STAFF"
+    ],
+    "rarity": "Rare",
+    "name": "Vortex Call",
+    "base": "Foul Staff",
+    "category": "Warstaff",
+    "title": "Foul Staff",
+    "mods": [
+     {
+      "ref": "#% Chance to Block Attack Damage",
+      "values": [
+       22.0
+      ],
+      "kind": "implicit"
+     },
+     {
+      "ref": "#% increased Physical Damage",
+      "values": [
+       21.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "Adds # to # Physical Damage",
+      "values": [
+       16.0,
+       29.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "Adds # to # Lightning Damage",
+      "values": [
+       8.0,
+       172.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Critical Strike Chance",
+      "values": [
+       16.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "+# to Accuracy Rating",
+      "values": [
+       248.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Attack Speed",
+      "values": [
+       8.0
+      ],
+      "kind": "explicit"
+     }
+    ],
+    "props": {
+     "quality": [
+      12.0
+     ],
+     "phys": [
+      110.0,
+      203.0
+     ],
+     "ele": [
+      8.0,
+      172.0
+     ],
+     "crit": [
+      8.7
+     ],
+     "aps": [
+      1.4
+     ],
+     "range": [
+      1.3
+     ],
+     "requires": [
+      55.0,
+      94.0,
+      94.0
+     ]
+    },
+    "query": {
+     "query": {
+      "status": {
+       "option": "securable"
+      },
+      "filters": {
+       "type_filters": {
+        "filters": {
+         "rarity": {
+          "option": "nonunique"
+         },
+         "category": {
+          "option": "weapon.warstaff"
+         }
+        }
+       },
+       "weapon_filters": {
+        "filters": {
+         "pdps": {
+          "min": 197
+         },
+         "edps": {
+          "min": 113
+         }
+        }
+       }
+      },
+      "stats": [
+       {
+        "type": "and",
+        "filters": []
+       }
+      ]
+     },
+     "sort": {
+      "price": "asc"
+     }
+    },
+    "notes": []
+   }
+  },
+  {
+   "name": "wildslash",
+   "width": 2184,
+   "height": 1968,
+   "lines": [
+    {
+     "text": "Press R to customise",
+     "x0": 1225.08740234375,
+     "y0": 511.8749694824219,
+     "x1": 1465.668701171875,
+     "y1": 539.1749877929688
+    },
+    {
+     "text": "STASH OPTIONS (",
+     "x0": 1789.856201171875,
+     "y0": 511.8749694824219,
+     "x1": 1951.949951171875,
+     "y1": 535.762451171875
+    },
+    {
+     "text": "(R3",
+     "x0": 1943.418701171875,
+     "y0": 513.5812377929688,
+     "x1": 1977.543701171875,
+     "y1": 534.0562133789062
+    },
+    {
+     "text": "R3",
+     "x0": 1550.981201171875,
+     "y0": 561.356201171875,
+     "x1": 1571.4561767578125,
+     "y1": 576.7124633789062
+    },
+    {
+     "text": "188",
+     "x0": 1614.1124267578125,
+     "y0": 576.7124633789062,
+     "x1": 1672.1248779296875,
+     "y1": 600.5999755859375
+    },
+    {
+     "text": "138",
+     "x0": 1291.6312255859375,
+     "y0": 580.125,
+     "x1": 1335.99365234375,
+     "y1": 598.8937377929688
+    },
+    {
+     "text": "15#",
+     "x0": 1443.4874267578125,
+     "y0": 580.125,
+     "x1": 1496.3812255859375,
+     "y1": 598.8937377929688
+    },
+    {
+     "text": "108",
+     "x0": 1776.2061767578125,
+     "y0": 580.125,
+     "x1": 1827.3936767578125,
+     "y1": 598.8937377929688
+    },
+    {
+     "text": "20送",
+     "x0": 1533.918701171875,
+     "y0": 581.8312377929688,
+     "x1": 1581.6937255859375,
+     "y1": 600.5999755859375
+    },
+    {
+     "text": "WILDSLASH",
+     "x0": 371.9624938964844,
+     "y0": 663.731201171875,
+     "x1": 484.5749816894531,
+     "y1": 685.9124755859375
+    },
+    {
+     "text": "AWL",
+     "x0": 404.3812255859375,
+     "y0": 692.7374877929688,
+     "x1": 447.0374755859375,
+     "y1": 711.5062255859375
+    },
+    {
+     "text": "CLAW",
+     "x0": 382.1999816894531,
+     "y0": 731.981201171875,
+     "x1": 458.9812316894531,
+     "y1": 755.8687133789062
+    },
+    {
+     "text": "PHYSICAL DAMAGE: 9-43",
+     "x0": 307.125,
+     "y0": 755.8687133789062,
+     "x1": 539.1749877929688,
+     "y1": 783.168701171875
+    },
+    {
+     "text": "ALLURE",
+     "x0": 1318.93115234375,
+     "y0": 776.3436889648438,
+     "x1": 1358.1749267578125,
+     "y1": 793.4061889648438
+    },
+    {
+     "text": "CRITICAL STRIKE CHANCE: 7.50%",
+     "x0": 269.5874938964844,
+     "y0": 783.168701171875,
+     "x1": 580.125,
+     "y1": 810.4686889648438
+    },
+    {
+     "text": "ATTACKS PER SECOND: 1.77",
+     "x0": 295.1812438964844,
+     "y0": 807.0562133789062,
+     "x1": 556.2374877929688,
+     "y1": 837.7687377929688
+    },
+    {
+     "text": "WEAPON RANGE: 1.1 METRES",
+     "x0": 288.3562316894531,
+     "y0": 832.6499633789062,
+     "x1": 557.9437255859375,
+     "y1": 861.6561889648438
+    },
+    {
+     "text": "REQUIRES LEVEL 12, 25 DEX, 25 INT",
+     "x0": 261.0562438964844,
+     "y0": 868.481201171875,
+     "x1": 586.949951171875,
+     "y1": 899.1937255859375
+    },
+    {
+     "text": "GRANTS 7 LIFE PER ENEMY HIT",
+     "x0": 281.53125,
+     "y0": 907.7249755859375,
+     "x1": 568.1812133789062,
+     "y1": 935.0249633789062
+    },
+    {
+     "text": "+10 TO STRENGTH",
+     "x0": 339.5437316894531,
+     "y0": 943.5562133789062,
+     "x1": 513.5812377929688,
+     "y1": 970.856201171875
+    },
+    {
+     "text": "+14 TO DEXTERITY",
+     "x0": 332.71875,
+     "y0": 969.1499633789062,
+     "x1": 513.5812377929688,
+     "y1": 998.1561889648438
+    },
+    {
+     "text": "ADDS 2TO 20 PHYSICAL DAMAGE",
+     "x0": 271.2937316894531,
+     "y0": 994.7437133789062,
+     "x1": 578.418701171875,
+     "y1": 1022.043701171875
+    },
+    {
+     "text": "14%INCREASEDATTACKSPEED",
+     "x0": 279.8249816894531,
+     "y0": 1022.043701171875,
+     "x1": 575.0062255859375,
+     "y1": 1049.34375
+    },
+    {
+     "text": "20% INCREASEDDAMAGEWITH MOVEMENT SKILLS",
+     "x0": 189.39373779296875,
+     "y0": 1045.93115234375,
+     "x1": 662.0249633789062,
+     "y1": 1074.9375
+    },
+    {
+     "text": "CRAFTINT5%EINCREASED ATTACK SPEED WITH MOVEMENT SKILLS",
+     "x0": 81.89999389648438,
+     "y0": 1066.40625,
+     "x1": 689.324951171875,
+     "y1": 1103.9437255859375
+    },
+    {
+     "text": "15%REDUCEDGLOBALACCURACYRATING",
+     "x0": 233.75624084472656,
+     "y0": 1098.824951171875,
+     "x1": 622.78125,
+     "y1": 1126.125
+    },
+    {
+     "text": "86731",
+     "x0": 936.731201171875,
+     "y0": 1100.53125,
+     "x1": 989.6249389648438,
+     "y1": 1119.2999267578125
+    },
+    {
+     "text": "THERE2ARE TWO THINGS TO KNOWABOUT FIGHTING:",
+     "x0": 179.15625,
+     "y0": 1129.5374755859375,
+     "x1": 672.262451171875,
+     "y1": 1165.36865234375
+    },
+    {
+     "text": "WHEN TO SWING LIKE CRAZY, AND WHEN TO RUN.",
+     "x0": 191.09999084472656,
+     "y0": 1160.25,
+     "x1": 660.3187255859375,
+     "y1": 1187.5499267578125
+    },
+    {
+     "text": "Stash (",
+     "x0": 250.81874084472656,
+     "y0": 1245.5625,
+     "x1": 320.7749938964844,
+     "y1": 1269.449951171875
+    },
+    {
+     "text": "g?58/1211Show:",
+     "x0": 1486.1436767578125,
+     "y0": 1335.99365234375,
+     "x1": 1701.1312255859375,
+     "y1": 1365.0
+    },
+    {
+     "text": "Size:",
+     "x0": 1252.387451171875,
+     "y0": 1339.40625,
+     "x1": 1296.75,
+     "y1": 1363.293701171875
+    },
+    {
+     "text": "Owned",
+     "x0": 1704.543701171875,
+     "y0": 1339.40625,
+     "x1": 1786.4437255859375,
+     "y1": 1368.4124755859375
+    },
+    {
+     "text": "Eqwp",
+     "x0": 400.9687194824219,
+     "y0": 1380.356201171875,
+     "x1": 448.7437438964844,
+     "y1": 1399.125
+    },
+    {
+     "text": "FILTER O+&",
+     "x0": 1306.9874267578125,
+     "y0": 1426.4249267578125,
+     "x1": 1448.606201171875,
+     "y1": 1457.137451171875
+    },
+    {
+     "text": "Enter keywords here...",
+     "x0": 1445.1937255859375,
+     "y0": 1426.4249267578125,
+     "x1": 1658.4749755859375,
+     "y1": 1457.137451171875
+    },
+    {
+     "text": "+  CLEAR FILTER",
+     "x0": 1757.4373779296875,
+     "y0": 1426.4249267578125,
+     "x1": 1921.2374267578125,
+     "y1": 1460.5499267578125
+    },
+    {
+     "text": "Close",
+     "x0": 1242.14990234375,
+     "y0": 1487.8499755859375,
+     "x1": 1318.93115234375,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "Pick Up",
+     "x0": 1105.64990234375,
+     "y0": 1489.55615234375,
+     "x1": 1197.7874755859375,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "R Reorder Tabs",
+     "x0": 1402.5374755859375,
+     "y0": 1489.55615234375,
+     "x1": 1583.39990234375,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "Navigate",
+     "x0": 634.7249755859375,
+     "y0": 1492.9686279296875,
+     "x1": 743.9249877929688,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "Compare / More Actions",
+     "x0": 800.231201171875,
+     "y0": 1492.9686279296875,
+     "x1": 1054.46240234375,
+     "y1": 1521.9749755859375
+    },
+    {
+     "text": "DIVINIA",
+     "x0": 2102.099853515625,
+     "y0": 1540.74365234375,
+     "x1": 2182.293701171875,
+     "y1": 1569.7498779296875
+    }
+   ],
+   "expect": {
+    "box": [
+     38,
+     644,
+     733,
+     1207
+    ],
+    "header": [
+     "WILDSLASH",
+     "AWL"
+    ],
+    "rarity": "Unique",
+    "name": "Wildslash",
+    "base": "Awl",
+    "category": "Claw",
+    "title": "Wildslash",
+    "mods": [
+     {
+      "ref": "Grants # Life per Enemy Hit",
+      "values": [
+       7.0
+      ],
+      "kind": "implicit"
+     },
+     {
+      "ref": "+# to Strength",
+      "values": [
+       10.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "+# to Dexterity",
+      "values": [
+       14.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "Adds # to # Physical Damage",
+      "values": [
+       2.0,
+       20.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Attack Speed",
+      "values": [
+       14.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Damage with Movement Skills",
+      "values": [
+       20.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Attack Speed with Movement Skills",
+      "values": [
+       5.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Global Accuracy Rating",
+      "values": [
+       -15.0
+      ],
+      "kind": "explicit"
+     }
+    ],
+    "props": {
+     "phys": [
+      9.0,
+      43.0
+     ],
+     "crit": [
+      7.5
+     ],
+     "aps": [
+      1.77
+     ],
+     "range": [
+      1.1
+     ],
+     "requires": [
+      12.0,
+      25.0,
+      25.0
+     ]
+    },
+    "query": {
+     "query": {
+      "status": {
+       "option": "securable"
+      },
+      "filters": {
+       "misc_filters": {
+        "filters": {
+         "foulborn_item": {
+          "option": "false"
+         }
+        }
+       }
+      },
+      "stats": [
+       {
+        "type": "and",
+        "filters": []
+       }
+      ],
+      "name": "Wildslash",
+      "type": "Awl"
+     },
+     "sort": {
+      "price": "asc"
+     }
+    },
+    "notes": [
+     "Dòng đọc chưa chắc, không dùng để lọc: CRAFTINT5%EINCREASED ATTACK SPEED WITH MOVEMENT SKILLS"
+    ]
+   }
+  }
+ ],
+ "mods": [
+  {
+   "game": "poe1",
+   "line": "+85 to maximum Lfe",
+   "clean": "+85 TO MAXIMUM LFE",
+   "ref": "+# to maximum Life",
+   "score": 96.2962962962963,
+   "n": 1,
+   "eid": "explicit.stat_3299347043"
+  },
+  {
+   "game": "poe1",
+   "line": "12% increased Atack Speed",
+   "clean": "12% INCREASED ATACK SPEED",
+   "ref": "#% increased Attack Speed",
+   "score": 97.5609756097561,
+   "n": 1,
+   "eid": "explicit.stat_681332047"
+  },
+  {
+   "game": "poe1",
+   "line": "+1 to Level of all Cold Spel Skill Gems",
+   "clean": "+1 TO LEVEL OF ALL COLD SPEL SKILL GEMS",
+   "ref": "+# to Level of all Cold Spell Skill Gems",
+   "score": 98.36065573770492,
+   "n": 1,
+   "eid": "explicit.stat_2254480358"
+  },
+  {
+   "game": "poe1",
+   "line": "+30% to Lightning Resistnce",
+   "clean": "+30% TO LIGHTNING RESISTNCE",
+   "ref": "+#% to Lightning Resistance",
+   "score": 97.67441860465115,
+   "n": 1,
+   "eid": "explicit.stat_1671376347"
+  },
+  {
+   "game": "poe1",
+   "line": "Adds 5 to 10 Physical Damage to Attack",
+   "clean": "ADDS 5 TO 10 PHYSICAL DAMAGE TO ATTACK",
+   "ref": "Adds # to # Physical Damage to Attacks",
+   "score": 98.36065573770492,
+   "n": 2,
+   "eid": "explicit.stat_3032590688"
+  },
+  {
+   "game": "poe1",
+   "line": "random words here today",
+   "clean": "RANDOM WORDS HERE TODAY",
+   "ref": null,
+   "score": 0,
+   "n": null,
+   "eid": null
+  },
+  {
+   "game": "poe1",
+   "line": "+85 to maximum Life",
+   "clean": "+85 TO MAXIMUM LIFE",
+   "ref": "+# to maximum Life",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_3299347043"
+  },
+  {
+   "game": "poe1",
+   "line": "+38% to Fire Resistance",
+   "clean": "+38% TO FIRE RESISTANCE",
+   "ref": "+#% to Fire Resistance",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_3372524247"
+  },
+  {
+   "game": "poe1",
+   "line": "Adds 5 to 10 Physical Damage to Attacks",
+   "clean": "ADDS 5 TO 10 PHYSICAL DAMAGE TO ATTACKS",
+   "ref": "Adds # to # Physical Damage to Attacks",
+   "score": 100.0,
+   "n": 2,
+   "eid": "explicit.stat_3032590688"
+  },
+  {
+   "game": "poe1",
+   "line": "+1 to Level of all Cold Spell Skill Gems",
+   "clean": "+1 TO LEVEL OF ALL COLD SPELL SKILL GEMS",
+   "ref": "+# to Level of all Cold Spell Skill Gems",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_2254480358"
+  },
+  {
+   "game": "poe1",
+   "line": "10% increased Movement Speed",
+   "clean": "10% INCREASED MOVEMENT SPEED",
+   "ref": "#% increased Movement Speed",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_2250533757"
+  },
+  {
+   "game": "poe1",
+   "line": "+2O% to Cold Resistance",
+   "clean": "+20% TO COLD RESISTANCE",
+   "ref": "+#% to Cold Resistance",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_4220027924"
+  },
+  {
+   "game": "poe1",
+   "line": "12% increased Attack Speed",
+   "clean": "12% INCREASED ATTACK SPEED",
+   "ref": "#% increased Attack Speed",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_681332047"
+  },
+  {
+   "game": "poe1",
+   "cat": null,
+   "line": "+12% to Global Critical Strike Multiplier",
+   "clean": "+12% TO GLOBAL CRITICAL STRIKE MULTIPLIER",
+   "ref": "+#% to Global Critical Strike Multiplier",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_3556824919"
+  },
+  {
+   "game": "poe1",
+   "cat": null,
+   "line": "Adds 10 to 20 Physical Damage",
+   "clean": "ADDS 10 TO 20 PHYSICAL DAMAGE",
+   "ref": "Adds # to # Physical Damage",
+   "score": 100.0,
+   "n": 2,
+   "eid": "explicit.stat_960081730"
+  },
+  {
+   "game": "poe1",
+   "cat": null,
+   "line": "15% increased Attack Speed",
+   "clean": "15% INCREASED ATTACK SPEED",
+   "ref": "#% increased Attack Speed",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_681332047"
+  },
+  {
+   "game": "poe1",
+   "cat": null,
+   "line": "+120 to Armour",
+   "clean": "+120 TO ARMOUR",
+   "ref": "+# to Armour",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_809229260"
+  },
+  {
+   "game": "poe1",
+   "cat": "Gloves",
+   "line": "+12% to Global Critical Strike Multiplier",
+   "clean": "+12% TO GLOBAL CRITICAL STRIKE MULTIPLIER",
+   "ref": "+#% to Global Critical Strike Multiplier",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_3556824919"
+  },
+  {
+   "game": "poe1",
+   "cat": "Gloves",
+   "line": "Adds 10 to 20 Physical Damage",
+   "clean": "ADDS 10 TO 20 PHYSICAL DAMAGE",
+   "ref": "Adds # to # Physical Damage",
+   "score": 100.0,
+   "n": 2,
+   "eid": "explicit.stat_960081730"
+  },
+  {
+   "game": "poe1",
+   "cat": "Gloves",
+   "line": "15% increased Attack Speed",
+   "clean": "15% INCREASED ATTACK SPEED",
+   "ref": "#% increased Attack Speed",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_681332047"
+  },
+  {
+   "game": "poe1",
+   "cat": "Gloves",
+   "line": "+120 to Armour",
+   "clean": "+120 TO ARMOUR",
+   "ref": "+# to Armour",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_3484657501"
+  },
+  {
+   "game": "poe1",
+   "cat": "Bow",
+   "line": "+12% to Global Critical Strike Multiplier",
+   "clean": "+12% TO GLOBAL CRITICAL STRIKE MULTIPLIER",
+   "ref": "+#% to Global Critical Strike Multiplier",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_3556824919"
+  },
+  {
+   "game": "poe1",
+   "cat": "Bow",
+   "line": "Adds 10 to 20 Physical Damage",
+   "clean": "ADDS 10 TO 20 PHYSICAL DAMAGE",
+   "ref": "Adds # to # Physical Damage",
+   "score": 100.0,
+   "n": 2,
+   "eid": "explicit.stat_1940865751"
+  },
+  {
+   "game": "poe1",
+   "cat": "Bow",
+   "line": "15% increased Attack Speed",
+   "clean": "15% INCREASED ATTACK SPEED",
+   "ref": "#% increased Attack Speed",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_210067635"
+  },
+  {
+   "game": "poe1",
+   "cat": "Bow",
+   "line": "+120 to Armour",
+   "clean": "+120 TO ARMOUR",
+   "ref": "+# to Armour",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_809229260"
+  },
+  {
+   "game": "poe1",
+   "cat": "Ring",
+   "line": "+12% to Global Critical Strike Multiplier",
+   "clean": "+12% TO GLOBAL CRITICAL STRIKE MULTIPLIER",
+   "ref": "+#% to Global Critical Strike Multiplier",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_3556824919"
+  },
+  {
+   "game": "poe1",
+   "cat": "Ring",
+   "line": "Adds 10 to 20 Physical Damage",
+   "clean": "ADDS 10 TO 20 PHYSICAL DAMAGE",
+   "ref": "Adds # to # Physical Damage",
+   "score": 100.0,
+   "n": 2,
+   "eid": "explicit.stat_960081730"
+  },
+  {
+   "game": "poe1",
+   "cat": "Ring",
+   "line": "15% increased Attack Speed",
+   "clean": "15% INCREASED ATTACK SPEED",
+   "ref": "#% increased Attack Speed",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_681332047"
+  },
+  {
+   "game": "poe1",
+   "cat": "Ring",
+   "line": "+120 to Armour",
+   "clean": "+120 TO ARMOUR",
+   "ref": "+# to Armour",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_809229260"
+  },
+  {
+   "game": "poe2",
+   "line": "+38% to Fire Resistance",
+   "clean": "+38% TO FIRE RESISTANCE",
+   "ref": "#% to Fire Resistance",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_3372524247"
+  },
+  {
+   "game": "poe2",
+   "line": "+85 to maximum Life",
+   "clean": "+85 TO MAXIMUM LIFE",
+   "ref": "# to maximum Life",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_3299347043"
+  },
+  {
+   "game": "poe2",
+   "line": "+1 to Level of all Spell Skills",
+   "clean": "+1 TO LEVEL OF ALL SPELL SKILLS",
+   "ref": "# to Level of all Spell Skills",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_124131830"
+  },
+  {
+   "game": "poe2",
+   "line": "12% increased Atack Speed",
+   "clean": "12% INCREASED ATACK SPEED",
+   "ref": "#% increased Attack Speed",
+   "score": 97.5609756097561,
+   "n": 1,
+   "eid": "explicit.stat_210067635"
+  },
+  {
+   "game": "poe2",
+   "line": "+30 to Spirit",
+   "clean": "+30 TO SPIRIT",
+   "ref": "# to Spirit",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_2704225257"
+  },
+  {
+   "game": "poe2",
+   "line": "15% increased Critical Damage Bonus",
+   "clean": "15% INCREASED CRITICAL DAMAGE BONUS",
+   "ref": "#% increased Critical Damage Bonus",
+   "score": 100.0,
+   "n": 1,
+   "eid": "explicit.stat_3556824919"
+  }
+ ],
+ "names": [
+  {
+   "text": "Heavy Bel",
+   "base": "Heavy Belt",
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": null
+  },
+  {
+   "text": "Vortex Cal",
+   "base": null,
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": null
+  },
+  {
+   "text": "Sapphire Rng",
+   "base": "Sapphire Ring",
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": null
+  },
+  {
+   "text": "Chaos Orh",
+   "base": null,
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": null
+  },
+  {
+   "text": "Heavy Belt",
+   "base": "Heavy Belt",
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": "Heavy Belt"
+  },
+  {
+   "text": "Vortex Call",
+   "base": null,
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": null
+  },
+  {
+   "text": "HEAVY BELI",
+   "base": null,
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": null
+  },
+  {
+   "text": "Chaos Orb",
+   "base": null,
+   "unique": null,
+   "other": "Chaos Orb",
+   "gem": null,
+   "base_in": null
+  },
+  {
+   "text": "Sapphire Ring",
+   "base": "Sapphire Ring",
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": "Sapphire Ring"
+  },
+  {
+   "text": "Vaal Regalia",
+   "base": "Vaal Regalia",
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": "Vaal Regalia"
+  },
+  {
+   "text": "Heavy Belt of the Whale",
+   "base": null,
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": "Heavy Belt",
+   "only_in": true
+  },
+  {
+   "text": "Sapphire Ring of Fire",
+   "base": null,
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": "Sapphire Ring",
+   "only_in": true
+  },
+  {
+   "text": "Chain: hello",
+   "base": null,
+   "unique": null,
+   "other": null,
+   "gem": null,
+   "base_in": null,
+   "only_in": true
+  }
+ ]
+}
