@@ -39,9 +39,13 @@ class PoeTvCoreTest {
     }
 
     @Test fun ritualWindowOpensGate() {
-        // dòng OCR thật ở đáy cửa sổ Ritual PoE2 (ảnh bản PC)
-        val l = listOf(Line("OFFERTRIBUTETOTHEKING", 0.0, 0.0, 10.0, 10.0), Line("866", 0.0, 0.0, 10.0, 10.0))
-        assertEquals(listOf("OFFERTRIBUTETOTHEKING"), TooltipFinder.inventoryMarks(l))
+        // dòng OCR thật của cửa sổ Ritual (ảnh bản PC): đáy có dấu hiệu yếu, dải trên có tiêu đề "FAVOURS"
+        for (bottom in listOf(listOf("OFFERTRIBUTETOTHEKING", "866"), listOf("CANCEL", "0 Rituals Remaining"))) {
+            val l = bottom.map { Line(it, 0.0, 0.0, 10.0, 10.0) }
+            assertTrue(TooltipFinder.inventoryMarks(l).isEmpty())
+            assertTrue(TooltipFinder.weakHint(l))
+        }
+        assertEquals(listOf("FAVOURS"), TooltipFinder.titleMarks(listOf(Line("FAVOURS", 0.0, 0.0, 10.0, 10.0))))
     }
 
     @Test fun gameplayHintsDoNotOpenGate() {

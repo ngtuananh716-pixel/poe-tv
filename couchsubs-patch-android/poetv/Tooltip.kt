@@ -16,18 +16,19 @@ class Tooltip(val box: IntArray, val header: List<String>, val lines: List<Line>
 object TooltipFinder {
     /**
      * Dòng gợi ý nút ở đáy màn hình chỉ có khi mở túi đồ / stash / cửa sổ bán đồ (bản console): PoE1 "Navigate",
-     * "Compare / More Actions", "Reorder Tabs"; PoE2 "Price Check", "Manage Sockets", "Toggle Weapon Set"; cửa sổ
-     * Ritual PoE2 "Offer Tribute to the King" (theo ảnh bản PC). Không dùng "Pick Up" (có cả khi nhặt đồ dưới đất).
+     * "Compare / More Actions", "Reorder Tabs"; PoE2 "Price Check", "Manage Sockets", "Toggle Weapon Set".
+     * Không dùng "Pick Up" (có cả khi nhặt đồ dưới đất).
      */
-    val UI_MARKERS = Regex("NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS|PRICECHECK|MANAGESOCKETS|TOGGLEWEAPONSET|OFFERTRIBUTE")
+    val UI_MARKERS = Regex("NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS|PRICECHECK|MANAGESOCKETS|TOGGLEWEAPONSET")
     /** Chỉ đọc phần màn hình từ 70% chiều cao trở xuống để tìm dòng gợi ý đó. */
     const val UI_STRIP = 0.70
     /**
-     * PoE2: rê vào đồ đang mặc không có sockets thì dòng gợi ý chỉ còn "Pick Up" (+ "Drop"). "Pick Up" có thể có cả lúc
-     * nhặt đồ dưới đất nên chưa đủ: thấy nó thì đọc thêm dải trên cùng tìm nhãn tab "INVENTORY"/"STASH".
+     * Dấu hiệu yếu ở dải đáy (chưa đủ chắc), thấy thì đọc thêm dải trên cùng tìm tiêu đề cửa sổ:
+     * PoE2 đồ đang mặc không có sockets chỉ còn "Pick Up"/"Drop" → "INVENTORY"; cửa sổ Ritual (PoE1, PoE2) có
+     * "Rituals Remaining"/"Cancel"/"Offer Tribute" ở đáy → tiêu đề "FAVOURS".
      */
-    val UI_WEAK = Regex("PICKUP|DROP")
-    val UI_TITLE = Regex("INVENTORY|STASH")
+    val UI_WEAK = Regex("PICKUP|DROP|TRIBUTE|RITUALS|CANCEL|DEFER|REROLL")
+    val UI_TITLE = Regex("INVENTORY|STASH|FAVOURS")
     const val TITLE_STRIP = 0.30
 
     fun upperLetters(s: String): String {
