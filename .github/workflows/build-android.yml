@@ -19,7 +19,8 @@ permissions:
 
 concurrency:
   group: build-android
-  cancel-in-progress: true
+  # không hủy lượt đang chạy: hủy giữa bước đăng Release có thể làm mất link tải
+  cancel-in-progress: false
 
 env:
   UPSTREAM_TAG: v0.1.0-beta.70
