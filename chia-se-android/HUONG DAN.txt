@@ -1,7 +1,7 @@
 PoE TV TRÊN ĐIỆN THOẠI ANDROID (tra giá món đồ, không cần laptop)
 ===================================================================
 
-Cần: điện thoại Android 12 trở lên, cùng mạng Wi-Fi với PS5 và TV LG; TV đã cài sẵn app CouchSubs (như khi dùng laptop).
+Cần: điện thoại Android 8 trở lên (đã chạy được trên Android 10, vd Mi MIX 3), cùng mạng Wi-Fi với PS5 và TV LG; TV đã cài sẵn app CouchSubs (như khi dùng laptop).
 Chưa có: dịch phụ đề tiếng Việt trên điện thoại (sẽ làm sau). iPhone chưa dùng được tra giá — vẫn dùng laptop/Mac.
 
 CÀI (lần đầu)
@@ -9,6 +9,7 @@ CÀI (lần đầu)
    https://github.com/ngtuananh716-pixel/poe-tv/releases/download/android/poe-tv-android.apk
 2. Tải xong bấm Mở. Lần đầu Android hỏi "Cho phép cài ứng dụng không rõ nguồn gốc" cho Chrome → Cho phép → quay lại → Cài đặt.
    Play Protect có thể cảnh báo "ứng dụng chưa được xác minh" → Chi tiết → Vẫn cài đặt.
+   Máy Xiaomi (MIUI): MIUI quét bảo mật rồi hiện cảnh báo rủi ro → đợi hết đếm ngược → "Tiếp tục cài đặt".
 3. Mở app "CouchSubs PoE TV" và làm theo các bước thiết lập (giao diện tiếng Anh):
    - chọn PlayStation, đăng nhập PSN (tài khoản chính đang chơi PoE trên PS5);
    - ghép PS5: trên PS5 vào Settings > System > Remote Play > Link Device, nhập mã PIN hiện ra vào điện thoại;
@@ -25,6 +26,8 @@ DÙNG
 - TẮT app CouchSubs trên laptop khi dùng điện thoại (TV chỉ nên nối với một máy).
 - Nên cắm sạc điện thoại: nhận hình PS5 và đọc chữ liên tục khá tốn pin, máy ấm lên là bình thường.
   Trong Cài đặt Android > Ứng dụng > CouchSubs PoE TV > Pin: chọn "Không hạn chế" để tắt màn hình vẫn chạy.
+  Máy Xiaomi (MIUI): Cài đặt > Ứng dụng > Quản lý ứng dụng > CouchSubs PoE TV: "Tiết kiệm pin" = Không hạn chế,
+  bật "Tự khởi chạy"; ở màn hình đa nhiệm nhấn giữ app → biểu tượng ổ khóa (để MIUI không tự tắt app).
 
 CẬP NHẬT
 Mở lại đúng link ở bước 1, tải và cài đè lên bản cũ (giữ nguyên đăng nhập, ghép nối).

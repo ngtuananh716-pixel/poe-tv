@@ -111,5 +111,5 @@ jobs:
           gh release delete android --yes --cleanup-tag 2>/dev/null || true
           gh release create android dist/poe-tv-android.apk dist/poe-tv-android.apk.sha256 \
             --title "PoE TV Android (bản ${{ github.run_number }})" \
-            --notes "Tra giá PoE ngay trên điện thoại Android 12+ (không cần laptop). Cài: mở link poe-tv-android.apk trên điện thoại. Mã nguồn: kho này + CouchSubs $UPSTREAM_TAG (AGPL-3.0)." \
+            --notes "Tra giá PoE ngay trên điện thoại Android 8+ (không cần laptop). Cài: mở link poe-tv-android.apk trên điện thoại. Mã nguồn: kho này + CouchSubs $UPSTREAM_TAG (AGPL-3.0)." \
             --latest=false
