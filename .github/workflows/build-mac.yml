@@ -3,16 +3,10 @@
 # Release "poe-tv-mac.zip" gồm app + lõi tra giá + bộ cài cho Mac.
 name: build-mac
 
+# Tạm ngưng tự build từ 22/11/2026 (Tuấn Anh: thay đổi chỉ làm cho điện thoại và Windows; bạn dùng Mac cần thì báo).
+# Muốn build bản Mac mới: tab Actions > build-mac > Run workflow.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "couchsubs-patch-mac/**"
-      - "chia-se-mac/**"
-      - "poe_tv/poe_tv/**"
-      - "poe_tv/data/**"
-      - ".github/workflows/build-mac.yml"
 
 permissions:
   contents: write

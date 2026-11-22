@@ -4,6 +4,7 @@ Chạy: cd poe_tv && python ../tools/android_fixture.py ../couchsubs-patch-andro
 import json, sys
 import cv2
 from poe_tv import data, ocr, parse, query, tooltip
+from poe_tv.serve import filter_lines
 
 import re
 import sys as _sys
@@ -41,7 +42,8 @@ for name, game, path in SAMPLES:
         case["expect"] = {"box": list(tt.box), "header": tt.header, "rarity": it.rarity, "name": it.name, "base": it.base,
                           "category": it.category, "title": it.title,
                           "mods": [{"ref": m.ref, "values": m.values, "kind": m.kind} for m in it.mods],
-                          "props": it.props, "query": q, "notes": notes}
+                          "props": it.props, "query": q, "notes": notes,
+                          "labels": query.labels(q, it), "filter_lines": filter_lines(query.labels(q, it))}
     cases.append(case)
 # kiểm riêng phần khớp: mod, tên món
 D = data.load("poe1")

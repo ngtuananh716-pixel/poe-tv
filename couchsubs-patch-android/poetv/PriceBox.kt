@@ -29,8 +29,30 @@ object PriceBox {
 
     class Listing(val amount: Double?, val currency: String?)
 
-    /** Tên món, giá rẻ nhất, giá phổ biến + số món, 1 lưu ý quan trọng nhất. */
-    fun priceLines(title: String, total: Int, listings: List<Listing>, notes: List<String>): MutableList<String> {
+    /** Các bộ lọc đã dùng, gói thành dòng ≤ MAX_CHARS ký tự: "Lọc: Máu≥94 · K.NT≥95", "K.Chaos≥16". */
+    fun filterLines(labels: List<String>, maxLines: Int = 3): List<String> {
+        if (labels.isEmpty()) return emptyList()
+        var lines = ArrayList<String>()
+        var cur = "Lọc: "
+        var first = true
+        for (lab in labels) {
+            val piece = if (first) lab else " · $lab"
+            if (first || cur.length + piece.length <= MAX_CHARS) cur += piece
+            else { lines.add(cur); cur = lab }
+            first = false
+        }
+        lines.add(cur)
+        lines = ArrayList(lines.map { it.take(MAX_CHARS) })
+        if (lines.size > maxLines) {
+            lines = ArrayList(lines.take(maxLines))
+            lines[lines.size - 1] = lines.last().take(MAX_CHARS - 1) + "…"
+        }
+        return lines
+    }
+
+    /** Tên món, giá rẻ nhất, giá phổ biến + số món, các dòng đã dùng để lọc, 1 lưu ý quan trọng nhất. */
+    fun priceLines(title: String, total: Int, listings: List<Listing>, notes: List<String>,
+                   labels: List<String> = emptyList()): MutableList<String> {
         val lines = mutableListOf(title)
         val ls = listings.filter { it.amount != null && it.currency != null }
         if (ls.isEmpty()) lines.add("Không có món nào đang bán")
@@ -43,6 +65,7 @@ object PriceBox {
             for ((k, n) in counts) if (n > most) { common = k; most = n }
             lines.add("Phổ biến: $common · $total món")
         }
+        lines.addAll(filterLines(labels))
         lines.addAll(noteLines(notes).take(1))
         return lines
     }

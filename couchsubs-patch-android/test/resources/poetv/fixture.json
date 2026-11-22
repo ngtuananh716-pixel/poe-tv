@@ -347,6 +347,14 @@
     },
     "notes": [
      "Món không có máu: giá thật nhiều khả năng THẤP hơn các món tương tự tìm được"
+    ],
+    "labels": [
+     "ES≥14",
+     "K.NT≥28",
+     "Str≥74"
+    ],
+    "filter_lines": [
+     "Lọc: ES≥14 · K.NT≥28 · Str≥74"
     ]
    }
   },
@@ -738,7 +746,14 @@
       "price": "asc"
      }
     },
-    "notes": []
+    "notes": [],
+    "labels": [
+     "pDPS≥197",
+     "eDPS≥113"
+    ],
+    "filter_lines": [
+     "Lọc: pDPS≥197 · eDPS≥113"
+    ]
    }
   },
   {
@@ -1182,7 +1197,9 @@
     },
     "notes": [
      "Dòng đọc chưa chắc, không dùng để lọc: CRAFTINT5%EINCREASED ATTACK SPEED WITH MOVEMENT SKILLS"
-    ]
+    ],
+    "labels": [],
+    "filter_lines": []
    }
   },
   {
@@ -1488,7 +1505,9 @@
       "price": "asc"
      }
     },
-    "notes": []
+    "notes": [],
+    "labels": [],
+    "filter_lines": []
    }
   },
   {
@@ -1775,6 +1794,13 @@
     "notes": [
      "Dòng đọc chưa chắc, không dùng để lọc: ADDSITO46 LICHTNING DAMAGE TO ATTACKS",
      "Món không có máu: giá thật nhiều khả năng THẤP hơn các món tương tự tìm được"
+    ],
+    "labels": [
+     "Giáp≥530",
+     "K.NT≥67"
+    ],
+    "filter_lines": [
+     "Lọc: Giáp≥530 · K.NT≥67"
     ]
    }
   },
@@ -2071,7 +2097,16 @@
       "price": "asc"
      }
     },
-    "notes": []
+    "notes": [],
+    "labels": [
+     "Máu≥94",
+     "K.NT≥95",
+     "K.Chaos≥16"
+    ],
+    "filter_lines": [
+     "Lọc: Máu≥94 · K.NT≥95",
+     "K.Chaos≥16"
+    ]
    }
   }
  ],

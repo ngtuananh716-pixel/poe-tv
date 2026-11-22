@@ -42,6 +42,55 @@ object Query {
         "Critical Damage Bonus", "to Spirit",
     )
 
+    // Nhãn ngắn của các bộ lọc, hiện dưới giá trên TV ("Lọc: Máu≥94 · K.NT≥95"); như query.labels của bản Python.
+    private val PSEUDO_LABEL = mapOf(
+        "pseudo.pseudo_total_life" to "Máu", "pseudo.pseudo_total_energy_shield" to "ES", "pseudo.pseudo_total_mana" to "Mana",
+        "pseudo.pseudo_total_elemental_resistance" to "K.NT", "pseudo.pseudo_total_chaos_resistance" to "K.Chaos",
+        "pseudo.pseudo_total_strength" to "Str", "pseudo.pseudo_total_dexterity" to "Dex", "pseudo.pseudo_total_intelligence" to "Int",
+    )
+    private val IMPORTANT_LABEL = listOf(
+        "Movement Speed" to "Tốc chạy", "to Level of" to "+Cấp skill", "Critical Strike Multiplier" to "Crit multi",
+        "Critical Damage Bonus" to "Crit dmg", "increased maximum Life" to "%Máu", "increased maximum Energy Shield" to "%ES",
+        "Spell Damage" to "Spell dmg", "Damage over Time Multiplier" to "DoT multi", "Physical Damage to Attacks" to "Phys atk",
+        "increased Cast Speed" to "Cast speed", "Suppress Spell Damage" to "Suppress", "to Spirit" to "Spirit",
+    )
+    private val EQUIP_LABEL = mapOf("pdps" to "pDPS", "edps" to "eDPS", "ar" to "Giáp", "ev" to "Né", "es" to "ES")
+
+    private fun num(v: Any?): String = PriceBox.g((v as Number).toDouble())
+
+    /** Các dòng đã dùng để lọc (đồ không phải unique), viết ngắn để hiện trên TV. */
+    fun labels(q: JSONObject, it: Item): List<String> {
+        if (it.rarity == "Unique") return emptyList()
+        val out = ArrayList<String>()
+        val qq = q.getJSONObject("query")
+        val flt = qq.optJSONObject("filters") ?: JSONObject()
+        for (key in listOf("weapon_filters", "armour_filters", "equipment_filters")) {
+            val f = flt.optJSONObject(key)?.optJSONObject("filters") ?: continue
+            for (k in f.keys()) {
+                val o = f.optJSONObject(k) ?: continue
+                if (o.has("min")) out.add("${EQUIP_LABEL[k] ?: k}≥${num(o.get("min"))}")
+            }
+        }
+        val mf = flt.optJSONObject("misc_filters")?.optJSONObject("filters") ?: JSONObject()
+        mf.optJSONObject("gem_level")?.let { o -> out.add("Cấp≥${num(o.get("min"))}") }
+        mf.optJSONObject("quality")?.let { o -> out.add("CL≥${num(o.get("min"))}") }
+        if (mf.optJSONObject("corrupted")?.optString("option") == "true") out.add("Corrupted")
+        val refs = LinkedHashMap<String, String>()
+        for (m in it.mods) { val sid = m.explicitId; if (sid != null && sid !in refs) refs[sid] = m.ref }
+        val stats = qq.getJSONArray("stats").getJSONObject(0).getJSONArray("filters")
+        for (i in 0 until stats.length()) {
+            val f = stats.getJSONObject(i)
+            val id = f.getString("id")
+            val name = PSEUDO_LABEL[id] ?: run {
+                val ref = refs[id] ?: ""
+                IMPORTANT_LABEL.firstOrNull { (k, _) -> k in ref }?.second ?: ref.replace("#", "").trim().take(14)
+            }
+            val v = f.optJSONObject("value")?.opt("min")
+            out.add(if (v != null && v != JSONObject.NULL) "$name≥${num(v)}" else name)
+        }
+        return out
+    }
+
     /** math.floor(v × 0,9) với v > 0 (số nguyên như bản Python), còn lại giữ nguyên v. */
     fun min(v: Double): Number = if (v > 0) Math.floor(v * (1 - RANGE)).toLong() else v
 

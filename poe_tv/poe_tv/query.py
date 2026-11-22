@@ -46,6 +46,53 @@ IMPORTANT = ("Movement Speed", "to Level of", "Critical Strike Multiplier", "inc
              "Critical Damage Bonus", "to Spirit")      # 2 mục cuối là mod PoE2
 
 
+# Nhãn ngắn của các bộ lọc, hiện dưới giá trên TV ("Lọc: Máu≥94 · K.NT≥95")
+PSEUDO_LABEL = {v: k for k, v in {
+    "Máu": "pseudo.pseudo_total_life", "ES": "pseudo.pseudo_total_energy_shield", "Mana": "pseudo.pseudo_total_mana",
+    "K.NT": "pseudo.pseudo_total_elemental_resistance", "K.Chaos": "pseudo.pseudo_total_chaos_resistance",
+    "Str": "pseudo.pseudo_total_strength", "Dex": "pseudo.pseudo_total_dexterity", "Int": "pseudo.pseudo_total_intelligence",
+}.items()}
+IMPORTANT_LABEL = (("Movement Speed", "Tốc chạy"), ("to Level of", "+Cấp skill"), ("Critical Strike Multiplier", "Crit multi"),
+                   ("Critical Damage Bonus", "Crit dmg"), ("increased maximum Life", "%Máu"),
+                   ("increased maximum Energy Shield", "%ES"), ("Spell Damage", "Spell dmg"),
+                   ("Damage over Time Multiplier", "DoT multi"), ("Physical Damage to Attacks", "Phys atk"),
+                   ("increased Cast Speed", "Cast speed"), ("Suppress Spell Damage", "Suppress"), ("to Spirit", "Spirit"))
+EQUIP_LABEL = {"pdps": "pDPS", "edps": "eDPS", "ar": "Giáp", "ev": "Né", "es": "ES"}
+
+
+def labels(q: dict, it: Item) -> list[str]:
+    """Các dòng đã dùng để lọc (đồ không phải unique), viết ngắn để hiện trên TV."""
+    if it.rarity == "Unique":
+        return []
+    out = []
+    qq = q["query"]
+    flt = qq.get("filters", {})
+    for key in ("weapon_filters", "armour_filters", "equipment_filters"):
+        for k, f in ((flt.get(key) or {}).get("filters") or {}).items():
+            if "min" in f:
+                out.append(f"{EQUIP_LABEL.get(k, k)}≥{f['min']:g}")
+    mf = (flt.get("misc_filters") or {}).get("filters") or {}
+    if "gem_level" in mf:
+        out.append(f"Cấp≥{mf['gem_level']['min']:g}")
+    if "quality" in mf:
+        out.append(f"CL≥{mf['quality']['min']:g}")
+    if (mf.get("corrupted") or {}).get("option") == "true":
+        out.append("Corrupted")
+    refs = {}
+    for m in it.mods:
+        sid = ((m.trade_ids or {}).get("explicit") or [None])[0]
+        if sid and sid not in refs:
+            refs[sid] = m.ref
+    for f in qq["stats"][0]["filters"]:
+        name = PSEUDO_LABEL.get(f["id"])
+        if name is None:
+            ref = refs.get(f["id"], "")
+            name = next((lab for key, lab in IMPORTANT_LABEL if key in ref), None) or ref.replace("#", "").strip()[:14]
+        v = (f.get("value") or {}).get("min")
+        out.append(f"{name}≥{v:g}" if v is not None else name)
+    return out
+
+
 def _min(v):
     return math.floor(v * (1 - RANGE)) if v > 0 else v
 
@@ -78,7 +125,7 @@ def build(it: Item, status: str = "securable", game: str = "poe1"):
         if it.foulborn:
             used = []
             for sm, vals, txt in it.mutated:
-                ids = sm.trade_ids.get("explicit") or []     # trade tìm dòng đột biến bằng mã explicit (như APT)
+                ids = (sm.trade_ids or {}).get("explicit") or []     # trade tìm dòng đột biến bằng mã explicit (như APT)
                 if not ids:
                     continue
                 f = {"id": ids[0]}
@@ -151,7 +198,7 @@ def build(it: Item, status: str = "securable", game: str = "poe1"):
             stats.append({"id": PSEUDO[a], "value": {"min": _min(v)}})
     for m in mods:
         if any(k in m.ref for k in IMPORTANT) and m.kind == "explicit":
-            ids = m.trade_ids.get("explicit") or []
+            ids = (m.trade_ids or {}).get("explicit") or []
             if ids and m.value is not None:
                 stats.append({"id": ids[0], "value": {"min": _min(m.value)}})
 

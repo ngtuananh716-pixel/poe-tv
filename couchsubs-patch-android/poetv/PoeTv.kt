@@ -302,7 +302,7 @@ object PoeTv {
                     res = trade.search(q)
                     notes = notes.filter { n -> !n.startsWith("Foulborn") } + "Foulborn: chưa ai bán đúng dòng đột biến"
                 }
-                PriceBox.priceLines(title, res.total, res.listings, notes).also { l ->
+                PriceBox.priceLines(title, res.total, res.listings, notes, Query.labels(q, item)).also { l ->
                     synchronized(lock) { recent[key] = SystemClock.elapsedRealtime() to l }
                 }
             } catch (e: Trade.RateLimited) {

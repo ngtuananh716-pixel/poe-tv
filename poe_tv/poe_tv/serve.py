@@ -101,8 +101,29 @@ def head(title: str, game: str = "poe1") -> str:
     return (("PoE2 · " if game == "poe2" else "") + title)[:MAX_CHARS]
 
 
-def price_lines(title, result, notes) -> list[str]:
-    """Nội dung ô giá: tên món, giá rẻ nhất, giá phổ biến + số món, 1 lưu ý quan trọng nhất."""
+def filter_lines(labels, max_lines=3) -> list[str]:
+    """Các bộ lọc đã dùng, gói thành dòng ≤ MAX_CHARS ký tự: "Lọc: Máu≥94 · K.NT≥95", "K.Chaos≥16"."""
+    if not labels:
+        return []
+    lines, cur, first = [], "Lọc: ", True
+    for lab in labels:
+        piece = lab if first else " · " + lab
+        if first or len(cur) + len(piece) <= MAX_CHARS:
+            cur += piece
+        else:
+            lines.append(cur)
+            cur = lab
+        first = False
+    lines.append(cur)
+    lines = [l[:MAX_CHARS] for l in lines]
+    if len(lines) > max_lines:
+        lines = lines[:max_lines]
+        lines[-1] = lines[-1][:MAX_CHARS - 1] + "…"
+    return lines
+
+
+def price_lines(title, result, notes, labels=()) -> list[str]:
+    """Nội dung ô giá: tên món, giá rẻ nhất, giá phổ biến + số món, các dòng đã dùng để lọc, 1 lưu ý quan trọng nhất."""
     lines = [title]
     ls = [l for l in result["listings"] if l.get("amount") is not None]
     if not ls:
@@ -115,6 +136,7 @@ def price_lines(title, result, notes) -> list[str]:
             counts[k] = counts.get(k, 0) + 1
         common = max(counts.items(), key=lambda kv: kv[1])[0]
         lines.append(f"Phổ biến: {common} · {result['total']} món")
+    lines.extend(filter_lines(labels))
     lines.extend(note_lines(notes)[:1])
     return lines
 
@@ -384,7 +406,7 @@ class Watcher:
                         q["query"]["stats"] = [{"type": "and", "filters": []}]
                         res = trade.search(q)
                         notes = [n for n in notes if not n.startswith("Foulborn")] + ["Foulborn: chưa ai bán đúng dòng đột biến"]
-                    lines = price_lines(title, res, notes)
+                    lines = price_lines(title, res, notes, query.labels(q, it))
                     if rec.get("foulborn_filter_failed"):
                         lines.append("! Trade không lọc được Foulborn")
                     with self.lock:

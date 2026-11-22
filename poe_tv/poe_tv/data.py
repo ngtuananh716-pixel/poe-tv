@@ -137,7 +137,7 @@ class Data:
         entry, matcher = _resolve(cands, category)
         sm = StatMatch(
             ref=entry["ref"],
-            trade_ids=entry.get("trade", {}).get("ids", {}),
+            trade_ids=(entry.get("trade") or {}).get("ids") or {},
             negate=bool(matcher.get("negate")),
             fixed_value=matcher.get("value"),
             n_values=matcher["string"].count("#"),

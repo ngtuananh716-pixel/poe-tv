@@ -132,6 +132,9 @@ class PoeTvCoreTest {
             val (q, notes) = Query.build(it, "securable", game)
             assertTrue("$name query\n${e.getJSONObject("query")}\n$q", e.getJSONObject("query").similar(q))
             assertEquals(name, e.getJSONArray("notes").toList(), notes)
+            val labels = Query.labels(q, it)
+            assertEquals("$name labels", e.getJSONArray("labels").toList(), labels)
+            assertEquals("$name filter lines", e.getJSONArray("filter_lines").toList(), PriceBox.filterLines(labels))
             val box = PriceBox.place(tt.box, c.getInt("width"), c.getInt("height"), 3)
             assertTrue(name, box[2] <= 1.0 && box[0] >= 0.0)
         }
