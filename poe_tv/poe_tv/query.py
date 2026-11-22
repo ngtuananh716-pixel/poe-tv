@@ -89,9 +89,10 @@ def _num(v) -> str:
     return f"{v:g}"
 
 
-def labels(q: dict, it: Item) -> dict:
+def labels(q: dict, it: Item, totals: bool = False) -> dict:
     """Các bộ lọc đã dùng (đồ không phải unique), viết ngắn để hiện trên TV:
-    {"req": [bắt buộc], "count": [nhóm đếm], "need": số dòng cần đủ, "of": số dòng trong nhóm}."""
+    {"req": [bắt buộc], "count": [nhóm đếm], "need": số dòng cần đủ, "of": số dòng trong nhóm}.
+    totals: ghi "Máu tổng", "K.NT tổng"… (bảng chọn dòng) thay cho "Máu", "K.NT" (ô giá trên TV)."""
     out = {"req": [], "count": [], "need": 0, "of": 0}
     if it.rarity == "Unique":
         return out
@@ -124,6 +125,8 @@ def labels(q: dict, it: Item) -> dict:
         ref = refs.get(f["id"], "")
         if name is None:
             name = mod_label(ref)
+        elif totals:
+            name += " tổng"
         v = (f.get("value") or {}).get("min")
         if v is None:
             return name

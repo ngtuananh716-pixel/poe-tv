@@ -89,6 +89,57 @@ class PoeTvCoreTest {
         o.getInt("need"), o.getInt("of"),
     )
 
+    private fun numOrNull(o: JSONObject, k: String): Double? = if (o.isNull(k)) null else o.getDouble(k)
+
+    /** Bảng chọn dòng và bộ lọc dựng từ lựa chọn: so với pick.py. */
+    private fun checkPicks(name: String, game: String, it: Item, picks: JSONArray) {
+        for (pi in 0 until picks.length()) {
+            val pc = picks.getJSONObject(pi)
+            val md = pc.getJSONObject("mode")
+            val strict = md.getBoolean("strict")
+            val byBase = md.getBoolean("by_base")
+            val allLines = md.getBoolean("all_lines")
+            val (qa, _) = Query.build(it, "securable", game, strict, byBase, allLines)
+            val pn = Pick.panel(it, game, strict, byBase, allLines, qa)
+            assertNotNull("$name pick $pi", pn)
+            pn!!
+            val rows = pc.getJSONArray("rows")
+            assertEquals("$name pick $pi rows", rows.length(), pn.rows.size)
+            for (j in 0 until rows.length()) {
+                val r = rows.getJSONObject(j)
+                val k = pn.rows[j]
+                val at = "$name pick $pi row $j"
+                assertEquals(at, r.getString("key"), k.key)
+                assertEquals(at, r.getString("section"), k.section)
+                assertEquals(at, r.getString("text"), k.text)
+                assertEquals(at, r.getBoolean("on"), k.on)
+                assertEquals(at, r.getBoolean("enabled"), k.enabled)
+                assertEquals(at, str(r, "tag"), k.tag)
+                assertEquals(at, numOrNull(r, "show_min"), Pick.showMin(pn, k)?.toDouble())
+            }
+            assertEquals("$name pick $pi slots", pc.getInt("slots"), pn.slots)
+            assertEquals("$name pick $pi n", pc.getInt("n_explicit"), pn.nExplicit)
+            assertEquals("$name pick $pi need", pc.getInt("need"), pn.need)
+            assertEquals("$name pick $pi m0", pc.getInt("m0"), pn.m0)
+            val builds = pc.getJSONArray("builds")
+            for (bi in 0 until builds.length()) {
+                val b = builds.getJSONObject(bi)
+                val s = b.getJSONObject("sel")
+                val on = s.getJSONObject("on").let { o -> o.keySet().associateWith { k -> o.getBoolean(k) } }
+                val ed = s.getJSONObject("edit").let { o -> o.keySet().associateWith { k -> o.getDouble(k) } }
+                val sel = PickSel(on, ed, if (s.isNull("need")) null else s.getInt("need"))
+                val (q, summ) = Pick.build(it, pn, sel)
+                val at = "$name pick $pi build $bi"
+                assertTrue("$at\n${b.getJSONObject("query")}\n$q", b.getJSONObject("query").similar(q))
+                val es = b.getJSONObject("summary")
+                assertEquals(at, es.getJSONArray("req").toList(), summ.req)
+                assertEquals(at, es.getJSONArray("stats").toList(), summ.stats)
+                assertEquals(at, es.getInt("need"), summ.need)
+                assertEquals(at, es.getInt("of"), summ.of)
+            }
+        }
+    }
+
     /** Ô giá: Min, giá ước tính (khoảng), độ tin cậy, số món, các dòng lọc, lưu ý — so với bản Python. */
     @Test fun priceBoxMatchesPython() {
         val cases = fixture.getJSONArray("price_cases")
@@ -175,6 +226,7 @@ class PoeTvCoreTest {
             val (qs, _) = Query.build(it, "securable", game, strict = true, byBase = true)
             assertTrue("$name query strict base\n${e.getJSONObject("query_strict_base")}\n$qs",
                 e.getJSONObject("query_strict_base").similar(qs))
+            checkPicks(name, game, it, e.optJSONArray("picks") ?: JSONArray())
             val box = PriceBox.place(tt.box, c.getInt("width"), c.getInt("height"), 3)
             assertTrue(name, box[2] <= 1.0 && box[0] >= 0.0)
         }

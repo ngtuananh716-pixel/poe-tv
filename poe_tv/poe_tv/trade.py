@@ -3,6 +3,7 @@ PoE1: /api/trade/…/{realm}/{league} (realm Sony). PoE2: /api/trade2/…/{leagu
 from __future__ import annotations
 
 import json
+import threading
 import time
 from collections import Counter, defaultdict, deque
 from urllib.parse import quote
@@ -38,6 +39,8 @@ class Trade:
         self.sent = defaultdict(deque)       # policy -> thời điểm các lần gọi
         self.blocked_until = defaultdict(float)
         self.cache = {}
+        # tra tự động (luồng đọc khung hình) và TRA LẠI trên trang (luồng máy chủ) gọi lần lượt, đúng giới hạn tốc độ
+        self._lock = threading.RLock()
 
     # ---------------- giới hạn tốc độ ----------------
     def _wait_needed(self, policy):
@@ -68,6 +71,10 @@ class Trade:
             raise RateLimited(ra)
 
     def _call(self, policy, method, url, **kw):
+        with self._lock:
+            return self._call_locked(policy, method, url, **kw)
+
+    def _call_locked(self, policy, method, url, **kw):
         w = self._wait_needed(policy)
         if w > MAX_WAIT:
             raise RateLimited(w)

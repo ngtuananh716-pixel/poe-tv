@@ -67,7 +67,12 @@ class Trade(val game: String, private val http: OkHttpClient = DEFAULT_CLIENT) {
         }
     }
 
-    private fun call(policy: String, request: Request): JSONObject {
+    /** Tra tự động (luồng nền) và TRA LẠI (màn chọn dòng) gọi lần lượt, đúng giới hạn tốc độ. */
+    private val callLock = Any()
+
+    private fun call(policy: String, request: Request): JSONObject = synchronized(callLock) { callLocked(policy, request) }
+
+    private fun callLocked(policy: String, request: Request): JSONObject {
         val w = waitNeeded(policy)
         if (w > MAX_WAIT) throw RateLimited(w)
         if (w > 0) Thread.sleep((w * 1000).toLong())

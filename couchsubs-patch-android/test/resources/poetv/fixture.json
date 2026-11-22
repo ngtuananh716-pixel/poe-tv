@@ -503,7 +503,1842 @@
      "sort": {
       "price": "asc"
      }
-    }
+    },
+    "picks": [
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Heavy Belt",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "m0",
+        "section": "implicit",
+        "text": "+34 to Strength",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào Str tổng",
+        "show_min": 30
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "+49 to Strength",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào Str tổng",
+        "show_min": 44
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "+16 to maximum Energy Shield",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào ES tổng",
+        "show_min": 14
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "+32% to Cold Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 28
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "9% increased Flask Charges gained",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": 8
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 4,
+      "need": 2,
+      "m0": 3,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 28
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 74
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "ES tổng ≥ 14",
+          "K.NT tổng ≥ 28",
+          "Str tổng ≥ 74"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true,
+          "m4": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 28
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 74
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 8
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "ES tổng ≥ 14",
+          "K.NT tổng ≥ 28",
+          "Str tổng ≥ 74",
+          "Flask Charges gained ≥ 8%"
+         ],
+         "need": 3,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": false,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true,
+          "m4": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 28
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 74
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "ES tổng ≥ 14",
+          "K.NT tổng ≥ 28",
+          "Str tổng ≥ 74"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": false,
+          "m4": true
+         },
+         "edit": {
+          "m4": 13
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 28
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 44
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 13
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "ES tổng ≥ 14",
+          "K.NT tổng ≥ 28",
+          "Str tổng ≥ 44",
+          "Flask Charges gained ≥ 13%"
+         ],
+         "need": 3,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": false,
+          "m4": true
+         },
+         "edit": {
+          "m4": 13
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 28
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 44
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 13
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "ES tổng ≥ 14",
+          "K.NT tổng ≥ 28",
+          "Str tổng ≥ 44",
+          "Flask Charges gained ≥ 13%"
+         ],
+         "need": 1,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {
+          "m0": 7,
+          "m1": 7,
+          "m2": 7,
+          "m3": 7
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 7
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 7
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 14
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Heavy Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Heavy Belt"
+         ],
+         "stats": [
+          "ES tổng ≥ 7",
+          "K.NT tổng ≥ 7",
+          "Str tổng ≥ 14"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": true
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Heavy Belt",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "m0",
+        "section": "implicit",
+        "text": "+34 to Strength",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào Str tổng",
+        "show_min": 30
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "+49 to Strength",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào Str tổng",
+        "show_min": 44
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "+16 to maximum Energy Shield",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào ES tổng",
+        "show_min": 14
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "+32% to Cold Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 28
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "9% increased Flask Charges gained",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 8
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 4,
+      "need": 4,
+      "m0": 4,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 4
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 28
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 74
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 8
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "ES tổng ≥ 14",
+          "K.NT tổng ≥ 28",
+          "Str tổng ≥ 74",
+          "Flask Charges gained ≥ 8%"
+         ],
+         "need": 4,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true,
+          "m4": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 4
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 28
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 74
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 8
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "ES tổng ≥ 14",
+          "K.NT tổng ≥ 28",
+          "Str tổng ≥ 74",
+          "Flask Charges gained ≥ 8%"
+         ],
+         "need": 4,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": false,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true,
+          "m4": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 4
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 28
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 74
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 8
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "ES tổng ≥ 14",
+          "K.NT tổng ≥ 28",
+          "Str tổng ≥ 74",
+          "Flask Charges gained ≥ 8%"
+         ],
+         "need": 4,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": false,
+          "m4": true
+         },
+         "edit": {
+          "m4": 13
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 4
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 28
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 44
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 13
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "ES tổng ≥ 14",
+          "K.NT tổng ≥ 28",
+          "Str tổng ≥ 44",
+          "Flask Charges gained ≥ 13%"
+         ],
+         "need": 4,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": false,
+          "m4": true
+         },
+         "edit": {
+          "m4": 13
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 28
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 44
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 13
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "ES tổng ≥ 14",
+          "K.NT tổng ≥ 28",
+          "Str tổng ≥ 44",
+          "Flask Charges gained ≥ 13%"
+         ],
+         "need": 1,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {
+          "m0": 7,
+          "m1": 7,
+          "m2": 7,
+          "m3": 7
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 4
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 7
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 7
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 8
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Heavy Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Heavy Belt"
+         ],
+         "stats": [
+          "ES tổng ≥ 7",
+          "K.NT tổng ≥ 7",
+          "Str tổng ≥ 14",
+          "Flask Charges gained ≥ 8%"
+         ],
+         "need": 4,
+         "of": 4
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": true,
+       "by_base": true,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Heavy Belt",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "m0",
+        "section": "implicit",
+        "text": "+34 to Strength",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào Str tổng",
+        "show_min": 34
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "+49 to Strength",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào Str tổng",
+        "show_min": 49
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "+16 to maximum Energy Shield",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào ES tổng",
+        "show_min": 16
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "+32% to Cold Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 32
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "9% increased Flask Charges gained",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": 9
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 4,
+      "need": 2,
+      "m0": 3,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 32
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 83
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Heavy Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Heavy Belt"
+         ],
+         "stats": [
+          "ES tổng ≥ 16",
+          "K.NT tổng ≥ 32",
+          "Str tổng ≥ 83"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true,
+          "m4": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 32
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 83
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 9
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Heavy Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Heavy Belt"
+         ],
+         "stats": [
+          "ES tổng ≥ 16",
+          "K.NT tổng ≥ 32",
+          "Str tổng ≥ 83",
+          "Flask Charges gained ≥ 9%"
+         ],
+         "need": 3,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": false,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ],
+          "type": "Heavy Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Heavy Belt"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true,
+          "m4": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 32
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 83
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Heavy Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Heavy Belt"
+         ],
+         "stats": [
+          "ES tổng ≥ 16",
+          "K.NT tổng ≥ 32",
+          "Str tổng ≥ 83"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": false,
+          "m4": true
+         },
+         "edit": {
+          "m4": 14
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 32
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 49
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 14
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Heavy Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Heavy Belt"
+         ],
+         "stats": [
+          "ES tổng ≥ 16",
+          "K.NT tổng ≥ 32",
+          "Str tổng ≥ 49",
+          "Flask Charges gained ≥ 14%"
+         ],
+         "need": 3,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": false,
+          "m4": true
+         },
+         "edit": {
+          "m4": 14
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 32
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 49
+              }
+             },
+             {
+              "id": "explicit.stat_1452809865",
+              "value": {
+               "min": 14
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Heavy Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Heavy Belt"
+         ],
+         "stats": [
+          "ES tổng ≥ 16",
+          "K.NT tổng ≥ 32",
+          "Str tổng ≥ 49",
+          "Flask Charges gained ≥ 14%"
+         ],
+         "need": 1,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {
+          "m0": 7,
+          "m1": 7,
+          "m2": 7,
+          "m3": 7
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_energy_shield",
+              "value": {
+               "min": 7
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 7
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_strength",
+              "value": {
+               "min": 14
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Heavy Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Heavy Belt"
+         ],
+         "stats": [
+          "ES tổng ≥ 7",
+          "K.NT tổng ≥ 7",
+          "Str tổng ≥ 14"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       }
+      ]
+     }
+    ]
    }
   },
   {
@@ -1063,7 +2898,1983 @@
      "sort": {
       "price": "asc"
      }
-    }
+    },
+    "picks": [
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Foul Staff",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "g_pdps",
+        "section": "gear",
+        "text": "pDPS 219",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 197
+       },
+       {
+        "key": "g_edps",
+        "section": "gear",
+        "text": "eDPS 125",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 113
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "21% increased Physical Damage",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong DPS",
+        "show_min": 18
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "Adds 16 to 29 Physical Damage",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong DPS",
+        "show_min": 20
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "Adds 8 to 172 Lightning Damage",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong DPS",
+        "show_min": 81
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "16% increased Critical Strike Chance",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 14
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "+248 to Accuracy Rating",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": 223
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "8% increased Attack Speed",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 7
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 6,
+      "need": 2,
+      "m0": 2,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 197
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 197",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_pdps": true,
+          "g_edps": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": true,
+          "m5": true,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 197
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_691932474",
+              "value": {
+               "min": 223
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 197",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Accuracy Rating ≥ 223",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_pdps": true,
+          "g_edps": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 197
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 197",
+          "eDPS ≥ 113"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_pdps": true,
+          "g_edps": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": true,
+          "m5": false,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 197
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 197",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "g_pdps": true
+         },
+         "edit": {
+          "g_pdps": 202
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 202
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 202",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "g_pdps": true
+         },
+         "edit": {
+          "g_pdps": 202
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 202
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 202",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 1,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 197
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Foul Staff"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Foul Staff",
+          "pDPS ≥ 197",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": true
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Foul Staff",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "g_pdps",
+        "section": "gear",
+        "text": "pDPS 219",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 197
+       },
+       {
+        "key": "g_edps",
+        "section": "gear",
+        "text": "eDPS 125",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 113
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "21% increased Physical Damage",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong DPS",
+        "show_min": 18
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "Adds 16 to 29 Physical Damage",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong DPS",
+        "show_min": 20
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "Adds 8 to 172 Lightning Damage",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong DPS",
+        "show_min": 81
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "16% increased Critical Strike Chance",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 14
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "+248 to Accuracy Rating",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 223
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "8% increased Attack Speed",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 7
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 6,
+      "need": 3,
+      "m0": 3,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 197
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_691932474",
+              "value": {
+               "min": 223
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 197",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Accuracy Rating ≥ 223",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_pdps": true,
+          "g_edps": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": true,
+          "m5": true,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 197
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_691932474",
+              "value": {
+               "min": 223
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 197",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Accuracy Rating ≥ 223",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_pdps": true,
+          "g_edps": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 197
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 197",
+          "eDPS ≥ 113"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_pdps": true,
+          "g_edps": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": true,
+          "m5": true,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 197
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_691932474",
+              "value": {
+               "min": 223
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 197",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Accuracy Rating ≥ 223",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "g_pdps": true
+         },
+         "edit": {
+          "g_pdps": 202
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 202
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_691932474",
+              "value": {
+               "min": 223
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 202",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Accuracy Rating ≥ 223",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "g_pdps": true
+         },
+         "edit": {
+          "g_pdps": 202
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 202
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_691932474",
+              "value": {
+               "min": 223
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "pDPS ≥ 202",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Accuracy Rating ≥ 223",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 1,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 197
+             },
+             "edps": {
+              "min": 113
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_691932474",
+              "value": {
+               "min": 223
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Foul Staff"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Foul Staff",
+          "pDPS ≥ 197",
+          "eDPS ≥ 113"
+         ],
+         "stats": [
+          "Crit ≥ 14%",
+          "Accuracy Rating ≥ 223",
+          "Attack speed ≥ 7%"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": true,
+       "by_base": true,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Foul Staff",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "g_pdps",
+        "section": "gear",
+        "text": "pDPS 219",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 219
+       },
+       {
+        "key": "g_edps",
+        "section": "gear",
+        "text": "eDPS 125",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 125
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "21% increased Physical Damage",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong DPS",
+        "show_min": 21
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "Adds 16 to 29 Physical Damage",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong DPS",
+        "show_min": 22
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "Adds 8 to 172 Lightning Damage",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong DPS",
+        "show_min": 90
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "16% increased Critical Strike Chance",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 16
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "+248 to Accuracy Rating",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": 248
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "8% increased Attack Speed",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 8
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 6,
+      "need": 2,
+      "m0": 2,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 219
+             },
+             "edps": {
+              "min": 125
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 8
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Foul Staff"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Foul Staff",
+          "pDPS ≥ 219",
+          "eDPS ≥ 125"
+         ],
+         "stats": [
+          "Crit ≥ 16%",
+          "Attack speed ≥ 8%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "g_pdps": true,
+          "g_edps": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": true,
+          "m5": true,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 219
+             },
+             "edps": {
+              "min": 125
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_691932474",
+              "value": {
+               "min": 248
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 8
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Foul Staff"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Foul Staff",
+          "pDPS ≥ 219",
+          "eDPS ≥ 125"
+         ],
+         "stats": [
+          "Crit ≥ 16%",
+          "Accuracy Rating ≥ 248",
+          "Attack speed ≥ 8%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "g_pdps": true,
+          "g_edps": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 219
+             },
+             "edps": {
+              "min": 125
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ],
+          "type": "Foul Staff"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Foul Staff",
+          "pDPS ≥ 219",
+          "eDPS ≥ 125"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "g_pdps": true,
+          "g_edps": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": true,
+          "m5": false,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 219
+             },
+             "edps": {
+              "min": 125
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 8
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Foul Staff"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Foul Staff",
+          "pDPS ≥ 219",
+          "eDPS ≥ 125"
+         ],
+         "stats": [
+          "Crit ≥ 16%",
+          "Attack speed ≥ 8%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "g_pdps": true
+         },
+         "edit": {
+          "g_pdps": 224
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 224
+             },
+             "edps": {
+              "min": 125
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 8
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Foul Staff"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Foul Staff",
+          "pDPS ≥ 224",
+          "eDPS ≥ 125"
+         ],
+         "stats": [
+          "Crit ≥ 16%",
+          "Attack speed ≥ 8%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "g_pdps": true
+         },
+         "edit": {
+          "g_pdps": 224
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 224
+             },
+             "edps": {
+              "min": 125
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 8
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Foul Staff"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Foul Staff",
+          "pDPS ≥ 224",
+          "eDPS ≥ 125"
+         ],
+         "stats": [
+          "Crit ≥ 16%",
+          "Attack speed ≥ 8%"
+         ],
+         "need": 1,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "weapon.warstaff"
+             }
+            }
+           },
+           "weapon_filters": {
+            "filters": {
+             "pdps": {
+              "min": 219
+             },
+             "edps": {
+              "min": 125
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "explicit.stat_2375316951",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_210067635",
+              "value": {
+               "min": 8
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Foul Staff"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Foul Staff",
+          "pDPS ≥ 219",
+          "eDPS ≥ 125"
+         ],
+         "stats": [
+          "Crit ≥ 16%",
+          "Attack speed ≥ 8%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       }
+      ]
+     }
+    ]
    }
   },
   {
@@ -1575,7 +5386,8 @@
      "sort": {
       "price": "asc"
      }
-    }
+    },
+    "picks": []
    }
   },
   {
@@ -1933,7 +5745,8 @@
      "sort": {
       "price": "asc"
      }
-    }
+    },
+    "picks": []
    }
   },
   {
@@ -2355,7 +6168,1815 @@
      "sort": {
       "price": "asc"
      }
-    }
+    },
+    "picks": [
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Detailed Mitts",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "g_ar",
+        "section": "gear",
+        "text": "Giáp 589",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 530
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "+178 to Armour",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong Giáp/Né/ES",
+        "show_min": 160
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "Adds 46 to # Lightning damage to Attacks",
+        "on": false,
+        "enabled": true,
+        "tag": "đọc chưa chắc",
+        "show_min": 41
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "18% increased Rarity of Items found",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 16
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "+35% to Cold Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 31
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "+40% to Lightning Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 36
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "67% increased Armour",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong Giáp/Né/ES",
+        "show_min": 60
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 6,
+      "need": 2,
+      "m0": 2,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 530
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 67
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 530"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 67",
+          "Rarity ≥ 16%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_ar": true,
+          "m1": false,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 530
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 67
+              }
+             },
+             {
+              "id": "explicit.stat_1754445556",
+              "value": {
+               "min": 41
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 530"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 67",
+          "Lightning atk ≥ 41",
+          "Rarity ≥ 16%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_ar": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 530
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 530"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_ar": true,
+          "m1": false,
+          "m2": false,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 530
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 67
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 530"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 67",
+          "Rarity ≥ 16%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m4": false,
+          "g_ar": true
+         },
+         "edit": {
+          "g_ar": 535
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 535
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 36
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 535"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 36",
+          "Rarity ≥ 16%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m4": false,
+          "g_ar": true
+         },
+         "edit": {
+          "g_ar": 535
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 535
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 36
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 535"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 36",
+          "Rarity ≥ 16%"
+         ],
+         "need": 1,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {
+          "m4": 7,
+          "m5": 7
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 530
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Detailed Mitts"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Detailed Mitts",
+          "Giáp ≥ 530"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 14",
+          "Rarity ≥ 16%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": true
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Detailed Mitts",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "g_ar",
+        "section": "gear",
+        "text": "Giáp 589",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 530
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "+178 to Armour",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong Giáp/Né/ES",
+        "show_min": 160
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "Adds 46 to # Lightning damage to Attacks",
+        "on": false,
+        "enabled": true,
+        "tag": "đọc chưa chắc",
+        "show_min": 41
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "18% increased Rarity of Items found",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 16
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "+35% to Cold Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 31
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "+40% to Lightning Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 36
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "67% increased Armour",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong Giáp/Né/ES",
+        "show_min": 60
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 6,
+      "need": 2,
+      "m0": 2,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 530
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 67
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 530"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 67",
+          "Rarity ≥ 16%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_ar": true,
+          "m1": false,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 530
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 67
+              }
+             },
+             {
+              "id": "explicit.stat_1754445556",
+              "value": {
+               "min": 41
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 530"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 67",
+          "Lightning atk ≥ 41",
+          "Rarity ≥ 16%"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_ar": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 530
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 530"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "g_ar": true,
+          "m1": false,
+          "m2": false,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 530
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 67
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 530"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 67",
+          "Rarity ≥ 16%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m4": false,
+          "g_ar": true
+         },
+         "edit": {
+          "g_ar": 535
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 535
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 36
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 535"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 36",
+          "Rarity ≥ 16%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m4": false,
+          "g_ar": true
+         },
+         "edit": {
+          "g_ar": 535
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 535
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 36
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Giáp ≥ 535"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 36",
+          "Rarity ≥ 16%"
+         ],
+         "need": 1,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {
+          "m4": 7,
+          "m5": 7
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 530
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Detailed Mitts"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Detailed Mitts",
+          "Giáp ≥ 530"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 14",
+          "Rarity ≥ 16%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": true,
+       "by_base": true,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Detailed Mitts",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "g_ar",
+        "section": "gear",
+        "text": "Giáp 589",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 589
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "+178 to Armour",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong Giáp/Né/ES",
+        "show_min": 178
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "Adds 46 to # Lightning damage to Attacks",
+        "on": false,
+        "enabled": true,
+        "tag": "đọc chưa chắc",
+        "show_min": 46
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "18% increased Rarity of Items found",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 18
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "+35% to Cold Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 35
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "+40% to Lightning Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 40
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "67% increased Armour",
+        "on": false,
+        "enabled": false,
+        "tag": "đã tính trong Giáp/Né/ES",
+        "show_min": 67
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 6,
+      "need": 2,
+      "m0": 2,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 589
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 75
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 18
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Detailed Mitts"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Detailed Mitts",
+          "Giáp ≥ 589"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 75",
+          "Rarity ≥ 18%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "g_ar": true,
+          "m1": false,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 589
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 75
+              }
+             },
+             {
+              "id": "explicit.stat_1754445556",
+              "value": {
+               "min": 46
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 18
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Detailed Mitts"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Detailed Mitts",
+          "Giáp ≥ 589"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 75",
+          "Lightning atk ≥ 46",
+          "Rarity ≥ 18%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "g_ar": true,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 589
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ],
+          "type": "Detailed Mitts"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Detailed Mitts",
+          "Giáp ≥ 589"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "g_ar": true,
+          "m1": false,
+          "m2": false,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 589
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 75
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 18
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Detailed Mitts"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Detailed Mitts",
+          "Giáp ≥ 589"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 75",
+          "Rarity ≥ 18%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m4": false,
+          "g_ar": true
+         },
+         "edit": {
+          "g_ar": 594
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 594
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 40
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 18
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Detailed Mitts"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Detailed Mitts",
+          "Giáp ≥ 594"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 40",
+          "Rarity ≥ 18%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m4": false,
+          "g_ar": true
+         },
+         "edit": {
+          "g_ar": 594
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 594
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 40
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 18
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Detailed Mitts"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Detailed Mitts",
+          "Giáp ≥ 594"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 40",
+          "Rarity ≥ 18%"
+         ],
+         "need": 1,
+         "of": 2
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {
+          "m4": 7,
+          "m5": 7
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "armour.gloves"
+             }
+            }
+           },
+           "equipment_filters": {
+            "filters": {
+             "ar": {
+              "min": 589
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_3917489142",
+              "value": {
+               "min": 18
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Detailed Mitts"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Detailed Mitts",
+          "Giáp ≥ 589"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 14",
+          "Rarity ≥ 18%"
+         ],
+         "need": 2,
+         "of": 2
+        }
+       }
+      ]
+     }
+    ]
    }
   },
   {
@@ -2815,7 +8436,1892 @@
      "sort": {
       "price": "asc"
      }
-    }
+    },
+    "picks": [
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Utility Belt",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "+105 to maximum Life",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào Máu tổng",
+        "show_min": 94
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "+47% to Cold Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 42
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "+41% to Lightning Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 36
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "97 to 135 Physical Thorns damage",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": 104
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "+18% to Cold and Chaos Resistances",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng + K.Chaos tổng",
+        "show_min": 16
+       },
+       {
+        "key": "m7",
+        "section": "explicit",
+        "text": "22% increased Explicit Resistance Modifier magnitudes",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": 19
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 6,
+      "need": 2,
+      "m0": 3,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 94
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 95
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Máu tổng ≥ 94",
+          "K.NT tổng ≥ 95",
+          "K.Chaos tổng ≥ 16"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": true,
+          "m7": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 4
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 94
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 95
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 104
+              }
+             },
+             {
+              "id": "explicit.stat_1972391381",
+              "value": {
+               "min": 19
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Máu tổng ≥ 94",
+          "K.NT tổng ≥ 95",
+          "K.Chaos tổng ≥ 16",
+          "Physical Thorns ≥ 104",
+          "Explicit Resistance ≥ 19%"
+         ],
+         "need": 4,
+         "of": 5
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false,
+          "m7": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": false,
+          "m6": true,
+          "m7": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 94
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 95
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 16
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Máu tổng ≥ 94",
+          "K.NT tổng ≥ 95",
+          "K.Chaos tổng ≥ 16"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m2": false,
+          "m5": true
+         },
+         "edit": {
+          "m5": 109
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 95
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 109
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "K.NT tổng ≥ 95",
+          "K.Chaos tổng ≥ 16",
+          "Physical Thorns ≥ 109"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m2": false,
+          "m5": true
+         },
+         "edit": {
+          "m5": 109
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 95
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 109
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "K.NT tổng ≥ 95",
+          "K.Chaos tổng ≥ 16",
+          "Physical Thorns ≥ 109"
+         ],
+         "need": 1,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {
+          "m2": 7,
+          "m3": 7,
+          "m4": 7,
+          "m6": 7
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 7
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 21
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Utility Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Utility Belt"
+         ],
+         "stats": [
+          "Máu tổng ≥ 7",
+          "K.NT tổng ≥ 21",
+          "K.Chaos tổng ≥ 7"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": true
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Utility Belt",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "+105 to maximum Life",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào Máu tổng",
+        "show_min": 94
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "+47% to Cold Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 42
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "+41% to Lightning Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 36
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "97 to 135 Physical Thorns damage",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 104
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "+18% to Cold and Chaos Resistances",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng + K.Chaos tổng",
+        "show_min": 16
+       },
+       {
+        "key": "m7",
+        "section": "explicit",
+        "text": "22% increased Explicit Resistance Modifier magnitudes",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 19
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 6,
+      "need": 5,
+      "m0": 5,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 5
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 94
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 95
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 104
+              }
+             },
+             {
+              "id": "explicit.stat_1972391381",
+              "value": {
+               "min": 19
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Máu tổng ≥ 94",
+          "K.NT tổng ≥ 95",
+          "K.Chaos tổng ≥ 16",
+          "Physical Thorns ≥ 104",
+          "Explicit Resistance ≥ 19%"
+         ],
+         "need": 5,
+         "of": 5
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": true,
+          "m7": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 5
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 94
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 95
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 104
+              }
+             },
+             {
+              "id": "explicit.stat_1972391381",
+              "value": {
+               "min": 19
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Máu tổng ≥ 94",
+          "K.NT tổng ≥ 95",
+          "K.Chaos tổng ≥ 16",
+          "Physical Thorns ≥ 104",
+          "Explicit Resistance ≥ 19%"
+         ],
+         "need": 5,
+         "of": 5
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false,
+          "m7": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": true,
+          "m7": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 5
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 94
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 95
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 104
+              }
+             },
+             {
+              "id": "explicit.stat_1972391381",
+              "value": {
+               "min": 19
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Máu tổng ≥ 94",
+          "K.NT tổng ≥ 95",
+          "K.Chaos tổng ≥ 16",
+          "Physical Thorns ≥ 104",
+          "Explicit Resistance ≥ 19%"
+         ],
+         "need": 5,
+         "of": 5
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m2": false,
+          "m5": true
+         },
+         "edit": {
+          "m5": 109
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 4
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 95
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 109
+              }
+             },
+             {
+              "id": "explicit.stat_1972391381",
+              "value": {
+               "min": 19
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "K.NT tổng ≥ 95",
+          "K.Chaos tổng ≥ 16",
+          "Physical Thorns ≥ 109",
+          "Explicit Resistance ≥ 19%"
+         ],
+         "need": 4,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m2": false,
+          "m5": true
+         },
+         "edit": {
+          "m5": 109
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 95
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 16
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 109
+              }
+             },
+             {
+              "id": "explicit.stat_1972391381",
+              "value": {
+               "min": 19
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "K.NT tổng ≥ 95",
+          "K.Chaos tổng ≥ 16",
+          "Physical Thorns ≥ 109",
+          "Explicit Resistance ≥ 19%"
+         ],
+         "need": 1,
+         "of": 4
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {
+          "m2": 7,
+          "m3": 7,
+          "m4": 7,
+          "m6": 7
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 5
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 7
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 21
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 7
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 104
+              }
+             },
+             {
+              "id": "explicit.stat_1972391381",
+              "value": {
+               "min": 19
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Utility Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Utility Belt"
+         ],
+         "stats": [
+          "Máu tổng ≥ 7",
+          "K.NT tổng ≥ 21",
+          "K.Chaos tổng ≥ 7",
+          "Physical Thorns ≥ 104",
+          "Explicit Resistance ≥ 19%"
+         ],
+         "need": 5,
+         "of": 5
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": true,
+       "by_base": true,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Utility Belt",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "+105 to maximum Life",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào Máu tổng",
+        "show_min": 105
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "+47% to Cold Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 47
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "+41% to Lightning Resistance",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng",
+        "show_min": 41
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "97 to 135 Physical Thorns damage",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": 116
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "+18% to Cold and Chaos Resistances",
+        "on": true,
+        "enabled": true,
+        "tag": "→ gộp vào K.NT tổng + K.Chaos tổng",
+        "show_min": 18
+       },
+       {
+        "key": "m7",
+        "section": "explicit",
+        "text": "22% increased Explicit Resistance Modifier magnitudes",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": 22
+       }
+      ],
+      "slots": 6,
+      "n_explicit": 6,
+      "need": 2,
+      "m0": 3,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 105
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 106
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 18
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Utility Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Utility Belt"
+         ],
+         "stats": [
+          "Máu tổng ≥ 105",
+          "K.NT tổng ≥ 106",
+          "K.Chaos tổng ≥ 18"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": true,
+          "m7": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 4
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 105
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 106
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 18
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 116
+              }
+             },
+             {
+              "id": "explicit.stat_1972391381",
+              "value": {
+               "min": 22
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Utility Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Utility Belt"
+         ],
+         "stats": [
+          "Máu tổng ≥ 105",
+          "K.NT tổng ≥ 106",
+          "K.Chaos tổng ≥ 18",
+          "Physical Thorns ≥ 116",
+          "Explicit Resistance ≥ 22%"
+         ],
+         "need": 4,
+         "of": 5
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false,
+          "m7": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ],
+          "type": "Utility Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Utility Belt"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": false,
+          "m6": true,
+          "m7": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 105
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 106
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 18
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Utility Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Utility Belt"
+         ],
+         "stats": [
+          "Máu tổng ≥ 105",
+          "K.NT tổng ≥ 106",
+          "K.Chaos tổng ≥ 18"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m2": false,
+          "m5": true
+         },
+         "edit": {
+          "m5": 121
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 106
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 18
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 121
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Utility Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Utility Belt"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 106",
+          "K.Chaos tổng ≥ 18",
+          "Physical Thorns ≥ 121"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m2": false,
+          "m5": true
+         },
+         "edit": {
+          "m5": 121
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 106
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 18
+              }
+             },
+             {
+              "id": "explicit.stat_2881298780",
+              "value": {
+               "min": 121
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Utility Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Utility Belt"
+         ],
+         "stats": [
+          "K.NT tổng ≥ 106",
+          "K.Chaos tổng ≥ 18",
+          "Physical Thorns ≥ 121"
+         ],
+         "need": 1,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {
+          "m2": 7,
+          "m3": 7,
+          "m4": 7,
+          "m6": 7
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "accessory.belt"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "pseudo.pseudo_total_life",
+              "value": {
+               "min": 7
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_elemental_resistance",
+              "value": {
+               "min": 21
+              }
+             },
+             {
+              "id": "pseudo.pseudo_total_chaos_resistance",
+              "value": {
+               "min": 7
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Utility Belt"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Utility Belt"
+         ],
+         "stats": [
+          "Máu tổng ≥ 7",
+          "K.NT tổng ≥ 21",
+          "K.Chaos tổng ≥ 7"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       }
+      ]
+     }
+    ]
    }
   }
  ],

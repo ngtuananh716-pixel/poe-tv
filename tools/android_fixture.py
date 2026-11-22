@@ -5,6 +5,44 @@ import json, sys
 import cv2
 from poe_tv import data, ocr, parse, query, tooltip
 from poe_tv.serve import filter_lines, price_lines
+from poe_tv import pick
+
+
+def pick_cases(it, game):
+    """Bảng chọn dòng + bộ lọc dựng từ vài lựa chọn (mặc định, chọn nhanh, bỏ/sửa dòng) ở 3 chế độ."""
+    out = []
+    for mode in (dict(), dict(all_lines=True), dict(strict=True, by_base=True)):
+        qa, _ = query.build(it, status="securable", game=game, **mode)
+        pn = pick.panel(it, game, auto_q=qa, **mode)
+        if pn is None:
+            return out
+        assert pick.build(it, pn)[0] == qa, "lựa chọn mặc định phải ra đúng bộ lọc tự tra"
+        sels = [{}, pick.preset(pn, "all"), pick.preset(pn, "none"), pick.preset(pn, "main")]
+        grp = next((r for r in pn["rows"] if r["groups"] and r["enabled"] and r["on"]), None)
+        one = next((r for r in pn["rows"] if not r["groups"] and r["enabled"] and r["raw"] is not None
+                    and r["section"] in ("explicit", "gear")), None)
+        custom = {"on": {}, "edit": {}, "need": None}
+        if grp:
+            custom["on"][grp["key"]] = False
+        if one:
+            custom["on"][one["key"]] = True
+            custom["edit"][one["key"]] = pick.show_min(pn, one) + 5
+        sels.append(custom)
+        sels.append({**custom, "need": 1})
+        sels.append({"on": {"base": True}, "edit": {r["key"]: 7 for r in pn["rows"] if r["groups"] and r["on"]}})
+        builds = []
+        for sel in sels:
+            q, summ = pick.build(it, pn, sel)
+            builds.append({"sel": {"on": sel.get("on") or {}, "edit": sel.get("edit") or {}, "need": sel.get("need")},
+                           "query": q, "summary": summ})
+        out.append({"mode": {"strict": bool(mode.get("strict")), "by_base": bool(mode.get("by_base")),
+                             "all_lines": bool(mode.get("all_lines"))},
+                    "rows": [{"key": r["key"], "section": r["section"], "text": r["text"], "on": r["on"],
+                              "enabled": r["enabled"], "tag": r["tag"], "show_min": pick.show_min(pn, r)} for r in pn["rows"]],
+                    "slots": pn["slots"], "n_explicit": pn["n_explicit"], "need": pn["need"], "m0": pn["m0"],
+                    "builds": builds})
+    return out
+
 
 import re
 import sys as _sys
@@ -48,6 +86,7 @@ for name, game, path in SAMPLES:
         qs, _ = query.build(it, status="securable", game=game, strict=True, by_base=True)
         case["expect"].update({"query_all": qa, "labels_all": query.labels(qa, it),
                                "filter_lines_all": filter_lines(query.labels(qa, it)), "query_strict_base": qs})
+        case["expect"]["picks"] = pick_cases(it, game)
     cases.append(case)
 # kiểm riêng phần khớp: mod, tên món
 D = data.load("poe1")
@@ -81,6 +120,7 @@ for t in ["Heavy Bel", "Vortex Cal", "Sapphire Rng", "Chaos Orh",
 for t in ["Heavy Belt of the Whale", "Sapphire Ring of Fire", "Chain: hello"]:
     bi = D.find_base_in(t)
     names.append({"text": t, "base": None, "unique": None, "other": None, "gem": None, "base_in": bi["name"] if bi else None, "only_in": True})
+
 # ô giá: giá ước tính, khoảng, độ tin cậy (tỉ giá giả định), giá phổ biến khi không có tỉ giá
 L = lambda pairs: [{"amount": a, "currency": c} for a, c in pairs]
 LAB = {"req": ["Giáp ≥ 530"], "count": ["K.NT ≥ 67", "Rarity ≥ 16%", "Lightning atk ≥ 21"], "need": 2, "of": 3}

@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -61,6 +62,10 @@ fun PoeTvTile(modifier: Modifier = Modifier) {
                 PoeTv.setFilter(context, allLines = !s.allLines)
             }
         }
+        val rec by PoeTv.pick.collectAsState()
+        var open by remember { mutableStateOf(false) }
+        rec?.let { r -> PickCard(r) { open = true } }
+        if (open) rec?.let { r -> PickDialog(r) { open = false } }
         if (s.note.isNotEmpty()) Text(s.note, style = Tokens.Type.caption, color = Tokens.Color.text)
         else TileLabel("Chỉ tra khi mở túi đồ, stash hoặc cửa sổ mua bán. Bỏ qua đồ bán theo lô và đồ chưa giám định.")
     }

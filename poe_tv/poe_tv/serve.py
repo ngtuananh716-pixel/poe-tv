@@ -28,7 +28,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import cv2
 import numpy as np
 
-from . import data, parse, query, tooltip
+from . import data, parse, pick, query, tooltip
 
 REGION_ID = "poe-price"
 GAME_NAME = {"poe1": "PoE1", "poe2": "PoE2"}
@@ -323,6 +323,8 @@ class Watcher:
         self.all_lines = False    # lọc mọi dòng; mặc định chỉ dòng chính (tổng máu/kháng, mod quan trọng)
         self.screen_pending = False
         self.recent = {}          # nội dung tooltip → (lúc tra, các dòng ô giá): mở lại món vừa xem thì hiện ngay
+        self.picks = deque(maxlen=10)   # các món vừa tra (khung "Món vừa tra" trên trang để tự chọn dòng)
+        self.pick_seq = 0
 
     # ---- gọi từ máy chủ HTTP ----
     def on_frame(self, img: np.ndarray) -> list[dict]:
@@ -484,6 +486,17 @@ class Watcher:
                     except Exception:
                         rates = None             # không có tỉ giá: ô giá hiện giá phổ biến như cũ
                     lines = price_lines(title, res, notes, query.labels(q, it), rates, game)
+                    try:
+                        pn = pick.panel(it, game, strict, by_base, all_lines, auto_q=q)
+                    except Exception:
+                        pn = None                # bảng chọn dòng lỗi không được làm hỏng ô giá trên TV
+                        traceback.print_exc()
+                    if pn is not None:
+                        with self.lock:
+                            self.pick_seq += 1
+                            self.picks.append({"id": self.pick_seq, "at": time.strftime("%H:%M"), "item": it,
+                                               "panel": pn, "auto": price_lines(title, res, [], None, rates, game)[1:],
+                                               "auto_url": res.get("url"), "sel": None, "result": None, "url": None})
                     if rec.get("foulborn_filter_failed"):
                         lines.append("! Trade không lọc được Foulborn")
                     with self.lock:
@@ -570,6 +583,51 @@ class Watcher:
             return
         print(f"[{time.strftime('%H:%M:%S')}] {GAME_NAME[self.game]} · tra giá {'BẬT' if self.price_on else 'TẮT'}"
               f" · dịch {'BẬT' if self.translate_on else 'TẮT'}" + (" · dịch cả màn hình" if screen else ""), flush=True)
+
+    # ---- tự chọn dòng (khung "Món vừa tra" trên trang) ----
+    def pick_get(self, pid=None):
+        with self.lock:
+            if not self.picks:
+                return None
+            if pid is None:
+                return self.picks[-1]
+            return next((p for p in self.picks if p["id"] == pid), None)
+
+    def pick_latest_id(self):
+        with self.lock:
+            return self.picks[-1]["id"] if self.picks else 0
+
+    def pick_apply(self, pid, sel, act):
+        """Nút trên khung "Món vừa tra": chọn nhanh (main / all / none) hoặc TRA LẠI. Kết quả chỉ hiện trên trang:
+        không lên TV, không ghi vào giá đã nhớ của TV."""
+        rec = self.pick_get(pid)
+        if rec is None:
+            return None
+        if act in ("main", "all", "none"):
+            rec["sel"] = pick.preset(rec["panel"], act, sel)
+            return rec
+        rec["sel"] = sel
+        game = rec["panel"]["game"]
+        trade = (self.games.get(game) or (None, None))[1]
+        if trade is None:
+            rec["result"], rec["url"] = ["Chưa bật tra giá"], None
+            return rec
+        from .trade import RateLimited, get_rates
+        q, _ = pick.build(rec["item"], rec["panel"], sel, status=self.status)
+        try:
+            res = trade.search(q)
+            try:
+                rates = get_rates(trade) if res["listings"] else None
+            except Exception:
+                rates = None
+            rec["result"] = price_lines(rec["item"].title, res, [], None, rates, game)[1:]
+            rec["url"] = res.get("url")
+        except RateLimited as e:
+            rec["result"], rec["url"] = [f"Trade API bận, chờ {int(getattr(e, 'wait', 0)) + 1} giây rồi bấm lại"], None
+        except Exception as e:
+            rec["result"], rec["url"] = ["Lỗi tra giá", str(e)[:120]], None
+        print(f"[{time.strftime('%H:%M:%S')}] Tra lại {rec['item'].title}: {' | '.join(rec['result'])}", flush=True)
+        return rec
 
     def _mode_changed(self):
         """Đổi chế độ lọc (gọi khi đang giữ lock): quên giá đã nhớ (của chế độ cũ), xóa ô đang hiện để món đang mở được
@@ -674,7 +732,93 @@ def decode(body: bytes, w: int, h: int, stride: int) -> np.ndarray:
     return np.ascontiguousarray(rows[:, :, :3])     # BGRA → BGR
 
 
-def control_page(w: Watcher) -> str:
+def pick_section(w: Watcher, pid=None) -> str:
+    """Khung "Món vừa tra": chọn dòng, sửa mức tối thiểu, TRA LẠI (kết quả chỉ hiện ở đây, TV giữ giá tự tra)."""
+    from html import escape as esc
+    rec = w.pick_get(pid)
+    if rec is None:
+        return ""
+    it, pn, sel = rec["item"], rec["panel"], rec["sel"] or {}
+    on = pick._sel_on(pn, sel)
+    edit = sel.get("edit") or {}
+    _, summ = pick.build(it, pn, sel)
+    rows_html = {"base": [], "gear": [], "implicit": [], "explicit": []}
+    for r in pn["rows"]:
+        key = r["key"]
+        box = (f'<input type="checkbox" name="on_{key}" value="1"{" checked" if on[key] else ""}'
+               f'{"" if r["enabled"] else " disabled"}>')
+        num = ""
+        shown = pick.show_min(pn, r)
+        if r["section"] != "base" or key == "ilvl":
+            if shown is not None and r["enabled"]:
+                val = edit.get(key, shown)
+                num = (f'≥ <input type="number" step="any" name="min_{key}" value="{query._num(val)}">'
+                       f'<input type="hidden" name="min0_{key}" value="{query._num(shown)}">')
+        tag = f'<td class="t">{esc(r["tag"])}</td>' if r["tag"] else '<td class="t"></td>'
+        cls = "" if (on[key] and r["enabled"]) else ' class="off"'
+        rows_html[r["section"]].append(f'<tr><td class="c">{box}</td><td{cls}>{esc(r["text"])}</td>{tag}'
+                                       f'<td class="v">{num}</td></tr>')
+    for _ in range(pn["slots"] - pn["n_explicit"]):
+        rows_html["explicit"].append('<tr class="none"><td class="c"></td><td>none</td><td></td><td></td></tr>')
+    keys = ",".join(r["key"] for r in pn["rows"] if r["enabled"])
+
+    def sec(title, name):
+        return f'<div class="sec">{title}</div><table>{"".join(rows_html[name])}</table>' if rows_html[name] else ""
+
+    expl_title = f"DÒNG TRÊN MÓN · {pn['n_explicit']}/{pn['slots']}" if pn["slots"] else "DÒNG TRÊN MÓN"
+    bullets = "".join(f"• {esc(x)}<br>" for x in summ["req"] + summ["stats"])
+    need = (f'Cần đủ <input type="number" name="need" min="1" max="{summ["of"]}" value="{summ["need"]}" '
+            f'style="width:52px"><input type="hidden" name="need0" value="{summ["need"]}"> / {summ["of"]} dòng'
+            if summ["of"] else "Chưa chọn dòng chỉ số nào")
+    res, url = (rec["result"], rec["url"]) if rec["result"] else (rec["auto"], rec["auto_url"])
+    res_title = "KẾT QUẢ TRA LẠI (chỉ hiện ở đây, TV giữ giá tự tra)" if rec["result"] else "GIÁ TỰ TRA"
+    link = f'<a href="{esc(url)}" target="_blank" rel="noopener">Mở trên trang trade ›</a>' if url else ""
+    latest = w.pick_latest_id()
+    return f"""<div class="card" id="pick"><form method="post" action="/pick">
+<input type="hidden" name="id" value="{rec['id']}"><input type="hidden" name="keys" value="{keys}">
+<div class="hd"><b>Món vừa tra: {esc(it.title)} ({esc(it.rarity)} · {GAME_NAME.get(pn['game'], '')})</b>
+<span>tra lúc {rec['at']}</span></div>
+<a id="newer" class="newer" href="/"{"" if latest != rec["id"] else ' style="display:none"'}>Có món mới · Xem món mới ›</a>
+{sec("BASE", "base")}{sec("CHỈ SỐ MÓN", "gear")}{sec("IMPLICIT", "implicit")}{sec(expl_title, "explicit")}
+<div class="bottom"><div><div class="box"><div class="s">KHI TRA (ĐÃ GỘP)</div>{bullets}{need}</div>
+<div class="btns"><button class="g" name="act" value="main">Dòng chính</button><button class="g" name="act" value="all">Tất cả</button>
+<button class="g" name="act" value="none">Bỏ hết</button></div>
+<button class="go" name="act" value="retry">TRA LẠI</button></div>
+<div class="box"><div class="s">{res_title}</div>{"<br>".join(esc(x) for x in res)}<br>{link}</div></div>
+</form></div>
+<script>
+var cur={rec['id']};
+setInterval(function(){{fetch('/pick_latest').then(function(r){{return r.json()}}).then(function(j){{
+ if(j.id&&j.id!==cur)document.getElementById('newer').style.display='block';}}).catch(function(){{}});}},3000);
+</script>"""
+
+
+def parse_pick_form(w: Watcher, body: str):
+    """Đọc form khung "Món vừa tra" → (id, lựa chọn, nút đã bấm)."""
+    from urllib.parse import parse_qs
+    f = {k: v[-1] for k, v in parse_qs(body, keep_blank_values=True).items()}
+    pid = int(f.get("id", "0") or 0)
+    keys = [k for k in f.get("keys", "").split(",") if k]
+    sel = {"on": {k: f.get(f"on_{k}") == "1" for k in keys}, "edit": {}, "need": None}
+    for k in keys:
+        a, b = f.get(f"min_{k}"), f.get(f"min0_{k}")
+        if a is None or a.strip() == "" or a == b:
+            continue
+        try:
+            v = float(a.replace(",", "."))
+        except ValueError:
+            continue
+        sel["edit"][k] = int(v) if v.is_integer() else v
+    if f.get("need") not in (None, "", f.get("need0")):
+        try:
+            sel["need"] = int(float(f["need"]))
+        except ValueError:
+            pass
+    act = f.get("act", "retry")
+    return pid, sel, act if act in ("main", "all", "none", "retry") else "retry"
+
+
+def control_page(w: Watcher, pid=None) -> str:
     """Trang bật/tắt mở trên điện thoại (cùng mạng nhà)."""
     def btn(name, on, label):
         state, color, nxt = ("ĐANG BẬT", "#2e7d32", "0") if on else ("ĐANG TẮT", "#555", "1")
@@ -684,7 +828,22 @@ def control_page(w: Watcher) -> str:
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>PoE TV</title>
 <style>body{{font-family:system-ui,sans-serif;background:#111;color:#eee;margin:0;padding:16px}}
 h1{{font-size:20px}} .b{{display:block;color:#fff;text-decoration:none;text-align:center;font-size:22px;
-padding:22px 10px;margin:12px 0;border-radius:14px}} small{{font-size:14px;opacity:.85}} p{{color:#aaa;font-size:14px}}</style>
+padding:22px 10px;margin:12px 0;border-radius:14px}} small{{font-size:14px;opacity:.85}} p{{color:#aaa;font-size:14px}}
+.card{{background:#1c1e23;border:1.5px solid #f5b83d;border-radius:14px;padding:12px 14px;margin:16px 0;max-width:900px}}
+.hd{{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}} .hd b{{font-size:17px}}
+.hd span{{color:#a9a59c;font-size:13px}} .newer{{display:block;background:#3a3020;color:#f5b83d;border-radius:10px;
+padding:8px 10px;margin-top:8px;text-decoration:none}} .sec{{color:#a9a59c;font-size:11px;font-weight:700;letter-spacing:.06em;
+margin:12px 0 4px}} table{{width:100%;border-collapse:collapse}} td{{padding:6px 4px;border-bottom:1px solid #2a2d33;font-size:15px}}
+td.c{{width:26px}} td.v{{width:104px;text-align:right;white-space:nowrap}} td.t{{color:#a9a59c;font-size:12px;width:200px}}
+.off{{color:#8d8a83}} .none td{{color:#5f5d59;font-style:italic}}
+input[type=checkbox]{{width:18px;height:18px;accent-color:#f5b83d}}
+input[type=number]{{width:64px;background:#25282f;color:#f3eee4;border:1px solid #3a3d44;border-radius:8px;padding:5px;font-size:15px;text-align:right}}
+.bottom{{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:12px}}
+.box{{background:#25282f;border-radius:12px;padding:10px 12px;font-size:15px;line-height:1.55}} .box a{{color:#a9a59c}}
+.box .s{{color:#a9a59c;font-size:11px;font-weight:700;letter-spacing:.06em}} .btns{{display:flex;gap:8px;margin-top:10px}}
+.g{{flex:1;background:#25282f;border:1px solid #3a3d44;color:#eee;border-radius:10px;padding:9px;font-size:14px}}
+.go{{display:block;width:100%;background:#f5b83d;color:#17181b;font-weight:700;border:0;border-radius:12px;padding:13px;
+font-size:17px;margin-top:10px}}</style>
 </head><body><h1>PoE TV</h1>
 {btn("price", w.price_on, "Tra giá")}
 {btn("translate", w.translate_on, "Dịch phụ đề tiếng Việt")}
@@ -693,6 +852,7 @@ padding:22px 10px;margin:12px 0;border-radius:14px}} small{{font-size:14px;opaci
 <a class="b" style="background:#ef6c00" href="/set?base={"0" if w.by_base else "1"}">Base: {"ĐÚNG BASE" if w.by_base else "MỌI BASE"}<br><small>bấm để chuyển sang {"mọi base" if w.by_base else "đúng base"}</small></a>
 <a class="b" style="background:#ef6c00" href="/set?lines={"0" if w.all_lines else "1"}">Dòng: {"TẤT CẢ" if w.all_lines else "CHÍNH"}<br><small>bấm để chuyển sang {"chính" if w.all_lines else "tất cả"}</small></a>
 <a class="b" style="background:#6a1b9a" href="/set?game={"poe1" if w.game == "poe2" else "poe2"}">Game: {GAME_NAME[w.game]}<br><small>bấm để chuyển sang {"PoE1" if w.game == "poe2" else "PoE2"}</small></a>
+{pick_section(w, pid)}
 <p>Dịch cần khóa AI (Gemini miễn phí hoặc Claude) nhập trong CouchSubs › Settings › Translation. Chưa có khóa thì phụ đề giữ tiếng Anh.</p>
 </body></html>"""
 
@@ -720,6 +880,15 @@ def make_handler(watcher: Watcher):
             self.wfile.write(body)
 
         def do_POST(self):
+            if self.path == "/pick":
+                n = int(self.headers.get("Content-Length", "0"))
+                pid, sel, act = parse_pick_form(watcher, self.rfile.read(n).decode("utf-8", "replace"))
+                rec = watcher.pick_apply(pid, sel, act)
+                self.send_response(303)
+                self.send_header("Location", f"/?id={rec['id']}#pick" if rec else "/")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
             if self.path != "/frame":
                 return self._json(404, {"error": "not found"})
             try:
@@ -749,13 +918,18 @@ def make_handler(watcher: Watcher):
                     self.send_header("Content-Length", "0")
                     self.end_headers()
                     return
-                body = control_page(watcher).encode("utf-8")
+                from urllib.parse import parse_qs
+                pq = {k: v[-1] for k, v in parse_qs(qs).items()}
+                pid = int(pq["id"]) if pq.get("id", "").isdigit() else None
+                body = control_page(watcher, pid).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.send_header("Content-Length", str(len(body)))
                 self.end_headers()
                 self.wfile.write(body)
                 return
+            if self.path == "/pick_latest":
+                return self._json(200, {"id": watcher.pick_latest_id()})
             if self.path == "/health":
                 return self._json(200, {"ok": True, "frames": watcher.frames})
             if self.path == "/snap":

@@ -47,6 +47,21 @@ object PoeTv {
     private val _status = MutableStateFlow(Status())
     val status: StateFlow<Status> = _status
 
+    /** Món vừa tra (đồ không phải unique) cho màn "Chọn dòng để tra": bảng dòng, giá tự tra, link trang trade. */
+    class PickRecord(
+        val id: Int, val at: String, val item: Item, val panel: PickPanel, val auto: List<String>, val autoUrl: String?,
+    )
+
+    /** Kết quả TRA LẠI của món [id]: chỉ hiện trên điện thoại, không lên TV, không ghi vào giá đã nhớ của TV. */
+    class PickResult(val id: Int, val busy: Boolean, val lines: List<String>, val url: String?)
+
+    private val _pick = MutableStateFlow<PickRecord?>(null)
+    val pick: StateFlow<PickRecord?> = _pick
+    private val _pickResult = MutableStateFlow<PickResult?>(null)
+    val pickResult: StateFlow<PickResult?> = _pickResult
+    private var pickSeq = 0
+    private var pickWorker: ExecutorService? = null
+
     /** Bản gọn: không tải quảng cáo, không hiện chữ ký/logo của nhà phát triển. */
     val NO_PROMO = true
     /** Bản gọn: không gom và gửi câu phụ đề đọc được lên máy chủ chung của nhà phát triển. */
@@ -182,6 +197,35 @@ object PoeTv {
             _status.value = _status.value.copy(strict = ns, byBase = nb, allLines = nl)
         }
         save(context)
+    }
+
+    /**
+     * TRA LẠI theo các dòng đã chọn trên màn "Chọn dòng để tra" (luồng riêng, chạy được cả khi chưa kết nối PS5).
+     * Kết quả chỉ ở [pickResult]: không gửi lên TV, không ghi vào giá đã nhớ.
+     */
+    fun retry(rec: PickRecord, sel: PickSel) {
+        val ex = synchronized(lock) {
+            pickWorker ?: Executors.newSingleThreadExecutor { r -> Thread(r, "poetv-pick").apply { isDaemon = true } }
+                .also { pickWorker = it }
+        }
+        _pickResult.value = PickResult(rec.id, true, listOf("Đang tra…"), null)
+        ex.execute {
+            val game = rec.panel.game
+            val out = try {
+                val trade = synchronized(lock) { games[game]?.second } ?: throw IllegalStateException("Chưa nạp dữ liệu ${GAME_NAME[game]}")
+                val (q, _) = Pick.build(rec.item, rec.panel, sel)
+                val res = trade.search(q)
+                val rates = if (res.listings.isEmpty()) null else try { trade.rates() } catch (e: Exception) { null }
+                PickResult(rec.id, false,
+                    PriceBox.priceLines(rec.item.title, res.total, res.listings, emptyList(), null, rates, game).drop(1), res.url)
+            } catch (e: Trade.RateLimited) {
+                PickResult(rec.id, false, listOf("Trade API bận, chờ ${e.waitSeconds.toInt() + 1} giây rồi bấm lại"), null)
+            } catch (e: Exception) {
+                Log.w(TAG, "retry", e)
+                PickResult(rec.id, false, listOf("Lỗi tra giá", (e.message ?: e.javaClass.simpleName).take(120)), null)
+            }
+            _pickResult.value = out
+        }
     }
 
     // ---------------- khung hình (luồng giải mã) ----------------
@@ -348,6 +392,16 @@ object PoeTv {
                 }
                 val rates = if (res.listings.isEmpty()) null else try { trade.rates() } catch (e: Exception) {
                     null        // không có tỉ giá: ô giá hiện giá phổ biến như cũ
+                }
+                try {
+                    Pick.panel(item, j.game, j.strict, j.byBase, j.allLines, q)?.let { pn ->
+                        val auto = PriceBox.priceLines(item.title, res.total, res.listings, emptyList(), null, rates, j.game).drop(1)
+                        val at = java.text.SimpleDateFormat("HH:mm", java.util.Locale.ROOT).format(java.util.Date())
+                        val id = synchronized(lock) { ++pickSeq }
+                        _pick.value = PickRecord(id, at, item, pn, auto, res.url)
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "pick", e)       // bảng chọn dòng lỗi không được làm hỏng ô giá trên TV
                 }
                 PriceBox.priceLines(title, res.total, res.listings, notes, Query.labels(q, item), rates, j.game).also { l ->
                     // đã đổi chế độ lọc / game trong lúc tra: giá này của chế độ cũ, không nhớ

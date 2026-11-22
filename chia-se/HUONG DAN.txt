@@ -40,6 +40,8 @@ CHƠI
   "Base: MỌI BASE / ĐÚNG BASE": so với mọi base cùng loại đồ hay chỉ đúng base này (đồ trắng luôn đúng base);
   "Dòng: CHÍNH / TẤT CẢ": chỉ các dòng chính (máu, kháng, thuộc tính, mod quan trọng) hay mọi dòng; TẤT CẢ mà quá
   ít món khớp thì tự nới bớt 1–2 dòng.
+- Tự chọn dòng: cũng trên trang điều khiển, khung "Món vừa tra" (món không phải unique vừa tra): chọn/bỏ dòng, sửa
+  mức "≥", chỉnh "Cần đủ … dòng", bấm TRA LẠI. Kết quả chỉ hiện trên trang; TV vẫn hiện giá tự tra.
 - Ô giá: tên món; Min (rẻ nhất); ≈ giá ước tính (khoảng giá); Tin cậy cao/vừa/thấp; số món đang bán; các dòng đã
   dùng để lọc.
 - Tra giá: mở túi đồ / stash / cửa sổ mua bán, đưa con trỏ vào món, chờ một chút: cạnh tooltip hiện

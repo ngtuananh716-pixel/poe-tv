@@ -15,9 +15,9 @@ object Query {
     const val MIN_SCORE = 95.0    // dòng OCR khớp dưới mức này coi là chưa chắc, không đưa vào bộ lọc
 
     // Dữ liệu PoE2 ghi mod không có dấu "+" ở đầu: so khớp bỏ dấu "+".
-    private fun k(ref: String) = ref.replace("+", "")
+    internal fun k(ref: String) = ref.replace("+", "")
 
-    private val RES: Map<String, Pair<Int, Boolean>> = mapOf(   // mod kháng → (số loại kháng nguyên tố, có kháng chaos)
+    internal val RES: Map<String, Pair<Int, Boolean>> = mapOf(   // mod kháng → (số loại kháng nguyên tố, có kháng chaos)
         "+#% to all Elemental Resistances" to (3 to false),
         "+#% to All Resistances" to (3 to true),
         "+#% to Fire Resistance" to (1 to false), "+#% to Cold Resistance" to (1 to false),
@@ -28,12 +28,12 @@ object Query {
         "+#% to Fire and Chaos Resistances" to (1 to true), "+#% to Cold and Chaos Resistances" to (1 to true),
         "+#% to Lightning and Chaos Resistances" to (1 to true),
     ).mapKeys { k(it.key) }
-    private val ATTR: Map<String, String> = mapOf(
+    internal val ATTR: Map<String, String> = mapOf(
         "+# to Strength" to "str", "+# to Dexterity" to "dex", "+# to Intelligence" to "int",
         "+# to all Attributes" to "all", "+# to Strength and Dexterity" to "str dex",
         "+# to Strength and Intelligence" to "str int", "+# to Dexterity and Intelligence" to "dex int",
     ).mapKeys { k(it.key) }
-    private val PSEUDO = mapOf(
+    internal val PSEUDO = mapOf(
         "life" to "pseudo.pseudo_total_life", "es" to "pseudo.pseudo_total_energy_shield",
         "mana" to "pseudo.pseudo_total_mana", "ele_res" to "pseudo.pseudo_total_elemental_resistance",
         "chaos_res" to "pseudo.pseudo_total_chaos_resistance", "str" to "pseudo.pseudo_total_strength",
@@ -44,7 +44,7 @@ object Query {
      * Mod quan trọng: (chuỗi nhận ra trong câu mẫu, nhãn ngắn hiện trên TV). Mặc định (Dòng: CHÍNH) chỉ lọc các mod này
      * cùng các tổng (máu, ES, kháng, thuộc tính); Dòng: TẤT CẢ lọc thêm mọi dòng explicit đọc được.
      */
-    private val IMPORTANT_LABEL = listOf(
+    internal val IMPORTANT_LABEL = listOf(
         "Movement Speed" to "Tốc chạy", "to Level of" to "+Cấp skill", "Critical Strike Multiplier" to "Crit multi",
         "Critical Damage Bonus" to "Crit dmg", "increased maximum Life" to "%Máu",
         "increased maximum Energy Shield" to "%ES", "Spell Damage" to "Spell dmg",
@@ -56,7 +56,7 @@ object Query {
     private val ELEMENTS = listOf("Physical" to "Phys", "Fire" to "Fire", "Cold" to "Cold", "Lightning" to "Lightning",
         "Chaos" to "Chaos")
     // Nhãn ngắn của các bộ lọc, hiện dưới giá trên TV ("• Máu ≥ 94"); như query.labels của bản Python.
-    private val PSEUDO_LABEL = mapOf(
+    internal val PSEUDO_LABEL = mapOf(
         "pseudo.pseudo_total_life" to "Máu", "pseudo.pseudo_total_energy_shield" to "ES", "pseudo.pseudo_total_mana" to "Mana",
         "pseudo.pseudo_total_elemental_resistance" to "K.NT", "pseudo.pseudo_total_chaos_resistance" to "K.Chaos",
         "pseudo.pseudo_total_strength" to "Str", "pseudo.pseudo_total_dexterity" to "Dex", "pseudo.pseudo_total_intelligence" to "Int",
@@ -66,9 +66,9 @@ object Query {
     /** Dòng đã gộp vào tổng (máu, ES cộng thẳng; kháng, thuộc tính xét riêng): Dòng: TẤT CẢ không lọc riêng lần nữa. */
     private val FOLDED = setOf("# to maximum Life", "# to maximum Energy Shield")
     /** Dòng local đã nằm trong DPS (vũ khí) hay Giáp/Né/ES (giáp): Dòng: TẤT CẢ không lọc riêng. */
-    private val LOCAL_WEAPON = Regex("^(#% increased Physical Damage|Adds # to # (Physical|Fire|Cold|Lightning|Chaos) Damage)$",
+    internal val LOCAL_WEAPON = Regex("^(#% increased Physical Damage|Adds # to # (Physical|Fire|Cold|Lightning|Chaos) Damage)$",
         RegexOption.IGNORE_CASE)
-    private val LOCAL_ARMOUR = Regex("^(# to (Armour|Evasion Rating|maximum Energy Shield)|" +
+    internal val LOCAL_ARMOUR = Regex("^(# to (Armour|Evasion Rating|maximum Energy Shield)|" +
         "#% increased (Armour|Evasion Rating|Energy Shield)( and (Armour|Evasion|Energy Shield))?)$", RegexOption.IGNORE_CASE)
     private val SHORT_DROP = setOf("increased", "to", "of", "the", "Adds", "all", "with", "Items", "found", "damage", "Damage")
 
