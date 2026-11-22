@@ -22,9 +22,9 @@ CÀI (lần đầu)
    - "Tra giá: BẬT/TẮT" để bật tắt;
    - "Game: PoE1/PoE2" để chọn game đang chơi;
    - hàng nút chế độ lọc (bấm là đổi, món đang mở được tra lại ngay):
-     "Lọc: RỘNG (90%) / CHẶT (100%)": tìm món có chỉ số từ 90% hay từ đúng 100% món của mình;
-     "Base: MỌI BASE / ĐÚNG BASE": so với mọi base cùng loại đồ hay chỉ đúng base này (đồ trắng luôn đúng base);
-     "Dòng: CHÍNH / TẤT CẢ": chỉ các dòng chính (máu, kháng, thuộc tính, mod quan trọng) hay mọi dòng; TẤT CẢ mà quá
+     Lọc RỘNG 90% / CHẶT 100%: tìm món có chỉ số từ 90% hay từ đúng 100% món của mình;
+     Base MỌI BASE / ĐÚNG BASE: so với mọi base cùng loại đồ hay chỉ đúng base này (đồ trắng luôn đúng base);
+     Dòng CHÍNH / TẤT CẢ: chỉ các dòng chính (máu, kháng, thuộc tính, mod quan trọng) hay mọi dòng; TẤT CẢ mà quá
      ít món khớp thì tự nới bớt 1–2 dòng (ô giá ghi "! Ít món khớp … → tự nới").
    Bấm nút bắt đầu (Start translation) để kết nối PS5.
 
