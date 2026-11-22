@@ -21,3 +21,8 @@ thay 3 DLL, cài Python 3.13 + thư viện, tạo lối tắt. Cấu trúc gói:
 **Bản Mac** (thử nghiệm): `couchsubs-patch-mac/` (cầu nối Swift, 4 nút, dịch tiếng Việt, tắt tự cập nhật) +
 `.github/workflows/build-mac.yml` (macOS runner, ký ad-hoc, ghép gói TV/trợ giúp từ bản Mac chính thức cùng phiên bản,
 đăng Release `poe-tv-mac.zip`). Bộ cài Mac: `chia-se-mac/` (Python 3.13 qua uv, cài vào `~/poe_tv`).
+
+**Bản Android** (thử nghiệm, chỉ tra giá): `couchsubs-patch-android/` (lõi tra giá viết lại bằng Kotlin, OCR ML Kit,
+chạy ngay trên điện thoại, không cần laptop) + `.github/workflows/build-android.yml` (đăng Release tag `android`).
+Cài: mở https://github.com/ngtuananh716-pixel/poe-tv/releases/download/android/poe-tv-android.apk trên điện thoại;
+hướng dẫn ở `chia-se-android/HUONG DAN.txt`.
