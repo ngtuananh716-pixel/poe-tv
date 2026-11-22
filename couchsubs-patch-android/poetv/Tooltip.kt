@@ -16,10 +16,10 @@ class Tooltip(val box: IntArray, val header: List<String>, val lines: List<Line>
 object TooltipFinder {
     /**
      * Dòng gợi ý nút ở đáy màn hình chỉ có khi mở túi đồ / stash / cửa sổ bán đồ (bản console): PoE1 "Navigate",
-     * "Compare / More Actions", "Reorder Tabs"; PoE2 "Price Check", "Manage Sockets", "Toggle Weapon Set".
-     * Không dùng "Pick Up" (có cả khi nhặt đồ dưới đất).
+     * "Compare / More Actions", "Reorder Tabs"; PoE2 "Price Check", "Manage Sockets", "Toggle Weapon Set"; cửa sổ
+     * Ritual PoE2 "Offer Tribute to the King" (theo ảnh bản PC). Không dùng "Pick Up" (có cả khi nhặt đồ dưới đất).
      */
-    val UI_MARKERS = Regex("NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS|PRICECHECK|MANAGESOCKETS|TOGGLEWEAPONSET")
+    val UI_MARKERS = Regex("NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS|PRICECHECK|MANAGESOCKETS|TOGGLEWEAPONSET|OFFERTRIBUTE")
     /** Chỉ đọc phần màn hình từ 70% chiều cao trở xuống để tìm dòng gợi ý đó. */
     const val UI_STRIP = 0.70
     /**

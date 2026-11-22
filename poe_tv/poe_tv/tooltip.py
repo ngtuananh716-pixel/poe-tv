@@ -38,8 +38,9 @@ def needs_fine(header: list[str], data: Data) -> bool:
 
 # Dòng gợi ý nút ở đáy màn hình chỉ có khi mở túi đồ / stash / cửa sổ bán đồ (bản console): PoE1 "Navigate",
 # "Compare / More Actions", "Reorder Tabs"; PoE2 (ảnh TV 22/11/2026) "Price Check", "Manage Sockets", "Toggle Weapon Set".
+# Cửa sổ Ritual PoE2: nút "Offer Tribute to the King" ở đáy (ảnh bản PC 22/11/2026; bản PS5 chưa có ảnh).
 # Lúc đang đánh quái không có, nên đồ dưới đất không bị tra giá. Không dùng "Pick Up" (có cả khi nhặt đồ dưới đất).
-UI_MARKERS = re.compile(r"NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS|PRICECHECK|MANAGESOCKETS|TOGGLEWEAPONSET")
+UI_MARKERS = re.compile(r"NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS|PRICECHECK|MANAGESOCKETS|TOGGLEWEAPONSET|OFFERTRIBUTE")
 UI_STRIP = 0.70        # chỉ đọc phần màn hình từ 70% chiều cao trở xuống (dòng gợi ý nằm ở đáy)
 # PoE2: rê vào đồ đang mặc không có sockets thì dòng gợi ý chỉ còn "Pick Up" (+ "Drop"), không có chữ nào ở trên.
 # "Pick Up" có thể có cả lúc nhặt đồ dưới đất nên chưa đủ: khi thấy nó thì đọc thêm dải trên cùng tìm nhãn "INVENTORY"

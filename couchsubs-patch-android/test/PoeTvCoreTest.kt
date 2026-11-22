@@ -38,6 +38,12 @@ class PoeTvCoreTest {
         return d[a.length][b.length]
     }
 
+    @Test fun ritualWindowOpensGate() {
+        // dòng OCR thật ở đáy cửa sổ Ritual PoE2 (ảnh bản PC)
+        val l = listOf(Line("OFFERTRIBUTETOTHEKING", 0.0, 0.0, 10.0, 10.0), Line("866", 0.0, 0.0, 10.0, 10.0))
+        assertEquals(listOf("OFFERTRIBUTETOTHEKING"), TooltipFinder.inventoryMarks(l))
+    }
+
     @Test fun gameplayHintsDoNotOpenGate() {
         val l = listOf(Line("X Pick Up", 0.0, 0.0, 10.0, 10.0), Line("Toggle Chat", 0.0, 0.0, 10.0, 10.0))
         assertTrue(TooltipFinder.inventoryMarks(l).isEmpty())
