@@ -22,6 +22,13 @@ object TooltipFinder {
     val UI_MARKERS = Regex("NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS|PRICECHECK|MANAGESOCKETS|TOGGLEWEAPONSET")
     /** Chỉ đọc phần màn hình từ 70% chiều cao trở xuống để tìm dòng gợi ý đó. */
     const val UI_STRIP = 0.70
+    /**
+     * PoE2: rê vào đồ đang mặc không có sockets thì dòng gợi ý chỉ còn "Pick Up" (+ "Drop"). "Pick Up" có thể có cả lúc
+     * nhặt đồ dưới đất nên chưa đủ: thấy nó thì đọc thêm dải trên cùng tìm nhãn tab "INVENTORY"/"STASH".
+     */
+    val UI_WEAK = Regex("PICKUP|DROP")
+    val UI_TITLE = Regex("INVENTORY|STASH")
+    const val TITLE_STRIP = 0.30
 
     fun upperLetters(s: String): String {
         val sb = StringBuilder(s.length)
@@ -32,6 +39,13 @@ object TooltipFinder {
     /** Các chữ của dòng gợi ý nút tìm thấy trong dải đáy (rỗng = đang chơi, không mở túi đồ). */
     fun inventoryMarks(stripLines: List<Line>): List<String> =
         stripLines.map { it.text }.filter { UI_MARKERS.containsMatchIn(upperLetters(it)) }
+
+    /** Dải đáy chỉ có gợi ý yếu ("Pick Up", "Drop"): cần xem thêm nhãn tab ở dải trên. */
+    fun weakHint(stripLines: List<Line>): Boolean = stripLines.any { UI_WEAK.containsMatchIn(upperLetters(it.text)) }
+
+    /** Nhãn tab "INVENTORY"/"STASH" trong dải trên cùng. */
+    fun titleMarks(topLines: List<Line>): List<String> =
+        topLines.map { it.text }.filter { UI_TITLE.containsMatchIn(upperLetters(it)) }
 
     fun unidentified(tt: Tooltip): Boolean = tt.lines.any { "UNIDENTIFIED" in upperLetters(it.text) }
 

@@ -10,6 +10,10 @@
     "Navigate",
     "Compare/ MoreActions"
    ],
+   "weak": true,
+   "titles": [
+    "STASH OPTIONS ("
+   ],
    "lines": [
     {
      "text": "R2",
@@ -355,6 +359,10 @@
     "Navigate",
     "(3) Compare / More Actions",
     "RReorderTabs"
+   ],
+   "weak": true,
+   "titles": [
+    "STASH OPTIONS R3"
    ],
    "lines": [
     {
@@ -742,6 +750,10 @@
     "R Reorder Tabs",
     "Navigate",
     "Compare / More Actions"
+   ],
+   "weak": true,
+   "titles": [
+    "STASH OPTIONS ("
    ],
    "lines": [
     {
@@ -1183,6 +1195,8 @@
     "Price Check",
     "Manage Sockets"
    ],
+   "weak": true,
+   "titles": [],
    "lines": [
     {
      "text": "Canal Hideout",
@@ -1469,6 +1483,589 @@
       ],
       "name": "The Vertex",
       "type": "Tribal Mask"
+     },
+     "sort": {
+      "price": "asc"
+     }
+    },
+    "notes": []
+   }
+  },
+  {
+   "name": "poe2_gloves",
+   "game": "poe2",
+   "width": 1659,
+   "height": 2212,
+   "marks": [
+    "Manage Sockets"
+   ],
+   "weak": true,
+   "titles": [
+    "INVENTORY"
+   ],
+   "lines": [
+    {
+     "text": "R1",
+     "x0": 874.4312133789062,
+     "y0": 483.875,
+     "x1": 907.265625,
+     "y1": 504.61248779296875
+    },
+    {
+     "text": "INVENTORY",
+     "x0": 473.5062255859375,
+     "y0": 542.6312255859375,
+     "x1": 594.4749755859375,
+     "y1": 565.0968627929688
+    },
+    {
+     "text": "GLYPH TOUCH",
+     "x0": 919.3624877929688,
+     "y0": 546.0874633789062,
+     "x1": 1052.4281005859375,
+     "y1": 570.28125
+    },
+    {
+     "text": "DETAILED MITTS",
+     "x0": 914.1781005859375,
+     "y0": 563.3687133789062,
+     "x1": 1054.15625,
+     "y1": 591.0187377929688
+    },
+    {
+     "text": "GLOVES",
+     "x0": 953.9249877929688,
+     "y0": 596.203125,
+     "x1": 1016.137451171875,
+     "y1": 620.3968505859375
+    },
+    {
+     "text": "QUALITY:+20%",
+     "x0": 929.731201171875,
+     "y0": 616.9406127929688,
+     "x1": 1043.7874755859375,
+     "y1": 641.1343383789062
+    },
+    {
+     "text": "ARMOUR:589",
+     "x0": 933.1875,
+     "y0": 635.9500122070312,
+     "x1": 1038.6031494140625,
+     "y1": 660.1437377929688
+    },
+    {
+     "text": "REQUIRES:LEVEL56",
+     "x0": 910.7218627929688,
+     "y0": 656.6875,
+     "x1": 1059.340576171875,
+     "y1": 691.25
+    },
+    {
+     "text": "25%INCREASEDACCURACYRATING",
+     "x0": 853.6937255859375,
+     "y0": 684.3374633789062,
+     "x1": 1111.184326171875,
+     "y1": 715.4437255859375
+    },
+    {
+     "text": "+178TOARMOUR",
+     "x0": 917.6343383789062,
+     "y0": 711.9874877929688,
+     "x1": 1048.9718017578125,
+     "y1": 739.637451171875
+    },
+    {
+     "text": "ADDS1TO46 LICHTNING DAMAGE TO ATTACKS",
+     "x0": 813.9468383789062,
+     "y0": 729.2687377929688,
+     "x1": 1154.387451171875,
+     "y1": 762.1030883789062
+    },
+    {
+     "text": "18%INCREASED RARITYOFITEMS FOUND",
+     "x0": 838.140625,
+     "y0": 751.734375,
+     "x1": 1130.1937255859375,
+     "y1": 777.65625
+    },
+    {
+     "text": "+35%TOCOLDRESISTANCE",
+     "x0": 891.7124633789062,
+     "y0": 774.199951171875,
+     "x1": 1080.078125,
+     "y1": 796.6655883789062
+    },
+    {
+     "text": "+40%TOLIGHTNINGRESISTANCE",
+     "x0": 864.0625,
+     "y0": 789.7531127929688,
+     "x1": 1106.0,
+     "y1": 817.403076171875
+    },
+    {
+     "text": "67%INCREASEDARMOUR",
+     "x0": 889.984375,
+     "y0": 808.762451171875,
+     "x1": 1078.3499755859375,
+     "y1": 836.4124755859375
+    },
+    {
+     "text": "EQUIPPED",
+     "x0": 952.1968383789062,
+     "y0": 839.8687133789062,
+     "x1": 1021.3218383789062,
+     "y1": 858.8781127929688
+    },
+    {
+     "text": "OUnequip",
+     "x0": 936.6437377929688,
+     "y0": 865.7905883789062,
+     "x1": 1045.515625,
+     "y1": 898.625
+    },
+    {
+     "text": "Inspect",
+     "x0": 1176.8531494140625,
+     "y0": 908.9937133789062,
+     "x1": 1280.5406494140625,
+     "y1": 938.371826171875
+    },
+    {
+     "text": "7385951",
+     "x0": 1100.8155517578125,
+     "y0": 1541.4874267578125,
+     "x1": 1166.484375,
+     "y1": 1560.496826171875
+    },
+    {
+     "text": "PickUp",
+     "x0": 375.00311279296875,
+     "y0": 1641.71875,
+     "x1": 485.6031188964844,
+     "y1": 1671.0968017578125
+    },
+    {
+     "text": "Manage Sockets",
+     "x0": 546.0874633789062,
+     "y0": 1646.903076171875,
+     "x1": 691.25,
+     "y1": 1669.36865234375
+    }
+   ],
+   "expect": {
+    "box": [
+     780,
+     523,
+     1187,
+     920
+    ],
+    "header": [
+     "GLYPH TOUCH",
+     "DETAILED MITTS"
+    ],
+    "rarity": "Rare",
+    "name": "Glyph Touch",
+    "base": "Detailed Mitts",
+    "category": "Gloves",
+    "title": "Detailed Mitts",
+    "mods": [
+     {
+      "ref": "#% increased Accuracy Rating",
+      "values": [
+       25.0
+      ],
+      "kind": "implicit"
+     },
+     {
+      "ref": "# to Armour",
+      "values": [
+       178.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "Adds # to # Lightning damage to Attacks",
+      "values": [
+       46.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Rarity of Items found",
+      "values": [
+       18.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% to Cold Resistance",
+      "values": [
+       35.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% to Lightning Resistance",
+      "values": [
+       40.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Armour",
+      "values": [
+       67.0
+      ],
+      "kind": "explicit"
+     }
+    ],
+    "props": {
+     "quality": [
+      20.0
+     ],
+     "armour": [
+      589.0
+     ],
+     "requires": [
+      56.0
+     ]
+    },
+    "query": {
+     "query": {
+      "status": {
+       "option": "securable"
+      },
+      "filters": {
+       "type_filters": {
+        "filters": {
+         "rarity": {
+          "option": "nonunique"
+         },
+         "category": {
+          "option": "armour.gloves"
+         }
+        }
+       },
+       "equipment_filters": {
+        "filters": {
+         "ar": {
+          "min": 530
+         }
+        }
+       }
+      },
+      "stats": [
+       {
+        "type": "and",
+        "filters": [
+         {
+          "id": "pseudo.pseudo_total_elemental_resistance",
+          "value": {
+           "min": 67
+          }
+         }
+        ]
+       }
+      ]
+     },
+     "sort": {
+      "price": "asc"
+     }
+    },
+    "notes": [
+     "Dòng đọc chưa chắc, không dùng để lọc: ADDSITO46 LICHTNING DAMAGE TO ATTACKS",
+     "Món không có máu: giá thật nhiều khả năng THẤP hơn các món tương tự tìm được"
+    ]
+   }
+  },
+  {
+   "name": "poe2_belt",
+   "game": "poe2",
+   "width": 1659,
+   "height": 2212,
+   "marks": [],
+   "weak": true,
+   "titles": [
+    "INVENTORY"
+   ],
+   "lines": [
+    {
+     "text": "R1",
+     "x0": 793.2093505859375,
+     "y0": 79.4937515258789,
+     "x1": 826.043701171875,
+     "y1": 100.23124694824219
+    },
+    {
+     "text": "INVENTORY",
+     "x0": 264.4031066894531,
+     "y0": 155.53125,
+     "x1": 421.6624755859375,
+     "y1": 184.90936279296875
+    },
+    {
+     "text": "PoE2·UtilityBelt",
+     "x0": 84.6781234741211,
+     "y0": 912.449951171875,
+     "x1": 394.0124816894531,
+     "y1": 955.653076171875
+    },
+    {
+     "text": "BEHEMOTH TRAP",
+     "x0": 1111.184326171875,
+     "y0": 924.546875,
+     "x1": 1306.4625244140625,
+     "y1": 953.9249877929688
+    },
+    {
+     "text": "UTILITY BELT",
+     "x0": 1138.8343505859375,
+     "y0": 953.9249877929688,
+     "x1": 1282.2686767578125,
+     "y1": 978.1187133789062
+    },
+    {
+     "text": "Re nhat:3 div",
+     "x0": 86.40625,
+     "y0": 959.109375,
+     "x1": 321.4312438964844,
+     "y1": 998.856201171875
+    },
+    {
+     "text": "BELT",
+     "x0": 1185.4937744140625,
+     "y0": 995.3999633789062,
+     "x1": 1237.3375244140625,
+     "y1": 1021.3218383789062
+    },
+    {
+     "text": "Phobién:6div·185mon",
+     "x0": 86.40625,
+     "y0": 1004.0405883789062,
+     "x1": 513.2531127929688,
+     "y1": 1043.7874755859375
+    },
+    {
+     "text": "REQUIRES:LEVEL56",
+     "x0": 1118.0968017578125,
+     "y0": 1019.59375,
+     "x1": 1304.734375,
+     "y1": 1048.9718017578125
+    },
+    {
+     "text": "HAS2CHARMSLOTS",
+     "x0": 1112.9124755859375,
+     "y0": 1055.8843994140625,
+     "x1": 1308.1905517578125,
+     "y1": 1083.5343017578125
+    },
+    {
+     "text": "20%OFFLASKRECOVERYAPPLIEDINSTANTLY",
+     "x0": 1005.7687377929688,
+     "y0": 1081.8062744140625,
+     "x1": 1415.3343505859375,
+     "y1": 1111.184326171875
+    },
+    {
+     "text": "+105TOMAXIMUMLIFE",
+     "x0": 1100.8155517578125,
+     "y0": 1118.0968017578125,
+     "x1": 1325.4718017578125,
+     "y1": 1145.746826171875
+    },
+    {
+     "text": "+47%TOCOLDRESISTANCE",
+     "x0": 1085.262451171875,
+     "y0": 1144.0186767578125,
+     "x1": 1339.296875,
+     "y1": 1171.668701171875
+    },
+    {
+     "text": "+41%TO LIGHTNING RESISTANCE",
+     "x0": 1054.15625,
+     "y0": 1166.484375,
+     "x1": 1370.403076171875,
+     "y1": 1197.590576171875
+    },
+    {
+     "text": "97TO135PHYSICALTHORNSDAMAGE",
+     "x0": 1033.418701171875,
+     "y0": 1192.40625,
+     "x1": 1389.4124755859375,
+     "y1": 1223.512451171875
+    },
+    {
+     "text": "+18%TOCOLDANDCHAOSRESISTANCES",
+     "x0": 1021.3218383789062,
+     "y0": 1216.5999755859375,
+     "x1": 1401.5093994140625,
+     "y1": 1247.7061767578125
+    },
+    {
+     "text": "22%INCREASED EXPLICIT RESISTANCE MODIFIER MAGNITUDES",
+     "x0": 922.8187255859375,
+     "y0": 1242.5218505859375,
+     "x1": 1498.2843017578125,
+     "y1": 1275.356201171875
+    },
+    {
+     "text": "OEquip",
+     "x0": 1164.7562255859375,
+     "y0": 1285.7249755859375,
+     "x1": 1271.9000244140625,
+     "y1": 1323.7437744140625
+    },
+    {
+     "text": "Compare",
+     "x0": 1498.2843017578125,
+     "y0": 1339.296875,
+     "x1": 1603.699951171875,
+     "y1": 1368.6749267578125
+    },
+    {
+     "text": "7385951",
+     "x0": 1071.4375,
+     "y0": 1446.4405517578125,
+     "x1": 1185.4937744140625,
+     "y1": 1479.27490234375
+    },
+    {
+     "text": "ADrop",
+     "x0": 387.0999755859375,
+     "y0": 1588.1468505859375,
+     "x1": 497.6999816894531,
+     "y1": 1627.8936767578125
+    },
+    {
+     "text": "PickUp",
+     "x0": 216.015625,
+     "y0": 1591.60302734375,
+     "x1": 355.9937438964844,
+     "y1": 1626.16552734375
+    }
+   ],
+   "expect": {
+    "box": [
+     889,
+     902,
+     1531,
+     1345
+    ],
+    "header": [
+     "BEHEMOTH TRAP",
+     "UTILITY BELT"
+    ],
+    "rarity": "Rare",
+    "name": "Behemoth Trap",
+    "base": "Utility Belt",
+    "category": "Belt",
+    "title": "Utility Belt",
+    "mods": [
+     {
+      "ref": "Has # Charm Slot",
+      "values": [
+       2.0
+      ],
+      "kind": "implicit"
+     },
+     {
+      "ref": "#% of Flask Recovery applied Instantly",
+      "values": [
+       20.0
+      ],
+      "kind": "implicit"
+     },
+     {
+      "ref": "# to maximum Life",
+      "values": [
+       105.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% to Cold Resistance",
+      "values": [
+       47.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% to Lightning Resistance",
+      "values": [
+       41.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "# to # Physical Thorns damage",
+      "values": [
+       97.0,
+       135.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% to Cold and Chaos Resistances",
+      "values": [
+       18.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Explicit Resistance Modifier magnitudes",
+      "values": [
+       22.0
+      ],
+      "kind": "explicit"
+     }
+    ],
+    "props": {
+     "requires": [
+      56.0
+     ]
+    },
+    "query": {
+     "query": {
+      "status": {
+       "option": "securable"
+      },
+      "filters": {
+       "type_filters": {
+        "filters": {
+         "rarity": {
+          "option": "nonunique"
+         },
+         "category": {
+          "option": "accessory.belt"
+         }
+        }
+       }
+      },
+      "stats": [
+       {
+        "type": "and",
+        "filters": [
+         {
+          "id": "pseudo.pseudo_total_life",
+          "value": {
+           "min": 94
+          }
+         },
+         {
+          "id": "pseudo.pseudo_total_elemental_resistance",
+          "value": {
+           "min": 95
+          }
+         },
+         {
+          "id": "pseudo.pseudo_total_chaos_resistance",
+          "value": {
+           "min": 16
+          }
+         }
+        ]
+       }
+      ]
      },
      "sort": {
       "price": "asc"

@@ -89,7 +89,11 @@ class PoeTvCoreTest {
             // cổng túi đồ: chữ gợi ý nút trong dải đáy màn hình (PoE1 và PoE2)
             val strip = lines.filter { it.y0 >= TooltipFinder.UI_STRIP * c.getInt("height") }
             assertEquals("$name marks", c.getJSONArray("marks").toList(), TooltipFinder.inventoryMarks(strip))
-            assertTrue("$name gate", TooltipFinder.inventoryMarks(strip).isNotEmpty())
+            assertEquals("$name weak", c.getBoolean("weak"), TooltipFinder.weakHint(strip))
+            val top = lines.filter { it.y1 <= TooltipFinder.TITLE_STRIP * c.getInt("height") }
+            assertEquals("$name titles", c.getJSONArray("titles").toList(), TooltipFinder.titleMarks(top))
+            assertTrue("$name gate", TooltipFinder.inventoryMarks(strip).isNotEmpty() ||
+                (TooltipFinder.weakHint(strip) && TooltipFinder.titleMarks(top).isNotEmpty()))
             val tt = TooltipFinder.find(lines, c.getInt("width"), c.getInt("height"), d)
             val e = c.optJSONObject("expect")
             if (e == null) { assertEquals(name, null, tt); continue }

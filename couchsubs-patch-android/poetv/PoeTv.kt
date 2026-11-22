@@ -235,7 +235,13 @@ object PoeTv {
             // 1) Cổng túi đồ: đọc riêng dải đáy, tìm dòng gợi ý nút "Navigate / Compare / Reorder Tabs".
             val y0 = (H * TooltipFinder.UI_STRIP).toInt() and 1.inv()
             val strip = px.nv21.copyOfRange(y0 * W, H * W)
-            val marks = TooltipFinder.inventoryMarks(o.read(strip, W, H - y0, 0, y0))
+            val stripLines = o.read(strip, W, H - y0, 0, y0)
+            var marks = TooltipFinder.inventoryMarks(stripLines)
+            if (marks.isEmpty() && TooltipFinder.weakHint(stripLines)) {
+                // PoE2, đồ đang mặc không có sockets: chỉ có "Pick Up" → xem nhãn "INVENTORY" ở dải trên cùng
+                val th = (H * TooltipFinder.TITLE_STRIP).toInt() and 1.inv()
+                marks = TooltipFinder.titleMarks(o.read(px.nv21.copyOfRange(0, th * W), W, th))
+            }
             if (marks.isEmpty()) {
                 uiClosed = true
                 note("Chưa mở túi đồ / stash (đang chơi)")

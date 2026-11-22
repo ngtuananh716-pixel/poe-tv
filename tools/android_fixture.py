@@ -13,9 +13,10 @@ cases = []
 # nhân vật). Truyền đường dẫn ảnh đó ở tham số thứ 2 (không có thì giữ nguyên ca PoE2 cũ trong fixture).
 SAMPLES = [("foe_thread", "poe1", "mau/foe_thread.jpg"), ("vortex_call", "poe1", "mau/vortex_call.jpg"),
            ("wildslash", "poe1", "mau/wildslash.jpg")]
-if len(_sys.argv) > 2:
-    SAMPLES.append(("poe2_vertex", "poe2", _sys.argv[2]))
-PRIVATE_NAMES = {"wild", "wlld"}          # tên nhân vật trên ảnh TV (OCR có thể đọc sai) và dòng cấp độ
+for i, nm in enumerate(["poe2_vertex", "poe2_gloves", "poe2_belt"]):
+    if len(_sys.argv) > 2 + i:
+        SAMPLES.append((nm, "poe2", _sys.argv[2 + i]))
+PRIVATE_NAMES = {"wild", "wlld", "qimah", "qimal"}          # tên nhân vật trên ảnh TV (OCR có thể đọc sai) và dòng cấp độ
 def private(text):
     k = re.sub(r"[^a-z0-9]", "", text.lower())
     return k in PRIVATE_NAMES or re.fullmatch(r"lvl\d+", k) is not None
@@ -28,9 +29,11 @@ for name, game, path in SAMPLES:
     ocr.read_fast = lambda _img, det_max=1280, _l=lines: _l       # tìm tooltip trên đúng các dòng đã lọc
     tt = tooltip.find(img, D)
     ocr.read_fast = _orig
-    marks = [l.text for l in lines if l.y0 >= tooltip.UI_STRIP * H
-             and tooltip.UI_MARKERS.search(re.sub(r"[^A-Z]", "", l.text.upper()))]
-    case = {"name": name, "game": game, "width": W, "height": H, "marks": marks,
+    key = lambda t: re.sub(r"[^A-Z]", "", t.upper())
+    marks = [l.text for l in lines if l.y0 >= tooltip.UI_STRIP * H and tooltip.UI_MARKERS.search(key(l.text))]
+    weak = any(l.y0 >= tooltip.UI_STRIP * H and tooltip.UI_WEAK.search(key(l.text)) for l in lines)
+    titles = [l.text for l in lines if l.y1 <= tooltip.TITLE_STRIP * H and tooltip.UI_TITLE.search(key(l.text))]
+    case = {"name": name, "game": game, "width": W, "height": H, "marks": marks, "weak": weak, "titles": titles,
             "lines": [{"text": l.text, "x0": l.x0, "y0": l.y0, "x1": l.x1, "y1": l.y1} for l in lines]}
     if tt:
         it = parse.parse(tt.header, tt.lines, D)

@@ -41,14 +41,27 @@ def needs_fine(header: list[str], data: Data) -> bool:
 # Lúc đang đánh quái không có, nên đồ dưới đất không bị tra giá. Không dùng "Pick Up" (có cả khi nhặt đồ dưới đất).
 UI_MARKERS = re.compile(r"NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS|PRICECHECK|MANAGESOCKETS|TOGGLEWEAPONSET")
 UI_STRIP = 0.70        # chỉ đọc phần màn hình từ 70% chiều cao trở xuống (dòng gợi ý nằm ở đáy)
+# PoE2: rê vào đồ đang mặc không có sockets thì dòng gợi ý chỉ còn "Pick Up" (+ "Drop"), không có chữ nào ở trên.
+# "Pick Up" có thể có cả lúc nhặt đồ dưới đất nên chưa đủ: khi thấy nó thì đọc thêm dải trên cùng tìm nhãn "INVENTORY"
+# (PoE2 hiện nhãn tab đang mở dưới thanh L1/R1), chỉ khi đó mới coi là mở túi đồ.
+UI_WEAK = re.compile(r"PICKUP|DROP")
+UI_TITLE = re.compile(r"INVENTORY|STASH")
+TITLE_STRIP = 0.30     # dải trên cùng để tìm nhãn tab
+
+
+def _key(text: str) -> str:
+    return re.sub(r"[^A-Z]", "", text.upper())
 
 
 def inventory_open(img: np.ndarray) -> tuple[bool, list[str]]:
     """Màn hình đang mở túi đồ/stash/cửa sổ mua bán chưa: đọc riêng dải đáy (nhẹ hơn đọc cả màn hình) và tìm chữ
-    của dòng gợi ý nút. Trả (có/không, các chữ khớp)."""
+    của dòng gợi ý nút; chỉ có "Pick Up"/"Drop" thì đọc thêm dải trên tìm nhãn "INVENTORY". Trả (có/không, các chữ khớp)."""
     H = img.shape[0]
-    strip = img[int(H * UI_STRIP):, :]
-    marks = [l.text for l in ocr.read_fast(strip) if UI_MARKERS.search(re.sub(r"[^A-Z]", "", l.text.upper()))]
+    strip = ocr.read_fast(img[int(H * UI_STRIP):, :])
+    marks = [l.text for l in strip if UI_MARKERS.search(_key(l.text))]
+    if not marks and any(UI_WEAK.search(_key(l.text)) for l in strip):
+        top = ocr.read_fast(img[:int(H * TITLE_STRIP), :])
+        marks = [l.text for l in top if UI_TITLE.search(_key(l.text))]
     return bool(marks), marks
 
 
