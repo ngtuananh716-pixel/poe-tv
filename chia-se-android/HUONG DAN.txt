@@ -11,7 +11,11 @@ CÀI (lần đầu)
    Play Protect có thể cảnh báo "ứng dụng chưa được xác minh" → Chi tiết → Vẫn cài đặt.
    Máy Xiaomi (MIUI): MIUI quét bảo mật rồi hiện cảnh báo rủi ro → đợi hết đếm ngược → "Tiếp tục cài đặt".
 3. Mở app "CouchSubs PoE TV" và làm theo các bước thiết lập (giao diện tiếng Anh):
-   - chọn PlayStation, đăng nhập PSN (tài khoản chính đang chơi PoE trên PS5);
+   - chọn PlayStation, đăng nhập PSN bằng TÀI KHOẢN PHỤ (miễn phí, khác tài khoản đang chơi PoE; dùng lại đúng tài
+     khoản phụ đã dùng cho CouchSubs trên laptop). Đăng nhập bằng tài khoản chính thì Remote Play giành phiên chơi và tay cầm.
+     Nếu đăng nhập trong trình duyệt: xong sẽ dừng ở trang remoteplay.dl.playstation.net chỉ có chữ "redirect" (bình
+     thường) → chạm thanh địa chỉ, chép TOÀN BỘ địa chỉ → quay lại app (app tự đọc; không thì dán vào ô "Page address"
+     rồi bấm Next). Mã trong địa chỉ chỉ dùng một lần, hết hạn nhanh, không gửi cho ai;
    - ghép PS5: trên PS5 vào Settings > System > Remote Play > Link Device, nhập mã PIN hiện ra vào điện thoại;
    - chọn nơi hiện chữ: TV (LG), mở app CouchSubs trên TV để TV ghép với điện thoại.
 4. Ở màn hình chính có ô "Tra giá PoE (PoE TV)":
