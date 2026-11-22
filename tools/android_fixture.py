@@ -5,24 +5,43 @@ import json, sys
 import cv2
 from poe_tv import data, ocr, parse, query, tooltip
 
+import re
+import sys as _sys
 D = data.load("poe1")
 cases = []
-for name in ["foe_thread", "vortex_call", "wildslash"]:
-    img = cv2.imread(f"mau/{name}.jpg")
+# ảnh mẫu: (tên, game, đường dẫn). Ảnh PoE2 là ảnh chụp TV của người dùng, không đưa vào kho; chỉ lưu dòng OCR (đã bỏ tên
+# nhân vật). Truyền đường dẫn ảnh đó ở tham số thứ 2 (không có thì giữ nguyên ca PoE2 cũ trong fixture).
+SAMPLES = [("foe_thread", "poe1", "mau/foe_thread.jpg"), ("vortex_call", "poe1", "mau/vortex_call.jpg"),
+           ("wildslash", "poe1", "mau/wildslash.jpg")]
+if len(_sys.argv) > 2:
+    SAMPLES.append(("poe2_vertex", "poe2", _sys.argv[2]))
+PRIVATE_NAMES = {"wild", "wlld"}          # tên nhân vật trên ảnh TV (OCR có thể đọc sai) và dòng cấp độ
+def private(text):
+    k = re.sub(r"[^a-z0-9]", "", text.lower())
+    return k in PRIVATE_NAMES or re.fullmatch(r"lvl\d+", k) is not None
+for name, game, path in SAMPLES:
+    D = data.load(game)
+    img = cv2.imread(path)
     H, W = img.shape[:2]
-    lines = ocr.read_fast(img)
+    lines = [l for l in ocr.read_fast(img) if not private(l.text)]
+    _orig = ocr.read_fast
+    ocr.read_fast = lambda _img, det_max=1280, _l=lines: _l       # tìm tooltip trên đúng các dòng đã lọc
     tt = tooltip.find(img, D)
-    case = {"name": name, "width": W, "height": H,
+    ocr.read_fast = _orig
+    marks = [l.text for l in lines if l.y0 >= tooltip.UI_STRIP * H
+             and tooltip.UI_MARKERS.search(re.sub(r"[^A-Z]", "", l.text.upper()))]
+    case = {"name": name, "game": game, "width": W, "height": H, "marks": marks,
             "lines": [{"text": l.text, "x0": l.x0, "y0": l.y0, "x1": l.x1, "y1": l.y1} for l in lines]}
     if tt:
         it = parse.parse(tt.header, tt.lines, D)
-        q, notes = query.build(it, status="securable", game="poe1")
+        q, notes = query.build(it, status="securable", game=game)
         case["expect"] = {"box": list(tt.box), "header": tt.header, "rarity": it.rarity, "name": it.name, "base": it.base,
                           "category": it.category, "title": it.title,
                           "mods": [{"ref": m.ref, "values": m.values, "kind": m.kind} for m in it.mods],
                           "props": it.props, "query": q, "notes": notes}
     cases.append(case)
 # kiểm riêng phần khớp: mod, tên món
+D = data.load("poe1")
 checks = []
 for t in ["+85 to maximum Lfe", "12% increased Atack Speed", "+1 to Level of all Cold Spel Skill Gems", "+30% to Lightning Resistnce",
           "Adds 5 to 10 Physical Damage to Attack", "random words here today",

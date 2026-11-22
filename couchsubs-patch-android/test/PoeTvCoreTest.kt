@@ -38,6 +38,11 @@ class PoeTvCoreTest {
         return d[a.length][b.length]
     }
 
+    @Test fun gameplayHintsDoNotOpenGate() {
+        val l = listOf(Line("X Pick Up", 0.0, 0.0, 10.0, 10.0), Line("Toggle Chat", 0.0, 0.0, 10.0, 10.0))
+        assertTrue(TooltipFinder.inventoryMarks(l).isEmpty())
+    }
+
     @Test fun names() {
         val d = data("poe1")
         val names = fixture.getJSONArray("names")
@@ -71,15 +76,20 @@ class PoeTvCoreTest {
 
     @Test fun tooltipsParseAndQuery() {
         val cases = fixture.getJSONArray("cases")
-        val d = data("poe1")
         for (i in 0 until cases.length()) {
             val c = cases.getJSONObject(i)
             val name = c.getString("name")
+            val game = c.optString("game", "poe1")
+            val d = data(game)
             val ls = c.getJSONArray("lines")
             val lines = (0 until ls.length()).map { j ->
                 val l = ls.getJSONObject(j)
                 Line(l.getString("text"), l.getDouble("x0"), l.getDouble("y0"), l.getDouble("x1"), l.getDouble("y1"))
             }
+            // cổng túi đồ: chữ gợi ý nút trong dải đáy màn hình (PoE1 và PoE2)
+            val strip = lines.filter { it.y0 >= TooltipFinder.UI_STRIP * c.getInt("height") }
+            assertEquals("$name marks", c.getJSONArray("marks").toList(), TooltipFinder.inventoryMarks(strip))
+            assertTrue("$name gate", TooltipFinder.inventoryMarks(strip).isNotEmpty())
             val tt = TooltipFinder.find(lines, c.getInt("width"), c.getInt("height"), d)
             val e = c.optJSONObject("expect")
             if (e == null) { assertEquals(name, null, tt); continue }
@@ -105,7 +115,7 @@ class PoeTvCoreTest {
             assertEquals(name, props.keySet(), it.props.keys)
             for (k in props.keySet())
                 assertEquals("$name $k", props.getJSONArray(k).toList().map { (it as Number).toDouble() }, it.props[k])
-            val (q, notes) = Query.build(it, "securable", "poe1")
+            val (q, notes) = Query.build(it, "securable", game)
             assertTrue("$name query\n${e.getJSONObject("query")}\n$q", e.getJSONObject("query").similar(q))
             assertEquals(name, e.getJSONArray("notes").toList(), notes)
             val box = PriceBox.place(tt.box, c.getInt("width"), c.getInt("height"), 3)

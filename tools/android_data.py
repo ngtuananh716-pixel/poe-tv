@@ -57,7 +57,7 @@ def main(out_dir):
         doc = {
             "game": game,
             "bases": [[k, v["name"], v["category"]] for k, v in D.bases.items()],
-            "uniques": [[k, v["name"], v["base"]] for k, v in D.uniques.items()],
+            "uniques": [[k, v["name"], v["bases"]] for k, v in D.uniques.items()],
             "gems": [[k, v] for k, v in D.gems.items()],
             "others": [[k, v[0], v[1]] for k, v in D.others.items()],
             "mods": mods,

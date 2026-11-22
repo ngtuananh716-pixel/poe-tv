@@ -74,7 +74,7 @@ class StatMatch:
 class Data:
     game: str = "poe1"
     bases: dict = field(default_factory=dict)       # letters(base) -> {"name", "category"}
-    uniques: dict = field(default_factory=dict)     # letters(name) -> {"name", "base"}
+    uniques: dict = field(default_factory=dict)     # letters(name) -> {"name", "base" (base đầu), "bases" (mọi base)}
     gems: dict = field(default_factory=dict)        # letters(name) -> name
     others: dict = field(default_factory=dict)      # tiền tệ, thẻ bài... letters(name) -> (name, namespace)
     trade_tags: dict = field(default_factory=dict)  # letters(name) -> mã trên sàn trao đổi theo lô (vd "offer", "chaos")
@@ -146,6 +146,12 @@ class Data:
         return sm, score
 
 
+def unique_has_base(u: dict, base: str) -> bool:
+    """Base đọc trên tooltip có phải một base của unique này không."""
+    k = letters(base)
+    return any(letters(b) == k for b in u.get("bases") or [u["base"]])
+
+
 def _category_matches(category: str | None, expected: str) -> bool:
     if category is None:
         return False
@@ -199,7 +205,11 @@ def load(game: str = "poe1") -> Data:
         if ns == "ITEM" and o.get("craftable") and not (game == "poe2" and o["craftable"]["category"] in POE2_NON_EQUIP):
             d.bases[letters(name)] = {"name": name, "category": o["craftable"]["category"]}
         elif ns == "UNIQUE" and o.get("unique"):
-            d.uniques[letters(name)] = {"name": name, "base": o["unique"]["base"]}
+            # Một unique có thể có nhiều base (PoE2: base thường và "Runemastered …"; PoE1: vài jewel/nhẫn): giữ hết,
+            # trước đây chỉ giữ base cuối nên PoE2 nhận nhầm unique thành rare.
+            u = d.uniques.setdefault(letters(name), {"name": name, "base": o["unique"]["base"], "bases": []})
+            if o["unique"]["base"] not in u["bases"]:
+                u["bases"].append(o["unique"]["base"])
         elif ns == "GEM":
             d.gems[letters(name)] = name
         elif ns in ("ITEM", "DIVINATION_CARD", "CAPTURED_BEAST"):

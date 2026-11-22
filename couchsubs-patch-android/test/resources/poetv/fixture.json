@@ -2,8 +2,14 @@
  "cases": [
   {
    "name": "foe_thread",
+   "game": "poe1",
    "width": 2184,
    "height": 1968,
+   "marks": [
+    "R Reorder Tabs",
+    "Navigate",
+    "Compare/ MoreActions"
+   ],
    "lines": [
     {
      "text": "R2",
@@ -342,8 +348,14 @@
   },
   {
    "name": "vortex_call",
+   "game": "poe1",
    "width": 2184,
    "height": 1968,
+   "marks": [
+    "Navigate",
+    "(3) Compare / More Actions",
+    "RReorderTabs"
+   ],
    "lines": [
     {
      "text": "R2",
@@ -723,8 +735,14 @@
   },
   {
    "name": "wildslash",
+   "game": "poe1",
    "width": 2184,
    "height": 1968,
+   "marks": [
+    "R Reorder Tabs",
+    "Navigate",
+    "Compare / More Actions"
+   ],
    "lines": [
     {
      "text": "Press R to customise",
@@ -1153,6 +1171,310 @@
     "notes": [
      "Dòng đọc chưa chắc, không dùng để lọc: CRAFTINT5%EINCREASED ATTACK SPEED WITH MOVEMENT SKILLS"
     ]
+   }
+  },
+  {
+   "name": "poe2_vertex",
+   "game": "poe2",
+   "width": 2212,
+   "height": 1659,
+   "marks": [
+    "Toggle Weapon Set",
+    "Price Check",
+    "Manage Sockets"
+   ],
+   "lines": [
+    {
+     "text": "Canal Hideout",
+     "x0": 1933.7718505859375,
+     "y0": 371.546875,
+     "x1": 2116.953125,
+     "y1": 400.92498779296875
+    },
+    {
+     "text": "INVENTOR",
+     "x0": 1028.234375,
+     "y0": 449.3125,
+     "x1": 1140.5625,
+     "y1": 466.59375
+    },
+    {
+     "text": "THE VERTEX",
+     "x0": 1232.153076171875,
+     "y0": 540.9031372070312,
+     "x1": 1347.9375,
+     "y1": 563.3687133789062
+    },
+    {
+     "text": "TRIBALMASK",
+     "x0": 1226.96875,
+     "y0": 561.640625,
+     "x1": 1346.2093505859375,
+     "y1": 585.8343505859375
+    },
+    {
+     "text": "VAAL HELMET",
+     "x0": 1233.8812255859375,
+     "y0": 594.4749755859375,
+     "x1": 1341.0250244140625,
+     "y1": 616.9406127929688
+    },
+    {
+     "text": "QUALITY:+20%",
+     "x0": 1230.4249267578125,
+     "y0": 615.2124633789062,
+     "x1": 1341.0250244140625,
+     "y1": 639.40625
+    },
+    {
+     "text": "EVASIONRATING:247",
+     "x0": 1204.5030517578125,
+     "y0": 630.765625,
+     "x1": 1366.9468994140625,
+     "y1": 654.9593505859375
+    },
+    {
+     "text": "ENERCY SHIELD:85",
+     "x0": 1214.871826171875,
+     "y0": 653.2312622070312,
+     "x1": 1356.578125,
+     "y1": 675.6968383789062
+    },
+    {
+     "text": "REQUIRES:LEVEL33",
+     "x0": 1211.4156494140625,
+     "y0": 670.5125122070312,
+     "x1": 1382.5,
+     "y1": 711.9874877929688
+    },
+    {
+     "text": "MINIONS HAVE 15% INCREASED MAXIMUM LIFE",
+     "x0": 1112.9124755859375,
+     "y0": 706.8031005859375,
+     "x1": 1460.265625,
+     "y1": 734.453125
+    },
+    {
+     "text": "HAS NO ATTRIBUTE REQUIREMENTS",
+     "x0": 1157.84375,
+     "y0": 732.7249755859375,
+     "x1": 1413.606201171875,
+     "y1": 758.6468505859375
+    },
+    {
+     "text": "137%INCREASED EVASION AND ENERCY SHIELD",
+     "x0": 1114.640625,
+     "y0": 753.4624633789062,
+     "x1": 1458.5374755859375,
+     "y1": 781.1124877929688
+    },
+    {
+     "text": "30%INCREASEDCRITICALHIT CHANCE",
+     "x0": 1145.746826171875,
+     "y0": 775.9281005859375,
+     "x1": 1423.9749755859375,
+     "y1": 798.3937377929688
+    },
+    {
+     "text": "+15%TOCHAOSRESISTANCE",
+     "x0": 1182.0374755859375,
+     "y0": 794.9375,
+     "x1": 1389.4124755859375,
+     "y1": 817.403076171875
+    },
+    {
+     "text": "EQUIPMENT HAS NO ATTRIBUTE REQUIREMENTS",
+     "x0": 1112.9124755859375,
+     "y0": 812.21875,
+     "x1": 1458.5374755859375,
+     "y1": 838.140625
+    },
+    {
+     "text": "AQUEENSHOUDBEEENADMIRED,BUTNEVER",
+     "x0": 1112.9124755859375,
+     "y0": 841.5968627929688,
+     "x1": 1465.449951171875,
+     "y1": 864.0625
+    },
+    {
+     "text": "TOUCHED.",
+     "x0": 1247.7061767578125,
+     "y0": 864.0625,
+     "x1": 1325.4718017578125,
+     "y1": 881.34375
+    },
+    {
+     "text": "ATZIRI,QUEENOFTHEVAAL",
+     "x0": 1183.765625,
+     "y0": 877.887451171875,
+     "x1": 1396.324951171875,
+     "y1": 903.809326171875
+    },
+    {
+     "text": "EQUIPPED",
+     "x0": 1256.3468017578125,
+     "y0": 908.9937133789062,
+     "x1": 1325.4718017578125,
+     "y1": 928.0031127929688
+    },
+    {
+     "text": "OUnequip",
+     "x0": 1242.5218505859375,
+     "y0": 938.371826171875,
+     "x1": 1342.7530517578125,
+     "y1": 966.0218505859375
+    },
+    {
+     "text": "nspec",
+     "x0": 1536.3031005859375,
+     "y0": 986.7593383789062,
+     "x1": 1586.418701171875,
+     "y1": 998.856201171875
+    },
+    {
+     "text": "Toggle Chat",
+     "x0": 3.456249952316284,
+     "y0": 1436.0718994140625,
+     "x1": 134.7937469482422,
+     "y1": 1470.63427734375
+    },
+    {
+     "text": "7385951",
+     "x0": 1641.71875,
+     "y0": 1449.8968505859375,
+     "x1": 1743.6781005859375,
+     "y1": 1474.090576171875
+    },
+    {
+     "text": "Toggle Weapon Set",
+     "x0": 0.0,
+     "y0": 1472.3624267578125,
+     "x1": 202.19061279296875,
+     "y1": 1506.9249267578125
+    },
+    {
+     "text": "J+Reset",
+     "x0": 0.0,
+     "y0": 1503.46875,
+     "x1": 122.69686889648438,
+     "y1": 1544.9437255859375
+    },
+    {
+     "text": "+RMove",
+     "x0": 3.456249952316284,
+     "y0": 1544.9437255859375,
+     "x1": 167.6281280517578,
+     "y1": 1579.5062255859375
+    },
+    {
+     "text": "PickUp",
+     "x0": 851.965576171875,
+     "y0": 1563.953125,
+     "x1": 966.0218505859375,
+     "y1": 1593.3311767578125
+    },
+    {
+     "text": "Price Check",
+     "x0": 1239.0655517578125,
+     "y0": 1563.953125,
+     "x1": 1349.6656494140625,
+     "y1": 1588.1468505859375
+    },
+    {
+     "text": "Manage Sockets",
+     "x0": 1023.0499877929688,
+     "y0": 1565.68115234375,
+     "x1": 1175.125,
+     "y1": 1589.875
+    }
+   ],
+   "expect": {
+    "box": [
+     1068,
+     524,
+     1509,
+     982
+    ],
+    "header": [
+     "THE VERTEX",
+     "TRIBALMASK"
+    ],
+    "rarity": "Unique",
+    "name": "The Vertex",
+    "base": "Tribal Mask",
+    "category": "Helmet",
+    "title": "The Vertex",
+    "mods": [
+     {
+      "ref": "Minions have #% increased maximum Life",
+      "values": [
+       15.0
+      ],
+      "kind": "implicit"
+     },
+     {
+      "ref": "Has no Attribute Requirements",
+      "values": [],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Evasion and Energy Shield",
+      "values": [
+       137.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Critical Hit Chance",
+      "values": [
+       30.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% to Chaos Resistance",
+      "values": [
+       15.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "Equipment has no Attribute Requirements",
+      "values": [],
+      "kind": "explicit"
+     }
+    ],
+    "props": {
+     "quality": [
+      20.0
+     ],
+     "evasion": [
+      247.0
+     ],
+     "requires": [
+      33.0
+     ]
+    },
+    "query": {
+     "query": {
+      "status": {
+       "option": "securable"
+      },
+      "filters": {},
+      "stats": [
+       {
+        "type": "and",
+        "filters": []
+       }
+      ],
+      "name": "The Vertex",
+      "type": "Tribal Mask"
+     },
+     "sort": {
+      "price": "asc"
+     }
+    },
+    "notes": []
    }
   }
  ],

@@ -173,7 +173,7 @@ object Parse {
             val uname = m?.groupValues?.get(1) ?: header[0]
             val u = data.findUnique(uname)
             it.foulborn = m != null && u != null
-            it.rarity = if (u != null && PoeData.letters(u.base) == PoeData.letters(it.base)) "Unique" else "Rare"
+            it.rarity = if (u != null && u.hasBase(it.base)) "Unique" else "Rare"
             if (it.rarity == "Unique") it.name = u!!.name
         } else {
             val h = header[0]

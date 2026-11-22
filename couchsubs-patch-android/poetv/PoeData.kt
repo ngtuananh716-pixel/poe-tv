@@ -10,7 +10,13 @@ import org.json.JSONObject
  */
 class PoeData(json: String) {
     class Base(val name: String, val category: String)
-    class Unique(val name: String, val base: String)
+    /** Unique và mọi base của nó (PoE2: base thường và "Runemastered …"; PoE1: vài jewel/nhẫn). */
+    class Unique(val name: String, val bases: List<String>) {
+        fun hasBase(base: String): Boolean {
+            val k = letters(base)
+            return bases.any { letters(it) == k }
+        }
+    }
     class Other(val name: String, val namespace: String)
 
     /** Mod đã khớp: [ref] là câu mẫu ("+# to maximum Life"), [explicitId] là mã explicit trên trade (nếu có). */
@@ -37,7 +43,10 @@ class PoeData(json: String) {
         val o = JSONObject(json)
         game = o.getString("game")
         rows(o, "bases") { bases[it.getString(0)] = Base(it.getString(1), it.getString(2)) }
-        rows(o, "uniques") { uniques[it.getString(0)] = Unique(it.getString(1), it.getString(2)) }
+        rows(o, "uniques") { row ->
+            val b = row.getJSONArray(2)
+            uniques[row.getString(0)] = Unique(row.getString(1), (0 until b.length()).map { b.getString(it) })
+        }
         rows(o, "gems") { gems[it.getString(0)] = it.getString(1) }
         rows(o, "others") { others[it.getString(0)] = Other(it.getString(1), it.getString(2)) }
         val keys = ArrayList<String>()

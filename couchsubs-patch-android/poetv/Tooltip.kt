@@ -14,8 +14,12 @@ class Tooltip(val box: IntArray, val header: List<String>, val lines: List<Line>
 
 /** Bản Kotlin của poe_tv/tooltip.py: tìm tooltip món đồ trong các dòng OCR của cả khung hình. */
 object TooltipFinder {
-    /** Dòng gợi ý nút ở đáy màn hình chỉ có khi mở túi đồ / stash / cửa sổ bán đồ (bản console). */
-    val UI_MARKERS = Regex("NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS")
+    /**
+     * Dòng gợi ý nút ở đáy màn hình chỉ có khi mở túi đồ / stash / cửa sổ bán đồ (bản console): PoE1 "Navigate",
+     * "Compare / More Actions", "Reorder Tabs"; PoE2 "Price Check", "Manage Sockets", "Toggle Weapon Set".
+     * Không dùng "Pick Up" (có cả khi nhặt đồ dưới đất).
+     */
+    val UI_MARKERS = Regex("NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS|PRICECHECK|MANAGESOCKETS|TOGGLEWEAPONSET")
     /** Chỉ đọc phần màn hình từ 70% chiều cao trở xuống để tìm dòng gợi ý đó. */
     const val UI_STRIP = 0.70
 
@@ -39,7 +43,7 @@ object TooltipFinder {
             val name = FOULBORN.replaceFirst(header[0], "")
             val u = data.findUnique(name)
             val b = data.findBase(header[1])
-            return !(u != null && b != null && PoeData.letters(u.base) == PoeData.letters(b.name))
+            return !(u != null && b != null && u.hasBase(b.name))
         }
         return !(data.findGem(header[0]) != null || data.findOther(header[0]) != null)
     }

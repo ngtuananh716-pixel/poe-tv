@@ -8,7 +8,7 @@ from statistics import median
 import numpy as np
 
 from . import ocr
-from .data import Data, letters
+from .data import Data, letters, unique_has_base
 
 
 @dataclass
@@ -32,13 +32,14 @@ def needs_fine(header: list[str], data: Data) -> bool:
     if len(header) == 2:
         name = re.sub(r"^\s*foulborn\s+", "", header[0], flags=re.I)
         u, b = data.find_unique(name), data.find_base(header[1])
-        return not (u and b and letters(u["base"]) == letters(b["name"]))
+        return not (u and b and unique_has_base(u, b["name"]))
     return not (data.find_gem(header[0]) or data.find_other(header[0]))
 
 
-# Dòng gợi ý nút ở đáy màn hình chỉ có khi mở túi đồ / stash / cửa sổ bán đồ (bản console): "Navigate",
-# "Compare / More Actions", "Reorder Tabs". Lúc đang đánh quái không có, nên đồ dưới đất không bị tra giá.
-UI_MARKERS = re.compile(r"NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS")
+# Dòng gợi ý nút ở đáy màn hình chỉ có khi mở túi đồ / stash / cửa sổ bán đồ (bản console): PoE1 "Navigate",
+# "Compare / More Actions", "Reorder Tabs"; PoE2 (ảnh TV 22/11/2026) "Price Check", "Manage Sockets", "Toggle Weapon Set".
+# Lúc đang đánh quái không có, nên đồ dưới đất không bị tra giá. Không dùng "Pick Up" (có cả khi nhặt đồ dưới đất).
+UI_MARKERS = re.compile(r"NAVIGATE|COMPARE|MOREACTIONS|REORDERTABS|PRICECHECK|MANAGESOCKETS|TOGGLEWEAPONSET")
 UI_STRIP = 0.70        # chỉ đọc phần màn hình từ 70% chiều cao trở xuống (dòng gợi ý nằm ở đáy)
 
 

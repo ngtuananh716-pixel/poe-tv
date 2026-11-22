@@ -8,7 +8,7 @@ from statistics import median
 from rapidfuzz import fuzz
 
 from . import ocr
-from .data import ARMOUR, JEWELLERY, WEAPON, Data, letters
+from .data import ARMOUR, JEWELLERY, WEAPON, Data, letters, unique_has_base
 
 PROP_PATTERNS = {
     "quality": r"^QUALITY",
@@ -182,7 +182,7 @@ def parse(header: list[str], lines: list[ocr.Line], data: Data) -> Item:
             uname = m.group(1)
         u = data.find_unique(uname)
         it.foulborn = bool(m and u)
-        it.rarity = "Unique" if u and letters(u["base"]) == letters(it.base) else "Rare"
+        it.rarity = "Unique" if u and unique_has_base(u, it.base) else "Rare"
         if it.rarity == "Unique":
             it.name = u["name"]
     else:
