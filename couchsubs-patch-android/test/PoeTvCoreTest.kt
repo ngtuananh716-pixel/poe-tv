@@ -140,6 +140,47 @@ class PoeTvCoreTest {
         }
     }
 
+    /** Món dựng sẵn dòng: cluster jewel (enchant, notable, dòng phụ), jewel không có dòng chính (lọc mọi dòng có số). */
+    @Test fun parseCasesMatchPython() {
+        val cases = fixture.getJSONArray("parse_cases")
+        assertTrue(cases.length() >= 2)
+        for (i in 0 until cases.length()) {
+            val c = cases.getJSONObject(i)
+            val name = c.getString("name")
+            val game = c.getString("game")
+            val header = c.getJSONArray("header").toList().map { it as String }
+            val ls = c.getJSONArray("lines")
+            val lines = (0 until ls.length()).map { j ->
+                val l = ls.getJSONObject(j)
+                Line(l.getString("text"), l.getDouble("x0"), l.getDouble("y0"), l.getDouble("x1"), l.getDouble("y1"))
+            }
+            val it = Parse.parse(header, lines, data(game))
+            val e = c.getJSONObject("expect")
+            assertEquals("$name rarity", e.getString("rarity"), it.rarity)
+            assertEquals("$name base", e.getString("base"), it.base)
+            assertEquals("$name category", str(e, "category"), it.category)
+            val mods = e.getJSONArray("mods")
+            assertEquals("$name mods", mods.length(), it.mods.size)
+            for (j in 0 until mods.length()) {
+                val m = mods.getJSONObject(j)
+                assertEquals("$name mod $j", m.getString("ref"), it.mods[j].ref)
+                assertEquals("$name mod $j kind", m.getString("kind"), it.mods[j].kind)
+                assertEquals("$name mod $j values", m.getJSONArray("values").toList().map { (it as Number).toDouble() }, it.mods[j].values)
+            }
+            val (q, notes) = Query.build(it, "securable", game)
+            assertTrue("$name query\n${e.getJSONObject("query")}\n$q", e.getJSONObject("query").similar(q))
+            assertEquals("$name notes", e.getJSONArray("notes").toList(), notes)
+            assertEquals("$name note lines", e.getJSONArray("note_lines").toList(), PriceBox.noteLines(notes))
+            val labels = Query.labels(q, it)
+            assertEquals("$name labels", labelsOf(e.getJSONObject("labels")), labels)
+            assertEquals("$name filter lines", e.getJSONArray("filter_lines").toList(), PriceBox.filterLines(labels))
+            val (qa, _) = Query.build(it, "securable", game, allLines = true)
+            assertTrue("$name query all\n${e.getJSONObject("query_all")}\n$qa", e.getJSONObject("query_all").similar(qa))
+            assertEquals("$name filter lines all", e.getJSONArray("filter_lines_all").toList(), PriceBox.filterLines(Query.labels(qa, it)))
+            checkPicks(name, game, it, e.getJSONArray("picks"))
+        }
+    }
+
     /** Ô giá: Min, giá ước tính (khoảng), độ tin cậy, số món, các dòng lọc, lưu ý — so với bản Python. */
     @Test fun priceBoxMatchesPython() {
         val cases = fixture.getJSONArray("price_cases")

@@ -66,11 +66,22 @@ FOLDED = {"# to maximum Life", "# to maximum Energy Shield"}
 LOCAL_WEAPON = re.compile(r"^(#% increased Physical Damage|Adds # to # (Physical|Fire|Cold|Lightning|Chaos) Damage)$", re.I)
 LOCAL_ARMOUR = re.compile(r"^(# to (Armour|Evasion Rating|maximum Energy Shield)|"
                           r"#% increased (Armour|Evasion Rating|Energy Shield)( and (Armour|Evasion|Energy Shield))?)$", re.I)
+# Cluster jewel: số passive (enchant), loại passive nhỏ (enchant, lọc theo lựa chọn), notable (dòng không có số)
+PASSIVES_REF = "Adds # Passive Skills"
+FALLBACK_NOTE = "Lọc theo mọi dòng có số"
+SMALL_TYPE_PREFIX = "Added Small Passive Skills grant: "
+NOTABLE_PREFIX = "1 Added Passive Skill is "
+FILLER_PREFIX = "Added Small Passive Skills also grant: "
 _SHORT_DROP = {"increased", "to", "of", "the", "Adds", "all", "with", "Items", "found", "damage", "Damage"}
 
 
 def mod_label(ref: str) -> str:
-    """Nhãn ngắn của một mod: theo bảng mod quan trọng, không có thì lấy vài chữ chính của câu mẫu (≤ 20 ký tự)."""
+    """Nhãn ngắn của một mod: theo bảng mod quan trọng, không có thì lấy vài chữ chính của câu mẫu (≤ 20 ký tự);
+    notable của cluster jewel thì lấy tên notable; dòng sát thương bỏ chữ "Damage" thì ghi thêm "dmg"."""
+    if ref.startswith(NOTABLE_PREFIX):
+        return ref[len(NOTABLE_PREFIX):]
+    if ref.startswith(FILLER_PREFIX):
+        ref = ref[len(FILLER_PREFIX):]          # dòng phụ của cluster jewel: chỉ lấy phần chỉ số
     for key, lab in IMPORTANT_LABEL:
         if key in ref:
             if key == "to Attacks":
@@ -82,7 +93,58 @@ def mod_label(ref: str) -> str:
         if len(out) + len(w) + (1 if out else 0) > 20:
             break
         out = f"{out} {w}" if out else w
+    if out and "Damage" in ref.split() and len(out) + 4 <= 20:
+        out += " dmg"
     return out or ref[:20]
+
+
+def small_type(ref: str) -> str:
+    """Loại passive nhỏ của cluster jewel: "Added Small Passive Skills grant: 12% increased Lightning Damage"
+    → "Lightning Damage"."""
+    s = ref[len(SMALL_TYPE_PREFIX):] if ref.startswith(SMALL_TYPE_PREFIX) else ref
+    return re.sub(r"^[+-]?\d+(\.\d+)?%?\s*(increased\s+)?", "", s)
+
+
+def enchant_id(m) -> tuple[str | None, int | None]:
+    """Mã enchant trên trade của một dòng và lựa chọn (loại passive nhỏ: "enchant.stat_3948993189|14" → (mã, 14))."""
+    ids = (m.trade_ids or {}).get("enchant") or []
+    if not ids:
+        return None, None
+    sid, _, opt = ids[0].partition("|")
+    return sid, (int(opt) if opt else None)
+
+
+def stat_label(f: dict, ref: str, name: str | None = None) -> str:
+    """Nhãn của một bộ lọc chỉ số: "Máu ≥ 94", "Loại: Lightning Damage", "Số passive = 9", "Prismatic Heart"."""
+    v = f.get("value") or {}
+    if "option" in v:
+        return f"Loại: {small_type(ref)}"
+    if ref == PASSIVES_REF and v.get("min") is not None and v.get("min") == v.get("max"):
+        return f"Số passive = {_num(v['min'])}"
+    name = name or mod_label(ref)
+    if v.get("min") is None:
+        return name
+    return f"{name} ≥ {_num(v['min'])}{'%' if '#%' in ref else ''}"
+
+
+def cluster_filters(it: Item, mods) -> list:
+    """Bộ lọc bắt buộc theo dòng enchant và notable: số passive (đúng số), loại passive nhỏ, từng notable.
+    Trả [(bộ lọc, mod)] theo thứ tự dòng."""
+    out = []
+    for m in mods:
+        if m.kind == "enchant":
+            sid, opt = enchant_id(m)
+            if not sid:
+                continue
+            if opt is not None and m.ref.startswith(SMALL_TYPE_PREFIX):
+                out.append(({"id": sid, "value": {"option": opt}}, m))
+            elif m.ref == PASSIVES_REF and m.value is not None:
+                out.append(({"id": sid, "value": {"min": int(m.value), "max": int(m.value)}}, m))
+        elif m.kind == "explicit" and m.ref.startswith(NOTABLE_PREFIX):
+            sid = ((m.trade_ids or {}).get("explicit") or [None])[0]
+            if sid:
+                out.append(({"id": sid}, m))
+    return out
 
 
 def _num(v) -> str:
@@ -116,21 +178,16 @@ def labels(q: dict, it: Item, totals: bool = False) -> dict:
         req.append("Corrupted")
     refs = {}
     for m in it.mods:
-        sid = ((m.trade_ids or {}).get("explicit") or [None])[0]
-        if sid and sid not in refs:
-            refs[sid] = m.ref
+        for sid in (((m.trade_ids or {}).get("explicit") or [None])[0], enchant_id(m)[0]):
+            if sid and sid not in refs:
+                refs[sid] = m.ref
 
     def lab(f):
         name = PSEUDO_LABEL.get(f["id"])
         ref = refs.get(f["id"], "")
-        if name is None:
-            name = mod_label(ref)
-        elif totals:
+        if name is not None and totals:
             name += " tổng"
-        v = (f.get("value") or {}).get("min")
-        if v is None:
-            return name
-        return f"{name} ≥ {_num(v)}{'%' if '#%' in ref else ''}"
+        return stat_label(f, ref, name)
 
     for g in qq.get("stats", []):
         if g["type"] == "count":
@@ -215,8 +272,8 @@ def build(it: Item, status: str = "securable", game: str = "poe1", strict: bool 
     if it.rarity in ("Normal", "Magic") and it.props.get("ilvl"):
         # đồ làm base: item level quyết định mod có thể ra (tooltip chỉ có dòng này khi game hiện)
         flt.setdefault("misc_filters", {"filters": {}})["filters"]["ilvl"] = {"min": int(it.props["ilvl"][0])}
-    if (it.rarity == "Normal" or by_base) and it.base:
-        qq["type"] = it.base            # đồ trắng: giá nằm ở chính base
+    if (it.rarity == "Normal" or by_base or it.category == "Cluster Jewel") and it.base:
+        qq["type"] = it.base            # đồ trắng: giá nằm ở chính base; cluster jewel: Large/Medium/Small giá khác hẳn
 
     cat = TRADE_CATEGORY.get(it.category)
     tf = {"rarity": {"option": "nonunique"}}
@@ -264,25 +321,32 @@ def build(it: Item, status: str = "securable", game: str = "poe1", strict: bool 
     for a, v in attrs.items():
         if v >= 40:
             pool.append({"id": PSEUDO[a], "value": {"min": mn(v)}})
-    used_ids = set()
-    for m in mods:
-        if m.kind != "explicit" or m.value is None:
-            continue
-        important = any(k in m.ref for k in IMPORTANT)
-        folded = (_k(m.ref) in FOLDED or _k(m.ref) in RES or _k(m.ref) in ATTR
-                  or (is_weapon(it) and LOCAL_WEAPON.match(_k(m.ref)))
-                  or (is_armour(it) and LOCAL_ARMOUR.match(_k(m.ref))))
-        if not important and not (all_lines and not folded):
-            continue
-        ids = (m.trade_ids or {}).get("explicit") or []
-        if ids and ids[0] not in used_ids:
-            used_ids.add(ids[0])
-            pool.append({"id": ids[0], "value": {"min": mn(m.value)}})
-    if len(pool) >= 3:
-        qq["stats"].append({"type": "count", "value": {"min": len(pool) if all_lines else len(pool) - 1},
-                            "filters": pool})
-    else:
-        stats.extend(pool)
+    def explicit_lines(every):
+        used_ids = set()
+        for m in mods:
+            if m.kind != "explicit" or m.value is None or m.ref.startswith(NOTABLE_PREFIX):
+                continue                    # notable đã lọc bắt buộc riêng
+            important = any(k in m.ref for k in IMPORTANT)
+            folded = (_k(m.ref) in FOLDED or _k(m.ref) in RES or _k(m.ref) in ATTR
+                      or (is_weapon(it) and LOCAL_WEAPON.match(_k(m.ref)))
+                      or (is_armour(it) and LOCAL_ARMOUR.match(_k(m.ref))))
+            if not important and not (every and not folded):
+                continue
+            ids = (m.trade_ids or {}).get("explicit") or []
+            if ids and ids[0] not in used_ids:
+                used_ids.add(ids[0])
+                pool.append({"id": ids[0], "value": {"min": mn(m.value)}})
+
+    explicit_lines(all_lines)
+    required = [f for f, _ in cluster_filters(it, mods)]   # số passive, loại passive nhỏ, notable: bắt buộc
+    stats.extend(required)
+
+    def place_pool():
+        if len(pool) >= 3:
+            qq["stats"].append({"type": "count", "value": {"min": len(pool) if all_lines else len(pool) - 1},
+                                "filters": pool})
+        else:
+            stats.extend(pool)
 
     if is_armour(it):
         af = {}
@@ -297,6 +361,13 @@ def build(it: Item, status: str = "securable", game: str = "poe1", strict: bool 
 
     if defensive and life == 0 and es_flat < 40 and not (is_armour(it) and it.props.get("es")):
         notes.append("Món không có máu: giá thật nhiều khả năng THẤP hơn các món tương tự tìm được")
-    if not pool and not any(flt.get(k) for k in ("weapon_filters", "armour_filters", "equipment_filters")):
+    gear = any(flt.get(k) for k in ("weapon_filters", "armour_filters", "equipment_filters"))
+    if not pool and not gear and not required and not all_lines:
+        # không có dòng chính nào (jewel thường, flask…): lọc theo mọi dòng có số, cần đủ (tổng − 1)
+        explicit_lines(True)
+        if pool:
+            notes.insert(0, FALLBACK_NOTE)
+    place_pool()
+    if not pool and not gear and not required:
         notes.append("Không có chỉ số đáng lọc: chỉ tra theo loại món")
     return q, notes

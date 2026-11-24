@@ -75,7 +75,7 @@ def numbers(s: str) -> list[float]:
 class Mod:
     text: str
     ref: str
-    kind: str            # implicit / explicit
+    kind: str            # implicit / explicit / enchant
     values: list
     trade_ids: dict
     score: float
@@ -252,8 +252,12 @@ def parse(header: list[str], lines: list[ocr.Line], data: Data) -> Item:
 
     # khối mod đầu tiên sau yêu cầu cấp độ là implicit nếu còn khối mod khác phía sau
     for i, sec in enumerate(mod_secs):
-        kind = "implicit" if (len(mod_secs) > 1 and i == 0 and it.rarity != "Gem") else "explicit"
+        kind0 = "implicit" if (len(mod_secs) > 1 and i == 0 and it.rarity != "Gem") else "explicit"
         for sm, score, txt in sec:
+            ids = sm.trade_ids or {}
+            # dòng trong khối đầu mà trade chỉ có mã enchant (không có mã implicit): enchant, ví dụ 3 dòng đầu của
+            # cluster jewel (số passive, loại passive nhỏ, số ô jewel)
+            kind = "enchant" if kind0 == "implicit" and ids.get("enchant") and not ids.get("implicit") else kind0
             vals = numbers(txt)
             if sm.n_values and len(vals) > sm.n_values:
                 vals = vals[-sm.n_values:]       # bỏ số rác dính phía trước

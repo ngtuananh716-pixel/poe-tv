@@ -70,10 +70,21 @@ object Query {
         RegexOption.IGNORE_CASE)
     internal val LOCAL_ARMOUR = Regex("^(# to (Armour|Evasion Rating|maximum Energy Shield)|" +
         "#% increased (Armour|Evasion Rating|Energy Shield)( and (Armour|Evasion|Energy Shield))?)$", RegexOption.IGNORE_CASE)
+    // Cluster jewel: số passive (enchant), loại passive nhỏ (enchant, lọc theo lựa chọn), notable (dòng không có số)
+    const val PASSIVES_REF = "Adds # Passive Skills"
+    const val SMALL_TYPE_PREFIX = "Added Small Passive Skills grant: "
+    const val NOTABLE_PREFIX = "1 Added Passive Skill is "
+    const val FILLER_PREFIX = "Added Small Passive Skills also grant: "
+    const val FALLBACK_NOTE = "Lọc theo mọi dòng có số"
     private val SHORT_DROP = setOf("increased", "to", "of", "the", "Adds", "all", "with", "Items", "found", "damage", "Damage")
 
-    /** Nhãn ngắn của một mod: theo bảng mod quan trọng, không có thì vài chữ chính của câu mẫu (≤ 20 ký tự). */
-    fun modLabel(ref: String): String {
+    /**
+     * Nhãn ngắn của một mod: theo bảng mod quan trọng, không có thì vài chữ chính của câu mẫu (≤ 20 ký tự); notable của
+     * cluster jewel thì lấy tên notable; dòng sát thương bỏ chữ "Damage" thì ghi thêm "dmg".
+     */
+    fun modLabel(ref0: String): String {
+        if (ref0.startsWith(NOTABLE_PREFIX)) return ref0.substring(NOTABLE_PREFIX.length)
+        val ref = if (ref0.startsWith(FILLER_PREFIX)) ref0.substring(FILLER_PREFIX.length) else ref0
         for ((key, lab) in IMPORTANT_LABEL) {
             if (key in ref) {
                 if (key == "to Attacks") return (ELEMENTS.firstOrNull { it.first in ref }?.second ?: "") + " atk"
@@ -86,7 +97,53 @@ object Query {
             if (out.length + w.length + (if (out.isNotEmpty()) 1 else 0) > 20) break
             out = if (out.isNotEmpty()) "$out $w" else w
         }
+        if (out.isNotEmpty() && "Damage" in ref.split(Regex("\\s+")) && out.length + 4 <= 20) out += " dmg"
         return out.ifEmpty { ref.take(20) }
+    }
+
+    /** Loại passive nhỏ: "Added Small Passive Skills grant: 12% increased Lightning Damage" → "Lightning Damage". */
+    fun smallType(ref: String): String {
+        val s = if (ref.startsWith(SMALL_TYPE_PREFIX)) ref.substring(SMALL_TYPE_PREFIX.length) else ref
+        return s.replace(Regex("^[+-]?\\d+(\\.\\d+)?%?\\s*(increased\\s+)?"), "")
+    }
+
+    /** Mã enchant trên trade của một dòng và lựa chọn ("enchant.stat_3948993189|14" → (mã, 14)). */
+    fun enchantId(m: Mod): Pair<String?, Int?> {
+        val full = m.enchantId ?: return null to null
+        val i = full.indexOf('|')
+        return if (i < 0) full to null else full.substring(0, i) to full.substring(i + 1).toIntOrNull()
+    }
+
+    /** Nhãn của một bộ lọc chỉ số: "Máu ≥ 94", "Loại: Lightning Damage", "Số passive = 9", "Prismatic Heart". */
+    fun statLabel(f: JSONObject, ref: String, name0: String? = null): String {
+        val v = f.optJSONObject("value")
+        if (v != null && v.has("option")) return "Loại: ${smallType(ref)}"
+        val mn = v?.opt("min")?.takeIf { it != JSONObject.NULL }
+        val mx = v?.opt("max")?.takeIf { it != JSONObject.NULL }
+        if (ref == PASSIVES_REF && mn != null && mx != null && num(mn) == num(mx)) return "Số passive = ${num(mn)}"
+        val name = name0 ?: modLabel(ref)
+        if (mn == null) return name
+        return "$name ≥ ${num(mn)}${if ("#%" in ref) "%" else ""}"
+    }
+
+    /** Bộ lọc bắt buộc theo dòng enchant và notable: số passive (đúng số), loại passive nhỏ, từng notable. */
+    fun clusterFilters(mods: List<Mod>): List<Pair<JSONObject, Mod>> {
+        val out = ArrayList<Pair<JSONObject, Mod>>()
+        for (m in mods) {
+            if (m.kind == "enchant") {
+                val (sid, opt) = enchantId(m)
+                if (sid == null) continue
+                val v = m.value
+                if (opt != null && m.ref.startsWith(SMALL_TYPE_PREFIX))
+                    out.add(JSONObject().put("id", sid).put("value", JSONObject().put("option", opt)) to m)
+                else if (m.ref == PASSIVES_REF && v != null)
+                    out.add(JSONObject().put("id", sid).put("value", JSONObject().put("min", v.toLong()).put("max", v.toLong())) to m)
+            } else if (m.kind == "explicit" && m.ref.startsWith(NOTABLE_PREFIX)) {
+                val sid = m.explicitId ?: continue
+                out.add(JSONObject().put("id", sid) to m)
+            }
+        }
+        return out
     }
 
     private fun num(v: Any?): String = PriceBox.g((v as Number).toDouble())
@@ -112,15 +169,11 @@ object Query {
         mf.optJSONObject("quality")?.let { o -> req.add("CL ≥ ${num(o.get("min"))}") }
         if (mf.optJSONObject("corrupted")?.optString("option") == "true") req.add("Corrupted")
         val refs = LinkedHashMap<String, String>()
-        for (m in it.mods) { val sid = m.explicitId; if (sid != null && sid !in refs) refs[sid] = m.ref }
+        for (m in it.mods) for (sid in listOf(m.explicitId, enchantId(m).first)) if (sid != null && sid !in refs) refs[sid] = m.ref
 
         fun lab(f: JSONObject): String {
             val id = f.getString("id")
-            val ref = refs[id] ?: ""
-            val name = PSEUDO_LABEL[id] ?: modLabel(ref)
-            val v = f.optJSONObject("value")?.opt("min")
-            if (v == null || v == JSONObject.NULL) return name
-            return "$name ≥ ${num(v)}${if ("#%" in ref) "%" else ""}"
+            return statLabel(f, refs[id] ?: "", PSEUDO_LABEL[id])
         }
 
         var count: List<String> = emptyList()
@@ -209,7 +262,8 @@ object Query {
             // đồ làm base: item level quyết định mod có thể ra (tooltip chỉ có dòng này khi game hiện)
             it.props["ilvl"]?.firstOrNull()?.let { v -> miscFilters(flt).put("ilvl", minOf(v.toLong())) }
         }
-        if ((it.rarity == "Normal" || byBase) && it.base.isNotEmpty()) qq.put("type", it.base)   // đồ trắng: giá nằm ở base
+        // đồ trắng: giá nằm ở base; cluster jewel: Large/Medium/Small giá khác hẳn
+        if ((it.rarity == "Normal" || byBase || it.category == "Cluster Jewel") && it.base.isNotEmpty()) qq.put("type", it.base)
 
         val cat = PoeData.TRADE_CATEGORY[it.category]
         val tf = obj("rarity" to obj("option" to "nonunique"))
@@ -245,23 +299,23 @@ object Query {
         if (ele > 0) pool.add(obj("id" to PSEUDO.getValue("ele_res"), "value" to minOf(mn(ele))))
         if (chaos > 0) pool.add(obj("id" to PSEUDO.getValue("chaos_res"), "value" to minOf(mn(chaos))))
         for ((a, v) in attrs) if (v >= 40) pool.add(obj("id" to PSEUDO.getValue(a), "value" to minOf(mn(v))))
-        val usedIds = HashSet<String>()
-        for (m in mods) {
-            val v = m.value
-            if (m.kind != "explicit" || v == null) continue
-            val important = IMPORTANT_LABEL.any { (key, _) -> key in m.ref }
-            val r = k(m.ref)
-            val folded = r in FOLDED || r in RES || r in ATTR ||
-                (it.isWeapon && LOCAL_WEAPON.matches(r)) || (it.isArmour && LOCAL_ARMOUR.matches(r))
-            if (!important && !(allLines && !folded)) continue
-            val id = m.explicitId ?: continue
-            if (usedIds.add(id)) pool.add(obj("id" to id, "value" to minOf(mn(v))))
+        fun explicitLines(every: Boolean) {
+            val usedIds = HashSet<String>()
+            for (m in mods) {
+                val v = m.value
+                if (m.kind != "explicit" || v == null || m.ref.startsWith(NOTABLE_PREFIX)) continue   // notable: bắt buộc riêng
+                val important = IMPORTANT_LABEL.any { (key, _) -> key in m.ref }
+                val r = k(m.ref)
+                val folded = r in FOLDED || r in RES || r in ATTR ||
+                    (it.isWeapon && LOCAL_WEAPON.matches(r)) || (it.isArmour && LOCAL_ARMOUR.matches(r))
+                if (!important && !(every && !folded)) continue
+                val id = m.explicitId ?: continue
+                if (usedIds.add(id)) pool.add(obj("id" to id, "value" to minOf(mn(v))))
+            }
         }
-        if (pool.size >= 3) {
-            val f = JSONArray()
-            for (p in pool) f.put(p)
-            groups.put(obj("type" to "count", "value" to obj("min" to if (allLines) pool.size else pool.size - 1), "filters" to f))
-        } else for (p in pool) stats.put(p)
+        explicitLines(allLines)
+        val required = clusterFilters(mods).map { p -> p.first }    // số passive, loại passive nhỏ, notable: bắt buộc
+        for (f in required) stats.put(f)
 
         if (it.isArmour) {
             val af = JSONObject()
@@ -282,7 +336,17 @@ object Query {
         val anyGear = listOf("weapon_filters", "armour_filters", "equipment_filters").any { key ->
             flt.optJSONObject(key)?.let { o -> o.length() > 0 } == true
         }
-        if (pool.isEmpty() && !anyGear) notes.add("Không có chỉ số đáng lọc: chỉ tra theo loại món")
+        if (pool.isEmpty() && !anyGear && required.isEmpty() && !allLines) {
+            // không có dòng chính nào (jewel thường, flask…): lọc theo mọi dòng có số, cần đủ (tổng − 1)
+            explicitLines(true)
+            if (pool.isNotEmpty()) notes.add(0, FALLBACK_NOTE)
+        }
+        if (pool.size >= 3) {
+            val f = JSONArray()
+            for (p in pool) f.put(p)
+            groups.put(obj("type" to "count", "value" to obj("min" to if (allLines) pool.size else pool.size - 1), "filters" to f))
+        } else for (p in pool) stats.put(p)
+        if (pool.isEmpty() && !anyGear && required.isEmpty()) notes.add("Không có chỉ số đáng lọc: chỉ tra theo loại món")
         return q to notes
     }
 }

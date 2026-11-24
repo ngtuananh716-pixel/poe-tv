@@ -6,10 +6,16 @@ import org.json.JSONObject
 
 /** Một dòng trong bảng "Chọn dòng để tra" (như dict của pick._row bên Python). */
 class PickRow(
-    val key: String, val section: String, val text: String, val on: Boolean, val enabled: Boolean,
+    val key: String, val section: String, val text: String, on: Boolean, val enabled: Boolean,
     val raw: Double?, val exact: Boolean, val groups: List<Pair<String, Double>>, val id: String?, val pct: Boolean,
     val tag: String?, val ref: String, val unsure: Boolean,
-)
+    /** bộ lọc bắt buộc riêng (enchant, notable), không vào nhóm đếm */ val req: Boolean = false,
+    /** lọc theo lựa chọn (loại passive nhỏ) */ val option: Int? = null,
+    /** lọc đúng số (số passive) */ val eq: Boolean = false,
+) {
+    var on: Boolean = on
+        internal set
+}
 
 class PickPanel(
     val game: String, val title: String, val rarity: String, val base: String, val strict: Boolean,
@@ -19,6 +25,8 @@ class PickPanel(
     var m0 = 0
         internal set
     var need = 0
+        internal set
+    var fallback = false
         internal set
 }
 
@@ -44,6 +52,8 @@ object Pick {
     private val ATTRS = listOf("str", "dex", "int")
     private const val ATTR_MIN = 40.0
     private val SLOTS = mapOf("Rare" to 6, "Magic" to 2)
+    private val JEWEL_SLOTS = mapOf("Rare" to 4, "Magic" to 2)     // jewel (kể cả cluster): tối đa 2 prefix + 2 suffix
+    private val JEWELS = setOf("Jewel", "Abyss Jewel", "Cluster Jewel")
 
     /** Câu mẫu + giá trị: "+# to Strength", [49] → "+49 to Strength". */
     fun fill(ref: String, values: List<Double>): String {
@@ -57,8 +67,9 @@ object Pick {
 
     private fun row(key: String, section: String, text: String, on: Boolean, enabled: Boolean = true, raw: Double? = null,
                     exact: Boolean = false, groups: List<Pair<String, Double>> = emptyList(), id: String? = null,
-                    pct: Boolean = false, tag: String? = null, ref: String = "", unsure: Boolean = false) =
-        PickRow(key, section, text, on, enabled, raw, exact, groups, id, pct, tag, ref, unsure)
+                    pct: Boolean = false, tag: String? = null, ref: String = "", unsure: Boolean = false,
+                    req: Boolean = false, option: Int? = null, eq: Boolean = false) =
+        PickRow(key, section, text, on, enabled, raw, exact, groups, id, pct, tag, ref, unsure, req, option, eq)
 
     /** Bảng chọn dòng của món (null với unique, gem, đồ bán theo lô: những món này tra theo tên). */
     fun panel(it: Item, game: String = "poe1", strict: Boolean = false, byBase: Boolean = false, allLines: Boolean = false,
@@ -70,8 +81,10 @@ object Pick {
         val armour = it.isArmour
         val rows = ArrayList<PickRow>()
         val baseForced = PoeData.TRADE_CATEGORY[it.category] == null
+        val cluster = it.category == "Cluster Jewel"
         rows.add(row("base", "base", "Đúng base: ${it.base.ifEmpty { "?" }}",
-            baseForced || ((it.rarity == "Normal" || byBase) && it.base.isNotEmpty()), enabled = !baseForced && it.base.isNotEmpty()))
+            baseForced || ((it.rarity == "Normal" || byBase || cluster) && it.base.isNotEmpty()),
+            enabled = !baseForced && it.base.isNotEmpty(), tag = if (cluster) "cluster: luôn lọc đúng cỡ" else null))
         it.props["ilvl"]?.firstOrNull()?.let { v0 ->
             val v = v0.toLong().toDouble()
             rows.add(row("ilvl", "base", "Item level ${PriceBox.g(v)}", it.rarity == "Normal" || it.rarity == "Magic", raw = v, exact = true))
@@ -114,6 +127,21 @@ object Pick {
             val unsure = m.score < Query.MIN_SCORE
             val sid = m.explicitId
             val local = (weapon && Query.LOCAL_WEAPON.matches(r)) || (armour && Query.LOCAL_ARMOUR.matches(r))
+            if (m.kind == "enchant") {
+                val (eid, opt) = Query.enchantId(m)
+                val text = fill(m.ref, m.values)
+                val v = m.value
+                if (opt != null && m.ref.startsWith(Query.SMALL_TYPE_PREFIX))
+                    rows.add(row("m$i", "enchant", text, !unsure, id = eid, tag = "loại passive nhỏ", ref = m.ref,
+                        unsure = unsure, req = true, option = opt))
+                else if (m.ref == Query.PASSIVES_REF && v != null)
+                    rows.add(row("m$i", "enchant", text, !unsure, raw = v.toLong().toDouble(), id = eid,
+                        tag = "số passive: lọc đúng ${v.toLong()}", ref = m.ref, unsure = unsure, req = true, eq = true))
+                else
+                    rows.add(row("m$i", "enchant", text, false, enabled = eid != null, raw = v, id = eid, pct = "#%" in m.ref,
+                        tag = if (eid != null) null else "không lọc được", ref = m.ref, unsure = unsure, req = true))
+                continue
+            }
             val section: String
             if (m.kind == "implicit") {
                 if (g.isEmpty()) continue                 // implicit không gộp vào tổng: chưa lọc riêng được
@@ -143,14 +171,34 @@ object Pick {
                 rows.add(row("m$i", section, text, false, enabled = false, raw = m.value, tag = "không lọc được", ref = m.ref, unsure = unsure))
                 continue
             }
+            if (m.ref.startsWith(Query.NOTABLE_PREFIX)) {
+                rows.add(row("m$i", section, text, !unsure, id = sid, tag = "notable" + if (unsure) " · đọc chưa chắc" else "",
+                    ref = m.ref, unsure = unsure, req = true))
+                continue
+            }
             val important = Query.IMPORTANT_LABEL.any { (k, _) -> k in m.ref }
             val on = !unsure && m.value != null && sid !in used && (important || allLines)
             if (on) used.add(sid)
-            rows.add(row("m$i", section, text, on, raw = m.value, id = sid, pct = pct,
-                tag = if (unsure) "đọc chưa chắc" else null, ref = m.ref, unsure = unsure))
+            val tag = if (unsure) "đọc chưa chắc" else if (m.ref.startsWith(Query.FILLER_PREFIX)) "dòng phụ" else null
+            rows.add(row("m$i", section, text, on, raw = m.value, id = sid, pct = pct, tag = tag, ref = m.ref, unsure = unsure))
         }
+        // không có dòng chính nào (jewel thường, flask…): như tự tra, chọn sẵn mọi dòng có số, cần đủ (tổng − 1)
+        var fallback = false
+        if (!allLines && rows.none { r -> r.on && r.section in setOf("gear", "implicit", "explicit", "enchant") }) {
+            for (r in rows) {
+                val rid = r.id
+                if (r.section == "explicit" && r.groups.isEmpty() && r.enabled && !r.req && r.raw != null && !r.unsure &&
+                    rid != null && rid !in used) {
+                    used.add(rid)
+                    r.on = true
+                    fallback = true
+                }
+            }
+        }
+        val slots = (if (it.category in JEWELS) JEWEL_SLOTS else SLOTS)[it.rarity] ?: 0
         val pn = PickPanel(game, it.title, it.rarity, it.base, strict, allLines, rng, rows,
-            maxOf(SLOTS[it.rarity] ?: 0, nExpl), nExpl, it.corrupted, it.category)
+            maxOf(slots, nExpl), nExpl, it.corrupted, it.category)
+        pn.fallback = fallback
         val m0 = pool(pn, selOn(pn, null), emptyMap()).first.size
         pn.m0 = m0
         var need = defaultNeed(m0, allLines)
@@ -176,7 +224,7 @@ object Pick {
     /** Số hiện sẵn trong ô "≥" của một dòng (chưa sửa). */
     fun showMin(pn: PickPanel, r: PickRow): Number? {
         val v = r.raw ?: return null
-        return if (r.exact) v.toLong() else Query.min(v, pn.rng)
+        return if (r.exact || r.eq) v.toLong() else Query.min(v, pn.rng)
     }
 
     private fun whole(v: Double): Number = if (v == Math.floor(v) && Math.abs(v) < 1e15) v.toLong() else v
@@ -211,7 +259,7 @@ object Pick {
         val used = HashSet<String>()
         for (r in rows) {
             val id = r.id
-            if (r.groups.isNotEmpty() || on[r.key] != true || id == null || !used.add(id)) continue
+            if (r.groups.isNotEmpty() || r.req || on[r.key] != true || id == null || !used.add(id)) continue
             if (r.raw == null && r.key !in edit) {
                 pool.add(JSONObject().put("id", id))
                 labs.add(Query.modLabel(r.ref))
@@ -268,6 +316,19 @@ object Pick {
         ilvl?.let { v -> req.add("iLvl ≥ ${num(v)}") }
         if (pn.corrupted) req.add("Corrupted")
 
+        for (r in pn.rows) {                       // enchant, notable: bắt buộc, theo thứ tự dòng
+            val rid = r.id
+            if (!r.req || on[r.key] != true || rid == null) continue
+            val opt = r.option
+            val f = JSONObject().put("id", rid)
+            if (opt != null) f.put("value", JSONObject().put("option", opt))
+            else if (r.eq) {
+                val v = edit[r.key]?.let { whole(it) } ?: r.raw!!.toLong()
+                f.put("value", JSONObject().put("min", v).put("max", v))
+            } else if (r.raw != null || r.key in edit) f.put("value", JSONObject().put("min", minOf(pn, r, edit)))
+            stats.put(f)
+            req.add(Query.statLabel(f, r.ref))
+        }
         val (pool, labs) = pool(pn, on, edit)
         val m = pool.size
         val need = needFor(pn, sel, m)
@@ -301,7 +362,7 @@ object Pick {
      */
     fun preset(pn: PickPanel, which: String, sel: PickSel? = null): PickSel {
         val on = HashMap(selOn(pn, sel))
-        for (r in pn.rows) if ((r.section == "implicit" || r.section == "explicit") && r.enabled)
+        for (r in pn.rows) if ((r.section == "implicit" || r.section == "explicit" || r.section == "enchant") && r.enabled)
             on[r.key] = if (which == "main") r.on else which == "all"
         return PickSel(on, sel?.edit ?: emptyMap(), null)
     }

@@ -97,15 +97,16 @@ fun PickDialog(initial: PoeTv.PickRecord, onClose: () -> Unit) {
             }
 
             val explTitle = if (pn.slots > 0) "DÒNG TRÊN MÓN · ${pn.nExplicit}/${pn.slots}" else "DÒNG TRÊN MÓN"
-            for ((title, key) in listOf("BASE" to "base", "CHỈ SỐ MÓN" to "gear", "IMPLICIT" to "implicit", explTitle to "explicit")) {
+            for ((title, key) in listOf("BASE" to "base", "CHỈ SỐ MÓN" to "gear", "ENCHANT" to "enchant", "IMPLICIT" to "implicit",
+                    explTitle to "explicit")) {
                 val rows = pn.rows.filter { it.section == key }
                 val nones = if (key == "explicit") pn.slots - pn.nExplicit else 0
                 if (rows.isNotEmpty() || nones > 0) {
                     Text(title, style = Tokens.Type.caption, color = Tokens.Color.secondary, modifier = Modifier.padding(top = 6.dp))
                     for (r in rows) {
                         val shown = if (r.section == "base" && r.key != "ilvl") null else Pick.showMin(pn, r)
-                        val txt = if (shown == null || !r.enabled) null else texts[r.key] ?: PriceBox.g(shown.toDouble())
-                        PickRowView(r, on[r.key] == true, txt,
+                        val txt = if (shown == null || !r.enabled || r.eq) null else texts[r.key] ?: PriceBox.g(shown.toDouble())
+                        PickRowView(r, on[r.key] == true, txt, if (r.eq && shown != null) "= ${PriceBox.g(shown.toDouble())}" else null,
                             onCheck = { v -> sel = sel.copy(on = sel.on + (r.key to v)) },
                             onMin = { s ->
                                 texts[r.key] = s
@@ -135,7 +136,7 @@ fun PickDialog(initial: PoeTv.PickRecord, onClose: () -> Unit) {
                         SmallButton("+", Modifier.width(48.dp)) { sel = sel.copy(need = (summ.need + 1).coerceAtMost(summ.of)) }
                         Text("/ ${summ.of} dòng", style = Tokens.Type.body, color = Tokens.Color.text)
                     }
-                } else Text("Chưa chọn dòng chỉ số nào", style = Tokens.Type.body, color = Tokens.Color.secondary)
+                } else if (summ.req.isEmpty()) Text("Chưa chọn dòng chỉ số nào", style = Tokens.Type.body, color = Tokens.Color.secondary)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(Tokens.Space.inline)) {
                 SmallButton("Dòng chính", Modifier.weight(1f)) { sel = Pick.preset(pn, "main", sel); texts.clear() }
@@ -159,7 +160,8 @@ fun PickDialog(initial: PoeTv.PickRecord, onClose: () -> Unit) {
 
 /** Một dòng: dấu chọn, câu (và ghi chú gộp vào tổng nào), ô "≥ mức tối thiểu". */
 @Composable
-private fun PickRowView(r: PickRow, checked: Boolean, minText: String?, onCheck: (Boolean) -> Unit, onMin: (String) -> Unit) {
+private fun PickRowView(r: PickRow, checked: Boolean, minText: String?, fixedText: String?, onCheck: (Boolean) -> Unit,
+                        onMin: (String) -> Unit) {
     val shape = RoundedCornerShape(10.dp)
     val active = checked && r.enabled
     Row(
@@ -175,6 +177,8 @@ private fun PickRowView(r: PickRow, checked: Boolean, minText: String?, onCheck:
             Text(r.text, style = Tokens.Type.body, color = if (active) Tokens.Color.text else Tokens.Color.secondary)
             r.tag?.let { Text(it, style = Tokens.Type.caption, color = Tokens.Color.secondary) }
         }
+        if (fixedText != null) Text(fixedText, style = Tokens.Type.headline, color = if (active) Tokens.Color.text else Tokens.Color.secondary,
+            modifier = Modifier.padding(start = 6.dp))
         if (minText != null) {
             Text("≥", style = Tokens.Type.body, color = Tokens.Color.secondary, modifier = Modifier.padding(start = 6.dp, end = 4.dp))
             BasicTextField(

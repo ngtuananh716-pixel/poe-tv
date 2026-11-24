@@ -22,7 +22,7 @@ class PoeData(json: String) {
     /** Mod đã khớp: [ref] là câu mẫu ("+# to maximum Life"), [explicitId] là mã explicit trên trade (nếu có). */
     class StatMatch(
         val ref: String, val explicitId: String?, val negate: Boolean, val fixedValue: Double?, val nValues: Int,
-        val better: Int,
+        val better: Int, val enchantId: String? = null, val hasImplicit: Boolean = false,
     )
 
     private class Option(val test: String?, val match: StatMatch)
@@ -57,7 +57,8 @@ class PoeData(json: String) {
                 Option(
                     a.optStringOrNull(0),
                     StatMatch(a.getString(1), a.optStringOrNull(2), a.getBoolean(3),
-                        if (a.isNull(4)) null else a.getDouble(4), a.getInt(5), a.optInt(6, 1)),
+                        if (a.isNull(4)) null else a.getDouble(4), a.getInt(5), a.optInt(6, 1),
+                        if (a.length() > 7) a.optStringOrNull(7) else null, a.optBoolean(8, false)),
                 )
             }
             keys.add(row.getString(0))

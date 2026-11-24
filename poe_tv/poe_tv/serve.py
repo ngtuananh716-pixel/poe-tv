@@ -742,14 +742,16 @@ def pick_section(w: Watcher, pid=None) -> str:
     on = pick._sel_on(pn, sel)
     edit = sel.get("edit") or {}
     _, summ = pick.build(it, pn, sel)
-    rows_html = {"base": [], "gear": [], "implicit": [], "explicit": []}
+    rows_html = {"base": [], "gear": [], "enchant": [], "implicit": [], "explicit": []}
     for r in pn["rows"]:
         key = r["key"]
         box = (f'<input type="checkbox" name="on_{key}" value="1"{" checked" if on[key] else ""}'
                f'{"" if r["enabled"] else " disabled"}>')
         num = ""
         shown = pick.show_min(pn, r)
-        if r["section"] != "base" or key == "ilvl":
+        if r["eq"] and shown is not None:
+            num = f"= {query._num(shown)}"              # số passive: lọc đúng số
+        elif r["section"] != "base" or key == "ilvl":
             if shown is not None and r["enabled"]:
                 val = edit.get(key, shown)
                 num = (f'≥ <input type="number" step="any" name="min_{key}" value="{query._num(val)}">'
@@ -769,7 +771,7 @@ def pick_section(w: Watcher, pid=None) -> str:
     bullets = "".join(f"• {esc(x)}<br>" for x in summ["req"] + summ["stats"])
     need = (f'Cần đủ <input type="number" name="need" min="1" max="{summ["of"]}" value="{summ["need"]}" '
             f'style="width:52px"><input type="hidden" name="need0" value="{summ["need"]}"> / {summ["of"]} dòng'
-            if summ["of"] else "Chưa chọn dòng chỉ số nào")
+            if summ["of"] else ("" if summ["req"] else "Chưa chọn dòng chỉ số nào"))
     res, url = (rec["result"], rec["url"]) if rec["result"] else (rec["auto"], rec["auto_url"])
     res_title = "KẾT QUẢ TRA LẠI (chỉ hiện ở đây, TV giữ giá tự tra)" if rec["result"] else "GIÁ TỰ TRA"
     link = f'<a href="{esc(url)}" target="_blank" rel="noopener">Mở trên trang trade ›</a>' if url else ""
@@ -779,7 +781,7 @@ def pick_section(w: Watcher, pid=None) -> str:
 <div class="hd"><b>Món vừa tra: {esc(it.title)} ({esc(it.rarity)} · {GAME_NAME.get(pn['game'], '')})</b>
 <span>tra lúc {rec['at']}</span></div>
 <a id="newer" class="newer" href="/"{"" if latest != rec["id"] else ' style="display:none"'}>Có món mới · Xem món mới ›</a>
-{sec("BASE", "base")}{sec("CHỈ SỐ MÓN", "gear")}{sec("IMPLICIT", "implicit")}{sec(expl_title, "explicit")}
+{sec("BASE", "base")}{sec("CHỈ SỐ MÓN", "gear")}{sec("ENCHANT", "enchant")}{sec("IMPLICIT", "implicit")}{sec(expl_title, "explicit")}
 <div class="bottom"><div><div class="box"><div class="s">KHI TRA (ĐÃ GỘP)</div>{bullets}{need}</div>
 <div class="btns"><button class="g" name="act" value="main">Dòng chính</button><button class="g" name="act" value="all">Tất cả</button>
 <button class="g" name="act" value="none">Bỏ hết</button></div>

@@ -10325,6 +10325,4177 @@
    }
   }
  ],
+ "parse_cases": [
+  {
+   "name": "cluster_large",
+   "game": "poe1",
+   "header": [
+    "SPIRIT SPLINTER",
+    "LARGE CLUSTER JEWEL"
+   ],
+   "lines": [
+    {
+     "text": "SPIRIT SPLINTER",
+     "x0": 200.0,
+     "y0": 600.0,
+     "x1": 500.0,
+     "y1": 634.0
+    },
+    {
+     "text": "LARGE CLUSTER JEWEL",
+     "x0": 200.0,
+     "y0": 640.0,
+     "x1": 580.0,
+     "y1": 674.0
+    },
+    {
+     "text": "REQUIRES LEVEL 54",
+     "x0": 200.0,
+     "y0": 710.0,
+     "x1": 540.0,
+     "y1": 744.0
+    },
+    {
+     "text": "ADDS 9 PASSIVE SKILLS",
+     "x0": 200.0,
+     "y0": 780.0,
+     "x1": 620.0,
+     "y1": 814.0
+    },
+    {
+     "text": "2 ADDED PASSIVE SKILLS ARE JEWEL SOCKETS",
+     "x0": 200.0,
+     "y0": 820.0,
+     "x1": 1000.0,
+     "y1": 854.0
+    },
+    {
+     "text": "ADDED SMALL PASSIVE SKILLS GRANT: 12% INCREASED LIGHTNING DAMAGE",
+     "x0": 200.0,
+     "y0": 860.0,
+     "x1": 1480.0,
+     "y1": 894.0
+    },
+    {
+     "text": "ADDED SMALL PASSIVE SKILLS ALSO GRANT: +14 TO EVASION",
+     "x0": 200.0,
+     "y0": 930.0,
+     "x1": 1260.0,
+     "y1": 964.0
+    },
+    {
+     "text": "ADDED SMALL PASSIVE SKILLS ALSO GRANT: 5% INCREASED MANA REGENERATION RATE",
+     "x0": 200.0,
+     "y0": 970.0,
+     "x1": 1680.0,
+     "y1": 1004.0
+    },
+    {
+     "text": "ADDED SMALL PASSIVE SKILLS ALSO GRANT: +3 TO STRENGTH",
+     "x0": 200.0,
+     "y0": 1010.0,
+     "x1": 1260.0,
+     "y1": 1044.0
+    },
+    {
+     "text": "1 ADDED PASSIVE SKILL IS PRISMATIC HEART",
+     "x0": 200.0,
+     "y0": 1050.0,
+     "x1": 1000.0,
+     "y1": 1084.0
+    },
+    {
+     "text": "PLACE INTO AN ALLOCATED LARGE JEWEL SOCKET ON THE PASSIVE SKILL TREE.",
+     "x0": 200.0,
+     "y0": 1120.0,
+     "x1": 1580.0,
+     "y1": 1154.0
+    }
+   ],
+   "expect": {
+    "rarity": "Rare",
+    "base": "Large Cluster Jewel",
+    "category": "Cluster Jewel",
+    "mods": [
+     {
+      "ref": "Adds # Passive Skills",
+      "values": [
+       9.0
+      ],
+      "kind": "enchant"
+     },
+     {
+      "ref": "# Added Passive Skills are Jewel Sockets",
+      "values": [
+       2.0
+      ],
+      "kind": "enchant"
+     },
+     {
+      "ref": "Added Small Passive Skills grant: 12% increased Lightning Damage",
+      "values": [
+       12.0
+      ],
+      "kind": "enchant"
+     },
+     {
+      "ref": "Added Small Passive Skills also grant: +# to Evasion",
+      "values": [
+       14.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "Added Small Passive Skills also grant: #% increased Mana Regeneration Rate",
+      "values": [
+       5.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "Added Small Passive Skills also grant: +# to Strength",
+      "values": [
+       3.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "1 Added Passive Skill is Prismatic Heart",
+      "values": [
+       1.0
+      ],
+      "kind": "explicit"
+     }
+    ],
+    "query": {
+     "query": {
+      "status": {
+       "option": "securable"
+      },
+      "filters": {
+       "type_filters": {
+        "filters": {
+         "rarity": {
+          "option": "nonunique"
+         },
+         "category": {
+          "option": "jewel.cluster"
+         }
+        }
+       }
+      },
+      "stats": [
+       {
+        "type": "and",
+        "filters": [
+         {
+          "id": "enchant.stat_3086156145",
+          "value": {
+           "min": 9,
+           "max": 9
+          }
+         },
+         {
+          "id": "enchant.stat_3948993189",
+          "value": {
+           "option": 14
+          }
+         },
+         {
+          "id": "explicit.stat_2342448236"
+         }
+        ]
+       }
+      ],
+      "type": "Large Cluster Jewel"
+     },
+     "sort": {
+      "price": "asc"
+     }
+    },
+    "notes": [],
+    "note_lines": [],
+    "labels": {
+     "req": [
+      "Base: Large Cluster Jewel",
+      "Số passive = 9",
+      "Loại: Lightning Damage",
+      "Prismatic Heart"
+     ],
+     "count": [],
+     "need": 0,
+     "of": 0
+    },
+    "filter_lines": [
+     "Lọc:",
+     "• Base: Large Cluster Jewel",
+     "• Số passive = 9",
+     "• Loại: Lightning Damage",
+     "• Prismatic Heart"
+    ],
+    "query_all": {
+     "query": {
+      "status": {
+       "option": "securable"
+      },
+      "filters": {
+       "type_filters": {
+        "filters": {
+         "rarity": {
+          "option": "nonunique"
+         },
+         "category": {
+          "option": "jewel.cluster"
+         }
+        }
+       }
+      },
+      "stats": [
+       {
+        "type": "and",
+        "filters": [
+         {
+          "id": "enchant.stat_3086156145",
+          "value": {
+           "min": 9,
+           "max": 9
+          }
+         },
+         {
+          "id": "enchant.stat_3948993189",
+          "value": {
+           "option": 14
+          }
+         },
+         {
+          "id": "explicit.stat_2342448236"
+         }
+        ]
+       },
+       {
+        "type": "count",
+        "value": {
+         "min": 3
+        },
+        "filters": [
+         {
+          "id": "explicit.stat_4100161067",
+          "value": {
+           "min": 12
+          }
+         },
+         {
+          "id": "explicit.stat_2474836297",
+          "value": {
+           "min": 4
+          }
+         },
+         {
+          "id": "explicit.stat_3258414199",
+          "value": {
+           "min": 2
+          }
+         }
+        ]
+       }
+      ],
+      "type": "Large Cluster Jewel"
+     },
+     "sort": {
+      "price": "asc"
+     }
+    },
+    "filter_lines_all": [
+     "Lọc:",
+     "• Base: Large Cluster Jewel",
+     "• Số passive = 9",
+     "• Loại: Lightning Damage",
+     "• Prismatic Heart",
+     "Tất cả 3 dòng:",
+     "• Evasion ≥ 12",
+     "• Mana Regeneration ≥ 4%",
+     "• Strength ≥ 2"
+    ],
+    "picks": [
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Large Cluster Jewel",
+        "on": true,
+        "enabled": true,
+        "tag": "cluster: luôn lọc đúng cỡ",
+        "show_min": null
+       },
+       {
+        "key": "m0",
+        "section": "enchant",
+        "text": "Adds 9 Passive Skills",
+        "on": true,
+        "enabled": true,
+        "tag": "số passive: lọc đúng 9",
+        "show_min": 9
+       },
+       {
+        "key": "m1",
+        "section": "enchant",
+        "text": "2 Added Passive Skills are Jewel Sockets",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": 1
+       },
+       {
+        "key": "m2",
+        "section": "enchant",
+        "text": "Added Small Passive Skills grant: 12% increased Lightning Damage",
+        "on": true,
+        "enabled": true,
+        "tag": "loại passive nhỏ",
+        "show_min": null
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "Added Small Passive Skills also grant: +14 to Evasion",
+        "on": false,
+        "enabled": true,
+        "tag": "dòng phụ",
+        "show_min": 12
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "Added Small Passive Skills also grant: 5% increased Mana Regeneration Rate",
+        "on": false,
+        "enabled": true,
+        "tag": "dòng phụ",
+        "show_min": 4
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "Added Small Passive Skills also grant: +3 to Strength",
+        "on": false,
+        "enabled": true,
+        "tag": "dòng phụ",
+        "show_min": 2
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "1 Added Passive Skill is Prismatic Heart",
+        "on": true,
+        "enabled": true,
+        "tag": "notable",
+        "show_min": null
+       }
+      ],
+      "slots": 4,
+      "n_explicit": 4,
+      "need": 0,
+      "m0": 0,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_4079888060",
+              "value": {
+               "min": 1
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 12
+              }
+             },
+             {
+              "id": "explicit.stat_2474836297",
+              "value": {
+               "min": 4
+              }
+             },
+             {
+              "id": "explicit.stat_3258414199",
+              "value": {
+               "min": 2
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Added Passive Skills ≥ 1",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 12",
+          "Mana Regeneration ≥ 4%",
+          "Strength ≥ 2"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": false,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": true,
+          "m1": false,
+          "m2": true,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m3": true
+         },
+         "edit": {
+          "m3": 17
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             },
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 17
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 17"
+         ],
+         "need": 1,
+         "of": 1
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m3": true
+         },
+         "edit": {
+          "m3": 17
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             },
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 17
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 17"
+         ],
+         "need": 1,
+         "of": 1
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": true
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Large Cluster Jewel",
+        "on": true,
+        "enabled": true,
+        "tag": "cluster: luôn lọc đúng cỡ",
+        "show_min": null
+       },
+       {
+        "key": "m0",
+        "section": "enchant",
+        "text": "Adds 9 Passive Skills",
+        "on": true,
+        "enabled": true,
+        "tag": "số passive: lọc đúng 9",
+        "show_min": 9
+       },
+       {
+        "key": "m1",
+        "section": "enchant",
+        "text": "2 Added Passive Skills are Jewel Sockets",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": 1
+       },
+       {
+        "key": "m2",
+        "section": "enchant",
+        "text": "Added Small Passive Skills grant: 12% increased Lightning Damage",
+        "on": true,
+        "enabled": true,
+        "tag": "loại passive nhỏ",
+        "show_min": null
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "Added Small Passive Skills also grant: +14 to Evasion",
+        "on": true,
+        "enabled": true,
+        "tag": "dòng phụ",
+        "show_min": 12
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "Added Small Passive Skills also grant: 5% increased Mana Regeneration Rate",
+        "on": true,
+        "enabled": true,
+        "tag": "dòng phụ",
+        "show_min": 4
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "Added Small Passive Skills also grant: +3 to Strength",
+        "on": true,
+        "enabled": true,
+        "tag": "dòng phụ",
+        "show_min": 2
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "1 Added Passive Skill is Prismatic Heart",
+        "on": true,
+        "enabled": true,
+        "tag": "notable",
+        "show_min": null
+       }
+      ],
+      "slots": 4,
+      "n_explicit": 4,
+      "need": 3,
+      "m0": 3,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 12
+              }
+             },
+             {
+              "id": "explicit.stat_2474836297",
+              "value": {
+               "min": 4
+              }
+             },
+             {
+              "id": "explicit.stat_3258414199",
+              "value": {
+               "min": 2
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 12",
+          "Mana Regeneration ≥ 4%",
+          "Strength ≥ 2"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_4079888060",
+              "value": {
+               "min": 1
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 12
+              }
+             },
+             {
+              "id": "explicit.stat_2474836297",
+              "value": {
+               "min": 4
+              }
+             },
+             {
+              "id": "explicit.stat_3258414199",
+              "value": {
+               "min": 2
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Added Passive Skills ≥ 1",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 12",
+          "Mana Regeneration ≥ 4%",
+          "Strength ≥ 2"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": false,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": true,
+          "m1": false,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 12
+              }
+             },
+             {
+              "id": "explicit.stat_2474836297",
+              "value": {
+               "min": 4
+              }
+             },
+             {
+              "id": "explicit.stat_3258414199",
+              "value": {
+               "min": 2
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 12",
+          "Mana Regeneration ≥ 4%",
+          "Strength ≥ 2"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m3": true
+         },
+         "edit": {
+          "m3": 17
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 17
+              }
+             },
+             {
+              "id": "explicit.stat_2474836297",
+              "value": {
+               "min": 4
+              }
+             },
+             {
+              "id": "explicit.stat_3258414199",
+              "value": {
+               "min": 2
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 17",
+          "Mana Regeneration ≥ 4%",
+          "Strength ≥ 2"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m3": true
+         },
+         "edit": {
+          "m3": 17
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 17
+              }
+             },
+             {
+              "id": "explicit.stat_2474836297",
+              "value": {
+               "min": 4
+              }
+             },
+             {
+              "id": "explicit.stat_3258414199",
+              "value": {
+               "min": 2
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 17",
+          "Mana Regeneration ≥ 4%",
+          "Strength ≥ 2"
+         ],
+         "need": 1,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 12
+              }
+             },
+             {
+              "id": "explicit.stat_2474836297",
+              "value": {
+               "min": 4
+              }
+             },
+             {
+              "id": "explicit.stat_3258414199",
+              "value": {
+               "min": 2
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 12",
+          "Mana Regeneration ≥ 4%",
+          "Strength ≥ 2"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": true,
+       "by_base": true,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Large Cluster Jewel",
+        "on": true,
+        "enabled": true,
+        "tag": "cluster: luôn lọc đúng cỡ",
+        "show_min": null
+       },
+       {
+        "key": "m0",
+        "section": "enchant",
+        "text": "Adds 9 Passive Skills",
+        "on": true,
+        "enabled": true,
+        "tag": "số passive: lọc đúng 9",
+        "show_min": 9
+       },
+       {
+        "key": "m1",
+        "section": "enchant",
+        "text": "2 Added Passive Skills are Jewel Sockets",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": 2
+       },
+       {
+        "key": "m2",
+        "section": "enchant",
+        "text": "Added Small Passive Skills grant: 12% increased Lightning Damage",
+        "on": true,
+        "enabled": true,
+        "tag": "loại passive nhỏ",
+        "show_min": null
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "Added Small Passive Skills also grant: +14 to Evasion",
+        "on": false,
+        "enabled": true,
+        "tag": "dòng phụ",
+        "show_min": 14
+       },
+       {
+        "key": "m4",
+        "section": "explicit",
+        "text": "Added Small Passive Skills also grant: 5% increased Mana Regeneration Rate",
+        "on": false,
+        "enabled": true,
+        "tag": "dòng phụ",
+        "show_min": 5
+       },
+       {
+        "key": "m5",
+        "section": "explicit",
+        "text": "Added Small Passive Skills also grant: +3 to Strength",
+        "on": false,
+        "enabled": true,
+        "tag": "dòng phụ",
+        "show_min": 3
+       },
+       {
+        "key": "m6",
+        "section": "explicit",
+        "text": "1 Added Passive Skill is Prismatic Heart",
+        "on": true,
+        "enabled": true,
+        "tag": "notable",
+        "show_min": null
+       }
+      ],
+      "slots": 4,
+      "n_explicit": 4,
+      "need": 0,
+      "m0": 0,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true,
+          "m4": true,
+          "m5": true,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_4079888060",
+              "value": {
+               "min": 2
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2474836297",
+              "value": {
+               "min": 5
+              }
+             },
+             {
+              "id": "explicit.stat_3258414199",
+              "value": {
+               "min": 3
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Added Passive Skills ≥ 2",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 14",
+          "Mana Regeneration ≥ 5%",
+          "Strength ≥ 3"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": false,
+          "m1": false,
+          "m2": false,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": true,
+          "m1": false,
+          "m2": true,
+          "m3": false,
+          "m4": false,
+          "m5": false,
+          "m6": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m3": true
+         },
+         "edit": {
+          "m3": 19
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             },
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 19
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 19"
+         ],
+         "need": 1,
+         "of": 1
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m3": true
+         },
+         "edit": {
+          "m3": 19
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             },
+             {
+              "id": "explicit.stat_4100161067",
+              "value": {
+               "min": 19
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [
+          "Evasion ≥ 19"
+         ],
+         "need": 1,
+         "of": 1
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel.cluster"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": [
+             {
+              "id": "enchant.stat_3086156145",
+              "value": {
+               "min": 9,
+               "max": 9
+              }
+             },
+             {
+              "id": "enchant.stat_3948993189",
+              "value": {
+               "option": 14
+              }
+             },
+             {
+              "id": "explicit.stat_2342448236"
+             }
+            ]
+           }
+          ],
+          "type": "Large Cluster Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Large Cluster Jewel",
+          "Số passive = 9",
+          "Loại: Lightning Damage",
+          "Prismatic Heart"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "jewel_no_main",
+   "game": "poe1",
+   "header": [
+    "GLOOM SPARK",
+    "COBALT JEWEL"
+   ],
+   "lines": [
+    {
+     "text": "GLOOM SPARK",
+     "x0": 200.0,
+     "y0": 600.0,
+     "x1": 420.0,
+     "y1": 634.0
+    },
+    {
+     "text": "COBALT JEWEL",
+     "x0": 200.0,
+     "y0": 640.0,
+     "x1": 440.0,
+     "y1": 674.0
+    },
+    {
+     "text": "15% INCREASED FIRE DAMAGE",
+     "x0": 200.0,
+     "y0": 710.0,
+     "x1": 700.0,
+     "y1": 744.0
+    },
+    {
+     "text": "12% INCREASED DAMAGE WITH BOWS",
+     "x0": 200.0,
+     "y0": 750.0,
+     "x1": 800.0,
+     "y1": 784.0
+    },
+    {
+     "text": "+16 TO DEXTERITY",
+     "x0": 200.0,
+     "y0": 790.0,
+     "x1": 520.0,
+     "y1": 824.0
+    },
+    {
+     "text": "6% INCREASED MANA REGENERATION RATE",
+     "x0": 200.0,
+     "y0": 830.0,
+     "x1": 900.0,
+     "y1": 864.0
+    },
+    {
+     "text": "PLACE INTO AN ALLOCATED JEWEL SOCKET ON THE PASSIVE SKILL TREE.",
+     "x0": 200.0,
+     "y0": 900.0,
+     "x1": 1460.0,
+     "y1": 934.0
+    }
+   ],
+   "expect": {
+    "rarity": "Rare",
+    "base": "Cobalt Jewel",
+    "category": "Jewel",
+    "mods": [
+     {
+      "ref": "#% increased Fire Damage",
+      "values": [
+       15.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Damage with Bows",
+      "values": [
+       12.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "+# to Dexterity",
+      "values": [
+       16.0
+      ],
+      "kind": "explicit"
+     },
+     {
+      "ref": "#% increased Mana Regeneration Rate",
+      "values": [
+       6.0
+      ],
+      "kind": "explicit"
+     }
+    ],
+    "query": {
+     "query": {
+      "status": {
+       "option": "securable"
+      },
+      "filters": {
+       "type_filters": {
+        "filters": {
+         "rarity": {
+          "option": "nonunique"
+         },
+         "category": {
+          "option": "jewel"
+         }
+        }
+       }
+      },
+      "stats": [
+       {
+        "type": "and",
+        "filters": []
+       },
+       {
+        "type": "count",
+        "value": {
+         "min": 2
+        },
+        "filters": [
+         {
+          "id": "explicit.stat_3962278098",
+          "value": {
+           "min": 13
+          }
+         },
+         {
+          "id": "explicit.stat_4188894176",
+          "value": {
+           "min": 10
+          }
+         },
+         {
+          "id": "explicit.stat_789117908",
+          "value": {
+           "min": 5
+          }
+         }
+        ]
+       }
+      ]
+     },
+     "sort": {
+      "price": "asc"
+     }
+    },
+    "notes": [
+     "Lọc theo mọi dòng có số",
+     "Món không có máu: giá thật nhiều khả năng THẤP hơn các món tương tự tìm được"
+    ],
+    "note_lines": [
+     "! Lọc theo mọi dòng có số",
+     "! Không máu: giá thật thấp hơn"
+    ],
+    "labels": {
+     "req": [],
+     "count": [
+      "Fire dmg ≥ 13%",
+      "Bows dmg ≥ 10%",
+      "Mana Regeneration ≥ 5%"
+     ],
+     "need": 2,
+     "of": 3
+    },
+    "filter_lines": [
+     "Lọc (đủ ≥2/3 dòng):",
+     "• Fire dmg ≥ 13%",
+     "• Bows dmg ≥ 10%",
+     "• Mana Regeneration ≥ 5%"
+    ],
+    "query_all": {
+     "query": {
+      "status": {
+       "option": "securable"
+      },
+      "filters": {
+       "type_filters": {
+        "filters": {
+         "rarity": {
+          "option": "nonunique"
+         },
+         "category": {
+          "option": "jewel"
+         }
+        }
+       }
+      },
+      "stats": [
+       {
+        "type": "and",
+        "filters": []
+       },
+       {
+        "type": "count",
+        "value": {
+         "min": 3
+        },
+        "filters": [
+         {
+          "id": "explicit.stat_3962278098",
+          "value": {
+           "min": 13
+          }
+         },
+         {
+          "id": "explicit.stat_4188894176",
+          "value": {
+           "min": 10
+          }
+         },
+         {
+          "id": "explicit.stat_789117908",
+          "value": {
+           "min": 5
+          }
+         }
+        ]
+       }
+      ]
+     },
+     "sort": {
+      "price": "asc"
+     }
+    },
+    "filter_lines_all": [
+     "Lọc (tất cả 3 dòng):",
+     "• Fire dmg ≥ 13%",
+     "• Bows dmg ≥ 10%",
+     "• Mana Regeneration ≥ 5%"
+    ],
+    "picks": [
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Cobalt Jewel",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "m0",
+        "section": "explicit",
+        "text": "15% increased Fire Damage",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 13
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "12% increased Damage with Bows",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 10
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "+16 to Dexterity",
+        "on": false,
+        "enabled": true,
+        "tag": "→ gộp vào Dex tổng",
+        "show_min": 14
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "6% increased Mana Regeneration Rate",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 5
+       }
+      ],
+      "slots": 4,
+      "n_explicit": 4,
+      "need": 2,
+      "m0": 3,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 13
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Fire dmg ≥ 13%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 13
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Fire dmg ≥ 13%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": false,
+          "m1": false,
+          "m2": false,
+          "m3": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": true,
+          "m1": true,
+          "m2": false,
+          "m3": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 13
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Fire dmg ≥ 13%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": true
+         },
+         "edit": {
+          "m0": 18
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 18
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Fire dmg ≥ 18%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": true
+         },
+         "edit": {
+          "m0": 18
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 18
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Fire dmg ≥ 18%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 1,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 13
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Cobalt Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Cobalt Jewel"
+         ],
+         "stats": [
+          "Fire dmg ≥ 13%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": false,
+       "by_base": false,
+       "all_lines": true
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Cobalt Jewel",
+        "on": false,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "m0",
+        "section": "explicit",
+        "text": "15% increased Fire Damage",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 13
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "12% increased Damage with Bows",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 10
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "+16 to Dexterity",
+        "on": false,
+        "enabled": true,
+        "tag": "→ gộp vào Dex tổng",
+        "show_min": 14
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "6% increased Mana Regeneration Rate",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 5
+       }
+      ],
+      "slots": 4,
+      "n_explicit": 4,
+      "need": 3,
+      "m0": 3,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 13
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Fire dmg ≥ 13%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 13
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Fire dmg ≥ 13%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": false,
+          "m1": false,
+          "m2": false,
+          "m3": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": false,
+          "m0": true,
+          "m1": true,
+          "m2": false,
+          "m3": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 13
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Fire dmg ≥ 13%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": true
+         },
+         "edit": {
+          "m0": 18
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 18
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Fire dmg ≥ 18%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": true
+         },
+         "edit": {
+          "m0": 18
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 18
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ]
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [],
+         "stats": [
+          "Fire dmg ≥ 18%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 1,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 3
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 13
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 10
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 5
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Cobalt Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Cobalt Jewel"
+         ],
+         "stats": [
+          "Fire dmg ≥ 13%",
+          "Bows dmg ≥ 10%",
+          "Mana Regeneration ≥ 5%"
+         ],
+         "need": 3,
+         "of": 3
+        }
+       }
+      ]
+     },
+     {
+      "mode": {
+       "strict": true,
+       "by_base": true,
+       "all_lines": false
+      },
+      "rows": [
+       {
+        "key": "base",
+        "section": "base",
+        "text": "Đúng base: Cobalt Jewel",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": null
+       },
+       {
+        "key": "m0",
+        "section": "explicit",
+        "text": "15% increased Fire Damage",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 15
+       },
+       {
+        "key": "m1",
+        "section": "explicit",
+        "text": "12% increased Damage with Bows",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 12
+       },
+       {
+        "key": "m2",
+        "section": "explicit",
+        "text": "+16 to Dexterity",
+        "on": false,
+        "enabled": true,
+        "tag": "→ gộp vào Dex tổng",
+        "show_min": 16
+       },
+       {
+        "key": "m3",
+        "section": "explicit",
+        "text": "6% increased Mana Regeneration Rate",
+        "on": true,
+        "enabled": true,
+        "tag": null,
+        "show_min": 6
+       }
+      ],
+      "slots": 4,
+      "n_explicit": 4,
+      "need": 2,
+      "m0": 3,
+      "builds": [
+       {
+        "sel": {
+         "on": {},
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 15
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 12
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 6
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Cobalt Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Cobalt Jewel"
+         ],
+         "stats": [
+          "Fire dmg ≥ 15%",
+          "Bows dmg ≥ 12%",
+          "Mana Regeneration ≥ 6%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": true,
+          "m1": true,
+          "m2": true,
+          "m3": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 15
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 12
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 6
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Cobalt Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Cobalt Jewel"
+         ],
+         "stats": [
+          "Fire dmg ≥ 15%",
+          "Bows dmg ≥ 12%",
+          "Mana Regeneration ≥ 6%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": false,
+          "m1": false,
+          "m2": false,
+          "m3": false
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           }
+          ],
+          "type": "Cobalt Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Cobalt Jewel"
+         ],
+         "stats": [],
+         "need": 0,
+         "of": 0
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true,
+          "m0": true,
+          "m1": true,
+          "m2": false,
+          "m3": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 15
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 12
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 6
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Cobalt Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Cobalt Jewel"
+         ],
+         "stats": [
+          "Fire dmg ≥ 15%",
+          "Bows dmg ≥ 12%",
+          "Mana Regeneration ≥ 6%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": true
+         },
+         "edit": {
+          "m0": 20
+         },
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 20
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 12
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 6
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Cobalt Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Cobalt Jewel"
+         ],
+         "stats": [
+          "Fire dmg ≥ 20%",
+          "Bows dmg ≥ 12%",
+          "Mana Regeneration ≥ 6%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "m0": true
+         },
+         "edit": {
+          "m0": 20
+         },
+         "need": 1
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 1
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 20
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 12
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 6
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Cobalt Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Cobalt Jewel"
+         ],
+         "stats": [
+          "Fire dmg ≥ 20%",
+          "Bows dmg ≥ 12%",
+          "Mana Regeneration ≥ 6%"
+         ],
+         "need": 1,
+         "of": 3
+        }
+       },
+       {
+        "sel": {
+         "on": {
+          "base": true
+         },
+         "edit": {},
+         "need": null
+        },
+        "query": {
+         "query": {
+          "status": {
+           "option": "securable"
+          },
+          "filters": {
+           "type_filters": {
+            "filters": {
+             "rarity": {
+              "option": "nonunique"
+             },
+             "category": {
+              "option": "jewel"
+             }
+            }
+           }
+          },
+          "stats": [
+           {
+            "type": "and",
+            "filters": []
+           },
+           {
+            "type": "count",
+            "value": {
+             "min": 2
+            },
+            "filters": [
+             {
+              "id": "explicit.stat_3962278098",
+              "value": {
+               "min": 15
+              }
+             },
+             {
+              "id": "explicit.stat_4188894176",
+              "value": {
+               "min": 12
+              }
+             },
+             {
+              "id": "explicit.stat_789117908",
+              "value": {
+               "min": 6
+              }
+             }
+            ]
+           }
+          ],
+          "type": "Cobalt Jewel"
+         },
+         "sort": {
+          "price": "asc"
+         }
+        },
+        "summary": {
+         "req": [
+          "Base: Cobalt Jewel"
+         ],
+         "stats": [
+          "Fire dmg ≥ 15%",
+          "Bows dmg ≥ 12%",
+          "Mana Regeneration ≥ 6%"
+         ],
+         "need": 2,
+         "of": 3
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ],
  "mods": [
   {
    "game": "poe1",

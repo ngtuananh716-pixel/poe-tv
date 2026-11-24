@@ -25,6 +25,8 @@ GROUP_LABEL = {g: Q.PSEUDO_LABEL[GROUP_ID[g]] + " tổng" for g in GROUP_ORDER}
 ATTRS = ("str", "dex", "int")
 ATTR_MIN = 40               # thuộc tính chỉ lọc khi tổng ≥ bấy nhiêu (như tự tra)
 SLOTS = {"Rare": 6, "Magic": 2}
+JEWEL_SLOTS = {"Rare": 4, "Magic": 2}       # jewel (kể cả cluster): tối đa 2 prefix + 2 suffix
+JEWELS = ("Jewel", "Abyss Jewel", "Cluster Jewel")
 
 
 def fill(ref: str, values) -> str:
@@ -44,9 +46,12 @@ def default_need(m: int, all_lines: bool) -> int:
 
 
 def _row(key, section, text, on, enabled=True, raw=None, exact=False, groups=None, sid=None, pct=False, tag=None,
-         ref="", unsure=False):
+         ref="", unsure=False, req=False, option=None, eq=False):
+    """req: bộ lọc bắt buộc riêng (enchant, notable), không vào nhóm đếm; option: lọc theo lựa chọn (loại passive nhỏ);
+    eq: lọc đúng số (số passive)."""
     return {"key": key, "section": section, "text": text, "on": bool(on), "enabled": bool(enabled), "raw": raw,
-            "exact": exact, "groups": groups or [], "id": sid, "pct": pct, "tag": tag, "ref": ref, "unsure": unsure}
+            "exact": exact, "groups": groups or [], "id": sid, "pct": pct, "tag": tag, "ref": ref, "unsure": unsure,
+            "req": req, "option": option, "eq": eq}
 
 
 def panel(it: Item, game: str = "poe1", strict: bool = False, by_base: bool = False, all_lines: bool = False,
@@ -59,8 +64,10 @@ def panel(it: Item, game: str = "poe1", strict: bool = False, by_base: bool = Fa
     weapon, armour = is_weapon(it), is_armour(it)
     rows = []
     base_forced = not TRADE_CATEGORY.get(it.category)
-    rows.append(_row("base", "base", f"Đúng base: {it.base or '?'}", base_forced or ((it.rarity == "Normal" or by_base)
-                     and bool(it.base)), enabled=not base_forced and bool(it.base)))
+    cluster = it.category == "Cluster Jewel"
+    rows.append(_row("base", "base", f"Đúng base: {it.base or '?'}", base_forced or ((it.rarity == "Normal" or by_base
+                     or cluster) and bool(it.base)), enabled=not base_forced and bool(it.base),
+                     tag="cluster: luôn lọc đúng cỡ" if cluster else None))
     if it.props.get("ilvl"):
         v = float(int(it.props["ilvl"][0]))
         rows.append(_row("ilvl", "base", f"Item level {Q._num(v)}", it.rarity in ("Normal", "Magic"), raw=v, exact=True))
@@ -107,6 +114,20 @@ def panel(it: Item, game: str = "poe1", strict: bool = False, by_base: bool = Fa
         unsure = m.score < Q.MIN_SCORE
         sid = ((m.trade_ids or {}).get("explicit") or [None])[0]
         local = bool((weapon and Q.LOCAL_WEAPON.match(r)) or (armour and Q.LOCAL_ARMOUR.match(r)))
+        if m.kind == "enchant":
+            eid, opt = Q.enchant_id(m)
+            text = fill(m.ref, m.values)
+            if opt is not None and m.ref.startswith(Q.SMALL_TYPE_PREFIX):
+                rows.append(_row(f"m{i}", "enchant", text, not unsure, sid=eid, tag="loại passive nhỏ", ref=m.ref,
+                                 unsure=unsure, req=True, option=opt))
+            elif m.ref == Q.PASSIVES_REF and m.value is not None:
+                rows.append(_row(f"m{i}", "enchant", text, not unsure, raw=float(int(m.value)), sid=eid,
+                                 tag=f"số passive: lọc đúng {int(m.value)}", ref=m.ref, unsure=unsure, req=True, eq=True))
+            else:
+                rows.append(_row(f"m{i}", "enchant", text, False, enabled=bool(eid), raw=m.value, sid=eid,
+                                 pct="#%" in m.ref, tag=None if eid else "không lọc được", ref=m.ref, unsure=unsure,
+                                 req=True))
+            continue
         if m.kind == "implicit":
             if not g:
                 continue                    # implicit không gộp vào tổng: chưa lọc riêng được
@@ -134,15 +155,30 @@ def panel(it: Item, game: str = "poe1", strict: bool = False, by_base: bool = Fa
             rows.append(_row(f"m{i}", section, text, False, enabled=False, raw=m.value, tag="không lọc được",
                              ref=m.ref, unsure=unsure))
             continue
+        if m.ref.startswith(Q.NOTABLE_PREFIX):
+            rows.append(_row(f"m{i}", section, text, not unsure, sid=sid, tag="notable" + (" · đọc chưa chắc" if unsure
+                             else ""), ref=m.ref, unsure=unsure, req=True))
+            continue
         important = any(k in m.ref for k in Q.IMPORTANT)
         on = (not unsure and m.value is not None and sid not in used and (important or all_lines))
         if on:
             used.add(sid)
-        rows.append(_row(f"m{i}", section, text, on, raw=m.value, sid=sid, pct="#%" in m.ref,
-                         tag="đọc chưa chắc" if unsure else None, ref=m.ref, unsure=unsure))
+        tag = "đọc chưa chắc" if unsure else ("dòng phụ" if m.ref.startswith(Q.FILLER_PREFIX) else None)
+        rows.append(_row(f"m{i}", section, text, on, raw=m.value, sid=sid, pct="#%" in m.ref, tag=tag, ref=m.ref,
+                         unsure=unsure))
+    # không có dòng chính nào (jewel thường, flask…): như tự tra, chọn sẵn mọi dòng có số, cần đủ (tổng − 1)
+    fallback = False
+    if not all_lines and not any(r["on"] for r in rows if r["section"] in ("gear", "implicit", "explicit", "enchant")):
+        for r in rows:
+            if (r["section"] == "explicit" and not r["groups"] and r["enabled"] and not r["req"] and r["raw"] is not None
+                    and not r["unsure"] and r["id"] and r["id"] not in used):
+                used.add(r["id"])
+                r["on"] = True
+                fallback = True
+    slots = (JEWEL_SLOTS if it.category in JEWELS else SLOTS).get(it.rarity, 0)
     pn = {"game": game, "title": it.title, "rarity": it.rarity, "base": it.base, "strict": strict,
-          "all_lines": all_lines, "rng": rng, "rows": rows, "slots": max(SLOTS.get(it.rarity, 0), n_expl),
-          "n_explicit": n_expl, "corrupted": it.corrupted}
+          "all_lines": all_lines, "rng": rng, "rows": rows, "slots": max(slots, n_expl),
+          "n_explicit": n_expl, "corrupted": it.corrupted, "fallback": fallback}
     m0 = len(_pool(it, pn, _sel_on(pn, None), {})[0])
     pn["m0"] = m0
     need = default_need(m0, all_lines)
@@ -172,7 +208,7 @@ def show_min(pn, r):
     """Số hiện sẵn trong ô "≥" của một dòng (chưa sửa)."""
     if r["raw"] is None:
         return None
-    if r["exact"]:
+    if r["exact"] or r["eq"]:
         return int(r["raw"])
     return Q._min(r["raw"], pn["rng"])
 
@@ -207,7 +243,7 @@ def _pool(it, pn, on, edit):
         labs.append(f"{GROUP_LABEL[grp]} ≥ {Q._num(total)}")
     used = set()
     for r in rows:
-        if r["groups"] or not on[r["key"]] or not r["id"] or r["id"] in used:
+        if r["groups"] or r["req"] or not on[r["key"]] or not r["id"] or r["id"] in used:
             continue
         used.add(r["id"])
         if r["raw"] is None and r["key"] not in edit:
@@ -273,6 +309,20 @@ def build(it: Item, pn: dict, sel: dict | None = None, status: str = "securable"
     if pn["corrupted"]:
         req.append("Corrupted")
 
+    for r in pn["rows"]:                       # enchant, notable: bắt buộc, theo thứ tự dòng
+        if not (r["req"] and on[r["key"]] and r["id"]):
+            continue
+        if r["option"] is not None:
+            f = {"id": r["id"], "value": {"option": r["option"]}}
+        elif r["eq"]:
+            v = edit.get(r["key"], int(r["raw"]))
+            f = {"id": r["id"], "value": {"min": v, "max": v}}
+        elif r["raw"] is None and r["key"] not in edit:
+            f = {"id": r["id"]}
+        else:
+            f = {"id": r["id"], "value": {"min": _min_of(pn, r, edit)}}
+        stats.append(f)
+        req.append(Q.stat_label(f, r["ref"]))
     pool, labs = _pool(it, pn, on, edit)
     m = len(pool)
     need = need_for(pn, sel, m)
@@ -300,7 +350,7 @@ def preset(pn: dict, which: str, sel: dict | None = None) -> dict:
     sel = dict(sel or {})
     on = dict(_sel_on(pn, sel))
     for r in pn["rows"]:
-        if r["section"] in ("implicit", "explicit") and r["enabled"]:
+        if r["section"] in ("implicit", "explicit", "enchant") and r["enabled"]:
             on[r["key"]] = r["on"] if which == "main" else (which == "all")
     sel["on"] = on
     sel["need"] = None

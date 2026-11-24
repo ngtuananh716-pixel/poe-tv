@@ -121,6 +121,46 @@ for t in ["Heavy Belt of the Whale", "Sapphire Ring of Fire", "Chain: hello"]:
     bi = D.find_base_in(t)
     names.append({"text": t, "base": None, "unique": None, "other": None, "gem": None, "base_in": bi["name"] if bi else None, "only_in": True})
 
+# ca dựng sẵn dòng (không cần ảnh): cluster jewel (dòng enchant, notable, dòng phụ) và jewel thường không có dòng chính
+from poe_tv.serve import note_lines
+def _L(text, y, x0=200.0):
+    return ocr.Line(text=text, x0=x0, y0=float(y), x1=x0 + 20.0 * len(text), y1=float(y) + 34, conf=0.95)
+def _synth(header, secs):
+    lines, y = [], 600
+    for h in header:
+        lines.append(_L(h, y)); y += 40
+    for sec in secs:
+        y += 30
+        for t in sec:
+            lines.append(_L(t, y)); y += 40
+    return lines
+PARSE_SAMPLES = [
+    ("cluster_large", "poe1", ["SPIRIT SPLINTER", "LARGE CLUSTER JEWEL"], [["REQUIRES LEVEL 54"],
+     ["ADDS 9 PASSIVE SKILLS", "2 ADDED PASSIVE SKILLS ARE JEWEL SOCKETS",
+      "ADDED SMALL PASSIVE SKILLS GRANT: 12% INCREASED LIGHTNING DAMAGE"],
+     ["ADDED SMALL PASSIVE SKILLS ALSO GRANT: +14 TO EVASION",
+      "ADDED SMALL PASSIVE SKILLS ALSO GRANT: 5% INCREASED MANA REGENERATION RATE",
+      "ADDED SMALL PASSIVE SKILLS ALSO GRANT: +3 TO STRENGTH", "1 ADDED PASSIVE SKILL IS PRISMATIC HEART"],
+     ["PLACE INTO AN ALLOCATED LARGE JEWEL SOCKET ON THE PASSIVE SKILL TREE."]]),
+    ("jewel_no_main", "poe1", ["GLOOM SPARK", "COBALT JEWEL"], [["15% INCREASED FIRE DAMAGE", "12% INCREASED DAMAGE WITH BOWS",
+      "+16 TO DEXTERITY", "6% INCREASED MANA REGENERATION RATE"], ["PLACE INTO AN ALLOCATED JEWEL SOCKET ON THE PASSIVE SKILL TREE."]]),
+]
+parse_cases = []
+for name, game, header, secs in PARSE_SAMPLES:
+    D = data.load(game)
+    lines = _synth(header, secs)
+    it = parse.parse(header, lines, D)
+    q, notes = query.build(it, status="securable", game=game)
+    qa, notes_a = query.build(it, status="securable", game=game, all_lines=True)
+    parse_cases.append({"name": name, "game": game, "header": header,
+                        "lines": [{"text": l.text, "x0": l.x0, "y0": l.y0, "x1": l.x1, "y1": l.y1} for l in lines],
+                        "expect": {"rarity": it.rarity, "base": it.base, "category": it.category,
+                                   "mods": [{"ref": m.ref, "values": m.values, "kind": m.kind} for m in it.mods],
+                                   "query": q, "notes": notes, "note_lines": note_lines(notes),
+                                   "labels": query.labels(q, it), "filter_lines": filter_lines(query.labels(q, it)),
+                                   "query_all": qa, "filter_lines_all": filter_lines(query.labels(qa, it)),
+                                   "picks": pick_cases(it, game)}})
+
 # ô giá: giá ước tính, khoảng, độ tin cậy (tỉ giá giả định), giá phổ biến khi không có tỉ giá
 L = lambda pairs: [{"amount": a, "currency": c} for a, c in pairs]
 LAB = {"req": ["Giáp ≥ 530"], "count": ["K.NT ≥ 67", "Rarity ≥ 16%", "Lightning atk ≥ 21"], "need": 2, "of": 3}
@@ -144,5 +184,5 @@ for title, total, ls, notes, lab, rates, game in [
 ]:
     price_cases.append({"title": title, "total": total, "listings": ls, "notes": notes, "labels": lab, "rates": rates,
                         "game": game, "lines": price_lines(title, {"total": total, "listings": ls}, notes, lab, rates, game)})
-json.dump({"cases": cases, "mods": checks, "names": names, "price_cases": price_cases}, open(sys.argv[1], "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+json.dump({"cases": cases, "parse_cases": parse_cases, "mods": checks, "names": names, "price_cases": price_cases}, open(sys.argv[1], "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 print("ok", [ (c["name"], c.get("expect", {}).get("title")) for c in cases])

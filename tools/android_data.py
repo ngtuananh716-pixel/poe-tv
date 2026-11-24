@@ -8,7 +8,8 @@ from poe_tv.data import template_key, _resolve
 
 
 def matcher_opts(cands):
-    """Trả các lựa chọn [điều kiện loại món hoặc None, ref, mã explicit, negate, value, số #, better] theo đúng thứ tự
+    """Trả các lựa chọn [điều kiện loại món hoặc None, ref, mã explicit, negate, value, số #, better, mã enchant,
+    có mã implicit] theo đúng thứ tự
     thử của _resolve: lựa chọn đầu khớp loại món; không khớp thì lựa chọn điều kiện None; không có thì lựa chọn đầu."""
     groups = {}
     for entry, matcher, group in cands:
@@ -16,9 +17,12 @@ def matcher_opts(cands):
     group, items = next(iter(groups.values()))
 
     def pack(test, entry, matcher):
-        ids = (((entry.get("trade") or {}).get("ids") or {}).get("explicit")) or []
+        all_ids = ((entry.get("trade") or {}).get("ids") or {})
+        ids = all_ids.get("explicit") or []
+        enc = all_ids.get("enchant") or []
         return [test, entry["ref"], ids[0] if ids else None, bool(matcher.get("negate")), matcher.get("value"),
-                matcher["string"].count("#"), entry.get("better", 1)]
+                matcher["string"].count("#"), entry.get("better", 1), enc[0] if enc else None,
+                bool(all_ids.get("implicit"))]
 
     if group and group["resolve"]["strat"] == "select":
         out = []

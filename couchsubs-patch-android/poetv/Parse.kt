@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 package com.couchsubs.mobile.poetv
 
-/** Mod đã đọc: [ref] câu mẫu, [kind] implicit/explicit, [values] các số trên dòng. */
+/** Mod đã đọc: [ref] câu mẫu, [kind] implicit/explicit/enchant, [values] các số trên dòng, [enchantId] mã enchant
+ *  trên trade (có thể kèm lựa chọn: "enchant.stat_3948993189|14"). */
 class Mod(
     val text: String, val ref: String, val kind: String, val values: List<Double>, val explicitId: String?,
-    val score: Double, val better: Int = 1,
+    val score: Double, val better: Int = 1, val enchantId: String? = null,
 ) {
     /** Giá trị đại diện: trung bình nếu là khoảng "Adds # to #". */
     val value: Double? get() = if (values.isEmpty()) null else values.sum() / values.size
@@ -235,9 +236,13 @@ object Parse {
 
         // khối mod đầu tiên là implicit nếu còn khối mod khác phía sau
         for ((i, sec) in modSecs.withIndex()) {
-            val kind = if (modSecs.size > 1 && i == 0 && it.rarity != "Gem") "implicit" else "explicit"
-            for ((sm, score, txt) in sec)
-                it.mods.add(Mod(txt, sm.ref, kind, values(sm, txt), sm.explicitId, score, sm.better))
+            val kind0 = if (modSecs.size > 1 && i == 0 && it.rarity != "Gem") "implicit" else "explicit"
+            for ((sm, score, txt) in sec) {
+                // dòng trong khối đầu mà trade chỉ có mã enchant (không có mã implicit): enchant, ví dụ 3 dòng đầu của
+                // cluster jewel (số passive, loại passive nhỏ, số ô jewel)
+                val kind = if (kind0 == "implicit" && sm.enchantId != null && !sm.hasImplicit) "enchant" else kind0
+                it.mods.add(Mod(txt, sm.ref, kind, values(sm, txt), sm.explicitId, score, sm.better, sm.enchantId))
+            }
         }
         return it
     }
